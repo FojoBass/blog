@@ -1,0 +1,31 @@
+@import url('https://fonts.cdnfonts.com/css/sf-mono?styles=36554,36555,36552,36553');
+@import url('https://fonts.cdnfonts.com/css/warownia');
+@import url('https://fonts.googleapis.com/css2?family=Kodchasan:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+
+// * Variables
+$txt_hdg: 'Warownia', sans-serif;
+$txt_spc1: 'SF Mono', sans-serif;
+$txt_spc2: 'Kodchasan', sans-serif;
+$txt_gen: 'Roboto', sans-serif;
+
+:root.light-theme {
+  $bg_clr1: #fafafa;
+  $bg_clr2: #f5f5f5;
+  $bg_clr3: #ffffff;
+  $txt_clr1: #575757;
+  $txt_clr2: #404040;
+  $txt_clr3: #171717;
+  $acc_clr: #3b49df;
+}
+
+:root.dark-theme {
+  $bg_clr1: #000000;
+  $bg_clr2: #171717;
+  $bg_clr3: #171717;
+  $txt_clr1: #bdbdbd;
+  $txt_clr2: #e5e5e5;
+  $txt_clr3: #fafafa;
+  $acc_clr: #818cf8;
+}
+
+// * Variables End
