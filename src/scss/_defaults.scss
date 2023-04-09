@@ -4,8 +4,39 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus {
+  outline: none;
+}
+
+:root {
+  font-size: $fnt_size;
+}
+
+// TODO Change styles later
+.tab :focus {
+  outline: 2px solid tomato;
 }
 
 body {
   font-family: $txt_gen;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+}
+
+input,
+textarea {
+  border: none;
+  background: none;
+  outline: none;
 }

@@ -7,8 +7,15 @@ $txt_hdg: 'Warownia', sans-serif;
 $txt_spc1: 'SF Mono', sans-serif;
 $txt_spc2: 'Kodchasan', sans-serif;
 $txt_gen: 'Roboto', sans-serif;
+$vfast_trans: 0.1s;
+$fast_trans: 0.2s;
+$fmid_trans: 0.3s;
+$mid_trans: 0.4s;
+$mslow_trans: 0.5s;
+$slow_trans: 0.6s;
+$fnt_size: 10px;
 
-:root.light-theme {
+:root.light {
   $bg_clr1: #fafafa;
   $bg_clr2: #f5f5f5;
   $bg_clr3: #ffffff;
@@ -18,7 +25,7 @@ $txt_gen: 'Roboto', sans-serif;
   $acc_clr: #3b49df;
 }
 
-:root.dark-theme {
+:root.dark {
   $bg_clr1: #000000;
   $bg_clr2: #171717;
   $bg_clr3: #171717;
@@ -29,3 +36,14 @@ $txt_gen: 'Roboto', sans-serif;
 }
 
 // * Variables End
+
+// * Mixins
+@mixin transitionAll($duration) {
+  transition: all ease $duration;
+}
+
+@mixin transitionCustom($prop, $mode, $duration) {
+  transition: $prop $mode $duration;
+}
+
+// * Mixins End
