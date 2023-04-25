@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react';
 import './scss/main.scss';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+  Outlet,
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from 'react-router-dom';
 import {
   Home,
   About,
@@ -18,6 +25,7 @@ import {
   Error,
   Navbar,
   Footer,
+  Sidenav,
 } from './pages';
 import { useBlogSelector, useBlogDispatch } from './app/store';
 import { toggleTab } from './features/tabSlice';
@@ -40,7 +48,13 @@ const App = () => {
   };
 
   useEffect(() => {
-    document.documentElement.classList.add(theme);
+    if (document.documentElement.classList.contains('light')) {
+      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add(theme);
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add(theme);
+    }
   }, [theme]);
 
   useEffect(() => {
@@ -61,15 +75,10 @@ const App = () => {
     };
   }, [tabStatus]);
 
-  useEffect(() => {
-    document.documentElement.classList.add('mouse');
-  }, []);
-  return (
-    <Router>
-      <Navbar />
-
-      <Routes>
-        <Route path='/' element={<Home />} />
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route path='/' element={<Root />} errorElement={<Error />}>
+        <Route index element={<Home />} />
         <Route path='/know-us' element={<About />} />
         <Route path='/meet-us' element={<Contact />} />
         <Route path='/:username/dashboard' element={<Dashboard />} />
@@ -82,11 +91,24 @@ const App = () => {
         <Route path='/:username/:postId' element={<Post />} />
         <Route path='/p/:username' element={<Profile />} />
         <Route path='/search' element={<Search />} />
-        <Route path='*' element={<Error />} />
-      </Routes>
+      </Route>
+    )
+  );
 
+  useEffect(() => {
+    document.documentElement.classList.add('mouse');
+  }, []);
+  return <RouterProvider router={router} />;
+};
+
+const Root = () => {
+  return (
+    <>
+      <Navbar />
+      <Sidenav />
+      <Outlet />
       <Footer />
-    </Router>
+    </>
   );
 };
 

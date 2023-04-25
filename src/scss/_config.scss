@@ -1,38 +1,51 @@
 @import url('https://fonts.cdnfonts.com/css/sf-mono?styles=36554,36555,36552,36553');
-@import url('https://fonts.cdnfonts.com/css/warownia');
+@import url('https://fonts.cdnfonts.com/css/lg-kf300');
 @import url('https://fonts.googleapis.com/css2?family=Kodchasan:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+@import url('https://fonts.cdnfonts.com/css/g-guarantee');
 
 // * Variables
-$txt_hdg: 'Warownia', sans-serif;
-$txt_spc1: 'SF Mono', sans-serif;
-$txt_spc2: 'Kodchasan', sans-serif;
-$txt_gen: 'Roboto', sans-serif;
+$fnt_hdg1: 'LGE_GothicSB_Latin', sans-serif;
+$fnt_hdg2: 'g Guarantee', sans-serif;
+$fnt_spc1: 'SF Mono', sans-serif;
+$fnt_spc2: 'Kodchasan', sans-serif;
+$fnt_def: 'Roboto', sans-serif;
 $vfast_trans: 0.1s;
 $fast_trans: 0.2s;
 $fmid_trans: 0.3s;
 $mid_trans: 0.4s;
 $mslow_trans: 0.5s;
 $slow_trans: 0.6s;
-$fnt_size: 10px;
+$icn_size: 2.5rem;
+$txt_size1: 1.2rem;
+$txt_size2: 1.7rem;
+$txt_size3: 2.2rem;
+$txt_size4: 2.7rem;
 
 :root.light {
-  $bg_clr1: #fafafa;
-  $bg_clr2: #f5f5f5;
-  $bg_clr3: #ffffff;
-  $txt_clr1: #575757;
-  $txt_clr2: #404040;
-  $txt_clr3: #171717;
-  $acc_clr: #3b49df;
+  --bg_clr1: #fafafa;
+  --bg_clr2: #f5f5f5;
+  --bg_clr3: #ffffff;
+  --txt_clr1: #575757;
+  --txt_clr2: #404040;
+  --txt_clr3: #171717;
+  --acc_clr: #3b49df;
+  --acc_clr_shd: #3b49df1c;
+  --spc_clr: #40404023;
+  // --brd_clr: #0000001a;
+  --brd_clr: #f5f5f5;
 }
 
 :root.dark {
-  $bg_clr1: #000000;
-  $bg_clr2: #171717;
-  $bg_clr3: #171717;
-  $txt_clr1: #bdbdbd;
-  $txt_clr2: #e5e5e5;
-  $txt_clr3: #fafafa;
-  $acc_clr: #818cf8;
+  --bg_clr1: #000000;
+  --bg_clr2: #171717;
+  --bg_clr3: #171717;
+  --txt_clr1: #bdbdbd;
+  --txt_clr2: #e5e5e5;
+  --txt_clr3: #fafafa;
+  --acc_clr: #818cf8;
+  --acc_clr_shd: #252953;
+  --spc_clr: #5f5f5f93;
+  --brd_clr: #2b2b2b;
 }
 
 // * Variables End
@@ -44,6 +57,78 @@ $fnt_size: 10px;
 
 @mixin transitionCustom($prop, $mode, $duration) {
   transition: $prop $mode $duration;
+}
+
+@mixin flexDisplay($align, $just, $flex_dir: row) {
+  display: flex;
+  flex-direction: $flex_dir;
+  justify-content: $just;
+  align-items: $align;
+}
+
+@mixin displayHide {
+  display: none;
+}
+@mixin visibilityHide {
+  visibility: hidden;
+}
+@mixin visibilityShow {
+  visibility: visible;
+}
+
+@mixin opacityHide {
+  opacity: 0;
+  z-index: -1;
+}
+
+@mixin opacityShow {
+  opacity: 1;
+  z-index: 0;
+}
+
+@mixin mediaQueries($max_min, $width) {
+  @media screen and (#{$max_min}-width: $width) {
+    @content;
+  }
+}
+
+@mixin position($type, $x, $y, $x_val, $y_val) {
+  $x_trans: -$x_val;
+  $y_trans: -$y_val;
+
+  @if $x == right {
+    $x_trans: $x_val;
+  }
+  @if &y == bottom {
+    $y_trans: $y_val;
+  }
+
+  @if unit($x_val) == px {
+    $x_trans: 0;
+  }
+  @if unit($y_val) == px {
+    $y_trans: 0;
+  }
+
+  position: $type;
+  #{$x}: $x_val;
+  #{$y}: $y_val;
+  transform: translate($x_trans, $y_trans);
+}
+
+@mixin navBtnsGen {
+  font-size: $icn_size;
+  margin-right: 10px;
+  color: var(--txt_clr2);
+  transition: all ease $fast_trans;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+@mixin navHover {
+  color: var(--acc_clr);
+  background-color: var(--acc_clr_shd);
+  text-decoration: underline;
 }
 
 // * Mixins End

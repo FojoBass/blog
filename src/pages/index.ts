@@ -12,7 +12,7 @@ import Post from './Post';
 import Profile from './Profile';
 import Search from './Search';
 import Error from './Error';
-import { Navbar, Loading, Footer } from './components';
+import { Navbar, Loading, Footer, Sidenav } from './components';
 
 export {
   Home,
@@ -32,4 +32,5 @@ export {
   Navbar,
   Loading,
   Footer,
+  Sidenav,
 };

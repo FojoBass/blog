@@ -1,0 +1,87 @@
+@import 'config';
+
+.side_nav_sect {
+  @include position(fixed, left, top, 0px, 0px);
+  width: 100%;
+  height: 100vh;
+  background-color: #0000006c;
+  @include visibilityHide;
+  transition: all ease-out $fmid_trans;
+
+  &.active {
+    @include visibilityShow;
+  }
+
+  .side_nav {
+    width: 300px;
+    min-height: 100vh;
+    background-color: var(--bg_clr3);
+    border-radius: 0 10px 10px 0;
+    padding: 0 10px;
+    position: relative;
+    transform: translateX(-300px);
+    transition: all ease-out $fmid_trans;
+
+    &.active {
+      transform: translateX(0);
+    }
+
+    .heading {
+      @include flexDisplay(center, space-between);
+      padding: 10px;
+      font-family: $fnt_hdg1;
+      font-size: $txt_size3;
+      letter-spacing: 0.1rem;
+      color: var(--txt_clr3);
+
+      .close_btn {
+        @include navBtnsGen;
+        font-size: 2.1rem;
+        margin-right: 0;
+
+        &:hover {
+          @include navHover;
+        }
+      }
+    }
+
+    &_opts {
+      @include flexDisplay(flex-start, flex-start, column);
+      margin: 10px 0;
+
+      .side_nav_opt {
+        @include flexDisplay(center, flex-start);
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        transition: all ease $fast_trans;
+        color: var(--txt_clr1);
+        font-size: $txt_size2;
+
+        &:hover {
+          @include navHover;
+        }
+
+        .icon {
+          margin-right: 10px;
+        }
+      }
+    }
+
+    &_socials {
+      @include position(absolute, left, bottom, 0px, 0px);
+      @include flexDisplay(center, center);
+      width: 100%;
+      padding: 10px 20px;
+
+      .side_nav_social {
+        @include navBtnsGen;
+        margin: 0 5px;
+
+        &:hover {
+          @include navHover;
+        }
+      }
+    }
+  }
+}
