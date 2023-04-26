@@ -1,11 +1,8 @@
 import React from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import { sideNavLinks, socialLinks } from '../../data';
-import { Link } from 'react-router-dom';
-import { v4 } from 'uuid';
 import { useBlogSelector, useBlogDispatch } from '../../app/store';
 import { blogSlice } from '../../features/blogSlice';
-import { log } from 'console';
+import SidenavPart from './SidenavPart';
 
 const Sidenav = () => {
   const { isOpenSideNav } = useBlogSelector((state) => state.blog);
@@ -31,33 +28,7 @@ const Sidenav = () => {
           </button>
         </h3>
 
-        <div className='side_nav_opts'>
-          {sideNavLinks.map(({ Icon, title, link }) => {
-            return (
-              <Link className='side_nav_opt' key={v4()} to={link}>
-                <span className='icon'>
-                  <Icon />
-                </span>
-                <span className='title'>{title}</span>
-              </Link>
-            );
-          })}
-        </div>
-
-        <div className='side_nav_socials'>
-          {socialLinks.map(({ Icon, link }) => {
-            return (
-              <Link
-                className='side_nav_social'
-                to={link}
-                key={v4()}
-                target='_blank'
-              >
-                <Icon />
-              </Link>
-            );
-          })}
-        </div>
+        <SidenavPart />
       </aside>
     </section>
   );

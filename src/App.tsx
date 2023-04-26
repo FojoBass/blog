@@ -26,6 +26,7 @@ import {
   Navbar,
   Footer,
   Sidenav,
+  CategoryPosts,
 } from './pages';
 import { useBlogSelector, useBlogDispatch } from './app/store';
 import { toggleTab } from './features/tabSlice';
@@ -90,6 +91,7 @@ const App = () => {
         <Route path='/notifications' element={<Notification />} />
         <Route path='/:username/:postId' element={<Post />} />
         <Route path='/p/:username' element={<Profile />} />
+        <Route path='/categories/:category' element={<CategoryPosts />} />
         <Route path='/search' element={<Search />} />
       </Route>
     )

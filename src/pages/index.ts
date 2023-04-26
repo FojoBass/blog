@@ -12,6 +12,7 @@ import Post from './Post';
 import Profile from './Profile';
 import Search from './Search';
 import Error from './Error';
+import CategoryPosts from './CategoryPosts';
 import { Navbar, Loading, Footer, Sidenav } from './components';
 
 export {
@@ -33,4 +34,5 @@ export {
   Loading,
   Footer,
   Sidenav,
+  CategoryPosts,
 };

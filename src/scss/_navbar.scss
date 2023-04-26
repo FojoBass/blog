@@ -9,6 +9,7 @@ nav {
   position: sticky;
   top: 0;
   left: 0;
+  z-index: 5;
 
   .center_sect {
     @include flexDisplay(center, space-between);
@@ -171,9 +172,8 @@ nav {
         border-radius: 50%;
 
         img {
+          background-color: var(--bg_clr2);
           width: 40px;
-          height: auto;
-          display: block;
         }
       }
     }

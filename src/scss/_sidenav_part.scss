@@ -1,0 +1,28 @@
+@import 'config';
+
+.side_nav_opt {
+  @include flexDisplay(center, flex-start);
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  transition: all ease $fast_trans;
+  color: var(--txt_clr1);
+  font-size: $txt_size2;
+
+  &:hover {
+    @include navHover;
+  }
+
+  .icon {
+    margin-right: 10px;
+  }
+}
+
+.side_nav_social {
+  @include navBtnsGen;
+  margin: 0 5px;
+
+  &:hover {
+    @include navHover;
+  }
+}

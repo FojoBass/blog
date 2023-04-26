@@ -7,6 +7,7 @@
   background-color: #0000006c;
   @include visibilityHide;
   transition: all ease-out $fmid_trans;
+  z-index: 10;
 
   &.active {
     @include visibilityShow;
@@ -48,24 +49,6 @@
     &_opts {
       @include flexDisplay(flex-start, flex-start, column);
       margin: 10px 0;
-
-      .side_nav_opt {
-        @include flexDisplay(center, flex-start);
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        transition: all ease $fast_trans;
-        color: var(--txt_clr1);
-        font-size: $txt_size2;
-
-        &:hover {
-          @include navHover;
-        }
-
-        .icon {
-          margin-right: 10px;
-        }
-      }
     }
 
     &_socials {
@@ -73,15 +56,6 @@
       @include flexDisplay(center, center);
       width: 100%;
       padding: 10px 20px;
-
-      .side_nav_social {
-        @include navBtnsGen;
-        margin: 0 5px;
-
-        &:hover {
-          @include navHover;
-        }
-      }
     }
   }
 }

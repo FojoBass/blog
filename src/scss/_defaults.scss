@@ -53,7 +53,14 @@ textarea {
   padding-right: 15px;
 }
 
+img {
+  height: auto;
+  width: 100%;
+  display: block;
+}
+
 .img_wrapper {
+  display: block;
   position: relative;
   overflow: hidden;
 }

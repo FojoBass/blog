@@ -1,11 +1,9 @@
 @import url('https://fonts.cdnfonts.com/css/sf-mono?styles=36554,36555,36552,36553');
-@import url('https://fonts.cdnfonts.com/css/lg-kf300');
-@import url('https://fonts.googleapis.com/css2?family=Kodchasan:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
-@import url('https://fonts.cdnfonts.com/css/g-guarantee');
+@import url('https://fonts.googleapis.com/css2?family=Kodchasan:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Rubik:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Teko:wght@400;500;600&display=swap');
 
 // * Variables
-$fnt_hdg1: 'LGE_GothicSB_Latin', sans-serif;
-$fnt_hdg2: 'g Guarantee', sans-serif;
+$fnt_hdg1: 'Rubik', sans-serif;
+$fnt_hdg2: 'Teko', sans-serif;
 $fnt_spc1: 'SF Mono', sans-serif;
 $fnt_spc2: 'Kodchasan', sans-serif;
 $fnt_def: 'Roboto', sans-serif;
@@ -37,7 +35,7 @@ $txt_size4: 2.7rem;
 
 :root.dark {
   --bg_clr1: #000000;
-  --bg_clr2: #171717;
+  --bg_clr2: #2b2b2b;
   --bg_clr3: #171717;
   --txt_clr1: #bdbdbd;
   --txt_clr2: #e5e5e5;
