@@ -25,7 +25,7 @@
 }
 
 body {
-  background-color: var(--bg_clr1);
+  background-color: var(--bg_clr2);
   font-size: $txt_size1;
 }
 
@@ -57,6 +57,7 @@ img {
   height: auto;
   width: 100%;
   display: block;
+  background-color: var(--bg_clr2);
 }
 
 .img_wrapper {

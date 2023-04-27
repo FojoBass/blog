@@ -30,12 +30,12 @@ $txt_size4: 2.7rem;
   --acc_clr_shd: #3b49df1c;
   --spc_clr: #40404023;
   // --brd_clr: #0000001a;
-  --brd_clr: #f5f5f5;
+  --brd_clr: #f0f0f0;
 }
 
 :root.dark {
-  --bg_clr1: #000000;
-  --bg_clr2: #2b2b2b;
+  --bg_clr1: #2b2b2b;
+  --bg_clr2: #000000;
   --bg_clr3: #171717;
   --txt_clr1: #bdbdbd;
   --txt_clr2: #e5e5e5;
@@ -43,7 +43,7 @@ $txt_size4: 2.7rem;
   --acc_clr: #818cf8;
   --acc_clr_shd: #252953;
   --spc_clr: #5f5f5f93;
-  --brd_clr: #2b2b2b;
+  --brd_clr: #222222;
 }
 
 // * Variables End
@@ -90,21 +90,26 @@ $txt_size4: 2.7rem;
   }
 }
 
-@mixin position($type, $x, $y, $x_val, $y_val) {
+@mixin position($type, $x, $y, $x_val, $y_val, $cancel_trans: false) {
   $x_trans: -$x_val;
   $y_trans: -$y_val;
 
   @if $x == right {
     $x_trans: $x_val;
   }
-  @if &y == bottom {
+  @if $y == bottom {
     $y_trans: $y_val;
   }
 
-  @if unit($x_val) == px {
+  @if (unit($x_val) == px or $cancel_trans == x) {
     $x_trans: 0;
   }
-  @if unit($y_val) == px {
+  @if (unit($y_val) == px or $cancel_trans == y) {
+    $y_trans: 0;
+  }
+
+  @if $cancel_trans == both {
+    $x_trans: 0;
     $y_trans: 0;
   }
 

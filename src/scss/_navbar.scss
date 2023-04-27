@@ -56,6 +56,7 @@ nav {
         width: 400px;
         font-family: $fnt_spc2;
         transition: all ease $fast_trans;
+        color: var(--txt_clr3);
 
         &:focus {
           border-color: var(--acc_clr);
@@ -172,7 +173,6 @@ nav {
         border-radius: 50%;
 
         img {
-          background-color: var(--bg_clr2);
           width: 40px;
         }
       }
