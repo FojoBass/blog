@@ -1,4 +1,4 @@
-@import 'config';
+// @import 'config';
 
 * {
   padding: 0;
@@ -14,7 +14,7 @@
 
 :root {
   font-size: 10px;
-  @include mediaQueries(max, 350px) {
+  @include mediaQueries(max, 400px) {
     font-size: 8px;
   }
 }
@@ -27,6 +27,8 @@
 body {
   background-color: var(--bg_clr2);
   font-size: $txt_size1;
+  color: var(--txt_clr3);
+  transition: all ease $fast_trans;
 }
 
 button {
@@ -37,6 +39,7 @@ button {
 
 a {
   text-decoration: none;
+  transition: all ease $fast_trans;
 }
 
 input,
@@ -47,7 +50,7 @@ textarea {
 }
 
 .center_sect {
-  max-width: 1300px;
+  max-width: 1100px;
   margin: 0 auto;
   padding-left: 15px;
   padding-right: 15px;
@@ -73,4 +76,19 @@ img {
   height: 100%;
   background-color: #000;
   opacity: 0.2;
+}
+
+.spc_btn {
+  background-color: var(--acc_clr);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  font-family: $fnt_spc2;
+  font-weight: 500;
+  letter-spacing: 0.1rem;
+}
+
+button.disable {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

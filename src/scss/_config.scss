@@ -14,6 +14,7 @@ $mid_trans: 0.4s;
 $mslow_trans: 0.5s;
 $slow_trans: 0.6s;
 $icn_size: 2.5rem;
+$txt_size: 1rem;
 $txt_size1: 1.2rem;
 $txt_size2: 1.7rem;
 $txt_size3: 2.2rem;
@@ -132,6 +133,14 @@ $txt_size4: 2.7rem;
   color: var(--acc_clr);
   background-color: var(--acc_clr_shd);
   text-decoration: underline;
+}
+
+@mixin category {
+  background-color: var(--bg_clr2);
+  color: var(--txt_clr1);
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-family: $fnt_spc2;
 }
 
 // * Mixins End

@@ -1,4 +1,4 @@
-@import 'config';
+// @import 'config';
 
 $acc_clr: var(--acc_clr);
 
@@ -13,6 +13,7 @@ nav {
 
   .center_sect {
     @include flexDisplay(center, space-between);
+    max-width: 1300px;
   }
 
   .left_side {

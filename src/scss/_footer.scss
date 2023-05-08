@@ -1,0 +1,55 @@
+:root.light {
+  --fbg_clr: #000000;
+}
+
+:root.dark {
+  --fbg_clr: #181818;
+}
+
+#footer_sect {
+  background-color: var(--fbg_clr);
+
+  .footer_wrapper {
+    padding: 20px;
+    max-width: 700px;
+    text-align: center;
+    margin: 0 auto;
+
+    .nav_links {
+      li {
+        display: inline-block;
+
+        a {
+          display: block;
+          color: #fff;
+          padding: 3px 10px;
+          font-family: $fnt_spc1;
+          font-size: $txt_size1;
+          transition: all ease $fmid_trans;
+
+          &:hover {
+            color: $acc_clr;
+          }
+        }
+      }
+    }
+
+    .owner {
+      color: #d6d6d6;
+      margin-top: 20px;
+      line-height: 2.2rem;
+
+      p {
+        font-family: $fnt_hdg2;
+        font-size: $txt_size2;
+        letter-spacing: 0.1rem;
+        word-spacing: 0.1rem;
+
+        a {
+          font-family: $fnt_hdg2;
+          color: $acc_clr;
+        }
+      }
+    }
+  }
+}
