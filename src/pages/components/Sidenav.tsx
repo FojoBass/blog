@@ -7,11 +7,11 @@ import SidenavPart from './SidenavPart';
 const Sidenav = () => {
   const { isOpenSideNav } = useBlogSelector((state) => state.blog);
   const dispatch = useBlogDispatch();
-  const { handeSideNav } = blogSlice.actions;
+  const { handleSideNav } = blogSlice.actions;
 
   const handleClose = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget.children[0]) {
-      dispatch(handeSideNav());
+      dispatch(handleSideNav());
     }
   };
 

@@ -1,0 +1,63 @@
+$padding: 10px;
+
+.head_overlay {
+  height: 100px;
+  // z-index: -1;
+}
+
+.profile_wrapper {
+  .profile_header {
+    background-color: var(--bg_clr3);
+    padding: $padding;
+    @include containerDef;
+    overflow: visible;
+    margin-top: -60px;
+
+    .top {
+      position: relative;
+
+      .img_wrapper {
+        width: 50px;
+        border-radius: 50%;
+        padding: 5px;
+        @include position(absolute, left, top, 0px, -40px);
+
+        img {
+          border-radius: 50%;
+        }
+      }
+
+      .right_side {
+        width: 100%;
+        @include flexDisplay(center, flex-end);
+
+        .spc_btn {
+          padding: 5px 15px;
+          border-radius: 5px;
+        }
+
+        .more_opts {
+          margin-left: 10px;
+          font-size: 2.3rem;
+          color: var(--txt_clr1);
+          transition: all ease $fmid_trans;
+          padding: 5px;
+          border-radius: 5px;
+          @include flexDisplay(center, center);
+
+          &:hover {
+            background-color: var(--bg_clr2);
+            color: var(--txt_clr3);
+          }
+        }
+      }
+    }
+  }
+
+  aside {
+    display: none;
+    @include mediaQueries(min, 800px) {
+      display: block;
+    }
+  }
+}

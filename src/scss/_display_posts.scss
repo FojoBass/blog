@@ -1,0 +1,73 @@
+.main_side {
+  flex-basis: 100%;
+
+  @include mediaQueries(min, 800px) {
+    flex-basis: 77%;
+  }
+
+  .load_more_btn {
+    max-width: 200px;
+    border: 1px solid var(--txt_clr1);
+    margin: 10px auto;
+    display: block;
+    color: var(--txt_clr1);
+    padding: 10px 25px;
+    border-radius: 5px;
+    font-family: $fnt_spc1;
+    transition: all ease $vfast_trans;
+
+    &:hover {
+      color: var(--txt_clr3);
+      border-color: var(--txt_clr3);
+    }
+  }
+
+  .dummy_single_post {
+    .top_child {
+      .img_wrapper {
+        @include skeletonTemp(20px, 20px, 50%);
+      }
+
+      .author_name {
+        @include skeletonTemp(80px, 10px, 2px);
+        height: 10px !important;
+      }
+    }
+
+    .mid {
+      .title {
+        @include skeletonTemp(250px, 30px, 5px);
+        display: block;
+      }
+
+      .detail {
+        @include skeletonTemp(200px, 20px, 5px);
+      }
+    }
+
+    .bottom {
+      .created_at {
+        @include skeletonTemp(50px, 7px, 2px);
+        display: inline-block;
+      }
+
+      .category {
+        @include skeletonTemp(50px, 7px, 2px);
+        display: inline-block;
+      }
+
+      .bkmark_btn {
+        @include skeletonTemp(10px, 15px, 2px);
+        display: inline-block;
+      }
+    }
+
+    .img_wrapper {
+      background-color: var(--bg_clr2);
+    }
+  }
+
+  .skeleton_anim {
+    animation: bgAnim 1s ease-in-out infinite;
+  }
+}

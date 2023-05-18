@@ -1,5 +1,5 @@
 // TODO ADD A GLOBAL VARIABLE FOR SHOWING menu_btn
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { IoMenuOutline } from 'react-icons/io5';
 import { CiSearch } from 'react-icons/ci';
 import { IoNotificationsOutline } from 'react-icons/io5';
@@ -11,20 +11,25 @@ import { toggleTheme } from '../../features/themeSlice';
 import { dropLinks } from '../../data';
 import { v4 } from 'uuid';
 import { blogSlice } from '../../features/blogSlice';
+import { useGlobalContext } from '../../context';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const theme = useBlogSelector((state) => state.theme);
   const dispatch = useBlogDispatch();
   const [isDropdown, setIsDropdown] = useState(false);
-  const { isOpenSideNav } = useBlogSelector((state) => state.blog);
-  const { handeSideNav } = blogSlice.actions;
-  const [isUserLogged, setIsUserLogged] = useState(true); //todo This will be changed once auth is setup
+  const { handleSideNav } = blogSlice.actions;
+  const { isUserLogged } = useGlobalContext();
+  const profileOptsRef = useRef<HTMLButtonElement>(null);
+
   return (
     <nav>
       <div className='center_sect'>
         <div className='left_side'>
-          <button className='menu_btn' onClick={() => dispatch(handeSideNav())}>
+          <button
+            className='menu_btn'
+            onClick={() => dispatch(handleSideNav())}
+          >
             <IoMenuOutline />
           </button>
 
@@ -81,6 +86,7 @@ const Navbar = () => {
               <button
                 className='profile_opts_btn'
                 onClick={() => setIsDropdown(!isDropdown)}
+                ref={profileOptsRef}
               >
                 <div className='img_wrapper'>
                   <img src={avatar} alt='avatar' className='avatar' />
@@ -91,7 +97,11 @@ const Navbar = () => {
         </div>
       </div>
 
-      <DropDown drop={isDropdown} setDrop={setIsDropdown} />
+      <DropDown
+        drop={isDropdown}
+        setDrop={setIsDropdown}
+        profileOptsRef={profileOptsRef}
+      />
     </nav>
   );
 };
@@ -99,15 +109,33 @@ const Navbar = () => {
 export interface DropType {
   drop: boolean;
   setDrop: React.Dispatch<React.SetStateAction<boolean>>;
+  profileOptsRef: React.RefObject<HTMLButtonElement>;
 }
 
-const DropDown: React.FC<DropType> = ({ drop, setDrop }) => {
+const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
+  const dropRef = useRef<HTMLDivElement>(null);
+
   const handleSignout = () => {
-    setDrop(false);
+    // setDrop(false);
   };
 
+  useEffect(() => {
+    if (dropRef.current && profileOptsRef.current) {
+      document.documentElement.onclick = (e: MouseEvent): void => {
+        if (
+          e.target !== dropRef.current &&
+          e.target !== profileOptsRef.current &&
+          e.target !== dropRef.current?.children[0] &&
+          e.target !== dropRef.current?.children[1] &&
+          e.target !== dropRef.current?.children[2]
+        )
+          setDrop(false);
+      };
+    }
+  }, [dropRef, profileOptsRef]);
+
   return (
-    <section className={drop ? ' drop_down active' : 'drop_down'}>
+    <section className={drop ? ' drop_down active' : 'drop_down'} ref={dropRef}>
       <article className='top'>
         {dropLinks
           .filter((link) => link.position === 'top')
@@ -115,12 +143,7 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop }) => {
             // TODO UPDATE MODLINK ONCE AUTH UIS UP AND RUNNING
             const modLink = param ? link.replace('dum', 'dummies') : link;
             return (
-              <Link
-                className='drop_down_links'
-                to={modLink}
-                onClick={() => setDrop(false)}
-                key={v4()}
-              >
+              <Link className='drop_down_links' to={modLink} key={v4()}>
                 {title}
               </Link>
             );
@@ -133,12 +156,7 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop }) => {
             // TODO UPDATE MODLINK ONCE AUTH UIS UP AND RUNNING
             const modLink = param ? link.replace('dum', 'dummies') : link;
             return (
-              <Link
-                className='drop_down_links'
-                to={modLink}
-                onClick={() => setDrop(false)}
-                key={v4()}
-              >
+              <Link className='drop_down_links' to={modLink} key={v4()}>
                 {title}
               </Link>
             );

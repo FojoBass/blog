@@ -1,4 +1,4 @@
-import Home from './home';
+import Home from './Home';
 import About from './About';
 import Contact from './Contact';
 import Dashboard from './Dashboard';

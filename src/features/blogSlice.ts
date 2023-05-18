@@ -9,7 +9,7 @@ export const blogSlice = createSlice({
   name: 'blog',
   initialState,
   reducers: {
-    handeSideNav: (state) => {
+    handleSideNav: (state) => {
       return { ...state, isOpenSideNav: !state.isOpenSideNav };
     },
   },

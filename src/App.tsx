@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import './scss/main.scss';
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import {
   Outlet,
   Route,

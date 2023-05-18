@@ -172,6 +172,7 @@ nav {
 
       .img_wrapper {
         border-radius: 50%;
+        pointer-events: none;
 
         img {
           width: 40px;
