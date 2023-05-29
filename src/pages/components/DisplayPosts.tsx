@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SkeletonLoad, SinglePost } from './index';
 import dummyImg from '../../assets/Me cropped.jpg';
 import { PostsInt } from '../Home';
+import { v4 } from 'uuid';
 
 interface PropInt {
   posts: PostsInt[];
@@ -28,7 +29,9 @@ const DisplayPosts: React.FC<PropInt> = ({ posts }) => {
     <>
       {isFakeLoading ? (
         <main className='main_side'>
-          {posts.map((post, ind) => (post.isDummy ? <SkeletonLoad /> : ''))}
+          {posts.map((post, ind) =>
+            post.isDummy ? <SkeletonLoad keyz={`${ind}${v4()}`} /> : ''
+          )}
           <button className='load_more_btn'>Load more</button>
         </main>
       ) : (

@@ -9,6 +9,10 @@ import {
   AiFillGithub,
   AiOutlineInstagram,
 } from 'react-icons/ai';
+import team1 from './assets/team 1.jpg';
+import team2 from './assets/team 2.jpg';
+import team3 from './assets/team 3.jpg';
+import team4 from './assets/team 4.jpg';
 
 export interface DropLinkType {
   title: string;
@@ -27,6 +31,55 @@ export interface SocialLinkType {
   Icon: IconType;
   link: string;
 }
+
+export interface TeamInt {
+  name: string;
+  position: string;
+  avi: string;
+}
+
+export const team: TeamInt[] = [
+  {
+    name: 'John Doe',
+    position: 'CEO',
+    avi: team1,
+  },
+  {
+    name: 'Jane Doe',
+    position: 'CTO',
+    avi: team2,
+  },
+  {
+    name: 'Lorem Ipsum',
+    position: 'HR Manager',
+    avi: team3,
+  },
+  {
+    name: 'Greg Payins',
+    position: 'Team Lead',
+    avi: team4,
+  },
+  {
+    name: 'Janet Briggs',
+    position: 'Team Lead',
+    avi: team2,
+  },
+  {
+    name: 'Bastin Psychi',
+    position: 'Dev Op',
+    avi: team4,
+  },
+  {
+    name: 'Wick Gisn',
+    position: 'Frontend Dev',
+    avi: team1,
+  },
+  {
+    name: 'Ipsum Dolor',
+    position: 'HR',
+    avi: team3,
+  },
+];
 
 export const dropLinks: DropLinkType[] = [
   {

@@ -1,0 +1,115 @@
+.single_post {
+  @include flexDisplay(center, space-between);
+  background-color: var(--bg_clr3);
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid var(--brd_clr);
+  margin-bottom: 10px;
+
+  .post_wrapper {
+    flex-basis: 70%;
+
+    .top {
+      margin-bottom: 10px;
+
+      .top_child {
+        @include flexDisplay(center, flex-start);
+        position: relative;
+        width: fit-content;
+
+        &:hover {
+          .author_info_wrapper {
+            @include opacityShow;
+            z-index: 100;
+          }
+        }
+
+        .img_wrapper:not(.heading .img_wrapper) {
+          width: 20px;
+          border-radius: 50%;
+        }
+
+        .author_name {
+          margin-left: 10px;
+          text-transform: capitalize;
+          font-family: $fnt_spc2;
+          font-size: $txt_size1;
+          color: var(--txt_clr1);
+          height: 100%;
+        }
+      }
+    }
+
+    .mid {
+      .title {
+        font-family: $fnt_hdg1;
+        font-size: $txt_size2;
+        color: var(--txt_clr3);
+        font-weight: 500;
+        transition: all ease $fast_trans;
+
+        &:hover {
+          color: var(--acc_clr);
+        }
+      }
+
+      .detail {
+        @include mediaQueries(max, 700px) {
+          display: none;
+        }
+        margin-top: 10px;
+        line-height: 2.3rem;
+        letter-spacing: 0.1rem;
+        color: var(--txt_clr3);
+      }
+    }
+
+    .bottom {
+      @include flexDisplay(center, space-between);
+      padding: 10px 0 0;
+
+      .created_at {
+        margin-right: 20px;
+        color: var(--txt_clr1);
+        font-family: $fnt_spc2;
+        font-style: italic;
+        letter-spacing: 0.1rem;
+      }
+
+      .category {
+        @include category;
+      }
+
+      .bkmark_btn {
+        font-size: $txt_size3;
+        color: var(--txt_clr1);
+      }
+    }
+  }
+
+  .post_wrapper + .img_wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 5px;
+    @include mediaQueries(max, 500px) {
+      width: 60px;
+      height: 60px;
+    }
+
+    @include mediaQueries(max, 300px) {
+      width: 50px;
+      height: 50px;
+    }
+
+    &:hover {
+      img {
+        transform: scale(1.2);
+      }
+    }
+
+    img {
+      object-fit: cover;
+      transition: all ease-out $fmid_trans;
+    }
+  }
+}

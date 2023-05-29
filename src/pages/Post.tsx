@@ -1,4 +1,5 @@
 // todo IMPLEMENTS CHANGES WHEN AUTH IS UP, WHERE NEEDED
+// todo Edit Post functionality
 import React from 'react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { BiComment } from 'react-icons/bi';

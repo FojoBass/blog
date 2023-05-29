@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
 import './scss/main.scss';
+import avi from './assets/Me cropped.jpg';
 import {
   Outlet,
   Route,
   RouterProvider,
   createBrowserRouter,
   createRoutesFromElements,
+  useLocation,
 } from 'react-router-dom';
 import {
   Home,
@@ -26,14 +28,30 @@ import {
   Footer,
   Sidenav,
   CategoryPosts,
+  Posts,
+  Follows,
 } from './pages';
 import { useBlogSelector, useBlogDispatch } from './app/store';
 import { toggleTab } from './features/tabSlice';
+
+export interface FollowsInt {
+  userName: string;
+  id: string;
+  avi: string;
+}
 
 const App = () => {
   const theme = useBlogSelector((state) => state.theme);
   const tabStatus = useBlogSelector((state) => state.tab);
   const dispatch = useBlogDispatch();
+  const [dummyFollows] = React.useState<FollowsInt[]>([
+    { userName: 'Dummy name', id: 'asdf', avi },
+    { userName: 'Dummy name', id: 'asdfd', avi },
+    { userName: 'Dummy name', id: 'asdfs', avi },
+    { userName: 'Dummy name', id: 'asdf8', avi },
+    { userName: 'Dummy name', id: 'asdfd4', avi },
+    { userName: 'Dummy name', id: 'asdfsl', avi },
+  ]);
 
   const handleTabAdd = (e: KeyboardEvent) => {
     if (e.key === 'Tab' && !tabStatus) {
@@ -81,7 +99,17 @@ const App = () => {
         <Route index element={<Home />} />
         <Route path='/know-us' element={<About />} />
         <Route path='/meet-us' element={<Contact />} />
-        <Route path='/:username/dashboard' element={<Dashboard />} />
+        <Route path='/:username/dashboard' element={<Dashboard />}>
+          <Route path='/:username/dashboard/posts' element={<Posts />} />
+          <Route
+            path='/:username/dashboard/followers'
+            element={<Follows items={dummyFollows} />}
+          />
+          <Route
+            path='/:username/dashboard/followings'
+            element={<Follows items={dummyFollows.slice(0, 3)} />}
+          />
+        </Route>
         <Route path='/faqs' element={<FAQ />} />
         <Route path='/join' element={<Signup />} />
         <Route path='/enter' element={<Login />} />
@@ -103,6 +131,11 @@ const App = () => {
 };
 
 const Root = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   return (
     <>
       <Navbar />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import avi from '../assets/Me cropped.jpg';
 import { useGlobalContext } from '../context';
-import { BsThreeDots, BsBoxArrowUpRight } from 'react-icons/bs';
+import { BsThreeDots, BsBoxArrowUpRight, BsPersonHearts } from 'react-icons/bs';
 import { ImLocation2 } from 'react-icons/im';
 import { MdCake, MdMail } from 'react-icons/md';
 import { FaScroll } from 'react-icons/fa';
@@ -70,30 +70,32 @@ const Profile = () => {
                 <div className='icon_wrapper'>
                   <ImLocation2 />
                 </div>
-                Earth
+                Africa, Earth
               </article>
 
               <article className='more_info_opt'>
-                <div className='icon_wrapper'>
-                  <MdCake />
-                </div>
-                Joinded on February 17, 1455
+                <a href='mailto: fojo4god@gmail.com'>
+                  <div className='icon_wrapper'>
+                    <MdMail />
+                  </div>
+                  fojo4god@gmail.com
+                </a>
               </article>
 
               <article className='more_info_opt'>
-                <div className='icon_wrapper'>
-                  <BsBoxArrowUpRight />
-                </div>
                 <a href='https://fast.com' target='_blank'>
+                  <div className='icon_wrapper'>
+                    <BsBoxArrowUpRight />
+                  </div>
                   https://fast.com
                 </a>
               </article>
 
               <article className='more_info_opt'>
                 <div className='icon_wrapper'>
-                  <MdMail />
+                  <MdCake />
                 </div>
-                <a href='mailto: fojo4god@gmail.com'>fojo4god@gmail.com</a>
+                Joined on Feb 17, 1455
               </article>
             </div>
 
@@ -153,28 +155,9 @@ const Profile = () => {
 
             <article className='bottom_opt'>
               <div className='icon_wrapper'>
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  width='24'
-                  height='24'
-                  fill='none'
-                  id='user-love'
-                >
-                  <path
-                    fill='#000'
-                    fill-rule='evenodd'
-                    d='M9 6.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7ZM4.5 10a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0Z'
-                    clip-rule='evenodd'
-                  ></path>
-                  <path
-                    fill='#000'
-                    fill-rule='evenodd'
-                    d='M2.5 20a6.5 6.5 0 1 1 13 0v.28c0 .503-.352.937-.844 1.04l-1.751.369c-1.757.37-3.554.487-5.336.352a.5.5 0 0 1 .076-.997c1.688.128 3.39.017 5.054-.334l1.751-.368a.062.062 0 0 0 .05-.061V20a5.5 5.5 0 1 0-11 0v.28c0 .03.02.055.05.062l1.751.368a.5.5 0 0 1-.206.979l-1.751-.369a1.062 1.062 0 0 1-.844-1.04V20zm15-17.987c1.108-.768 2.66-.674 3.66.283a2.675 2.675 0 0 1 0 3.894L17.846 9.36a.5.5 0 0 1-.692 0l-3.298-3.157-.015-.014.345-.362-.345.362a2.675 2.675 0 0 1 0-3.894c.999-.957 2.55-1.05 3.659-.283zm-2.968 3.454.012.012.003.003L17.5 8.308l2.968-2.84c.71-.68.71-1.771 0-2.45-.722-.69-1.9-.69-2.622 0a.5.5 0 0 1-.692 0c-.721-.69-1.9-.69-2.622 0-.71.679-.71 1.77 0 2.45z'
-                    clip-rule='evenodd'
-                  ></path>
-                </svg>
+                <BsPersonHearts />
               </div>
-              <span>10</span> followings
+              <span>10 followings</span>
             </article>
           </div>
         </header>
@@ -198,28 +181,9 @@ const Profile = () => {
 
               <article className='side_opt'>
                 <div className='icon_wrapper'>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    width='24'
-                    height='24'
-                    fill='none'
-                    id='user-love'
-                  >
-                    <path
-                      fill='#000'
-                      fill-rule='evenodd'
-                      d='M9 6.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7ZM4.5 10a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0Z'
-                      clip-rule='evenodd'
-                    ></path>
-                    <path
-                      fill='#000'
-                      fill-rule='evenodd'
-                      d='M2.5 20a6.5 6.5 0 1 1 13 0v.28c0 .503-.352.937-.844 1.04l-1.751.369c-1.757.37-3.554.487-5.336.352a.5.5 0 0 1 .076-.997c1.688.128 3.39.017 5.054-.334l1.751-.368a.062.062 0 0 0 .05-.061V20a5.5 5.5 0 1 0-11 0v.28c0 .03.02.055.05.062l1.751.368a.5.5 0 0 1-.206.979l-1.751-.369a1.062 1.062 0 0 1-.844-1.04V20zm15-17.987c1.108-.768 2.66-.674 3.66.283a2.675 2.675 0 0 1 0 3.894L17.846 9.36a.5.5 0 0 1-.692 0l-3.298-3.157-.015-.014.345-.362-.345.362a2.675 2.675 0 0 1 0-3.894c.999-.957 2.55-1.05 3.659-.283zm-2.968 3.454.012.012.003.003L17.5 8.308l2.968-2.84c.71-.68.71-1.771 0-2.45-.722-.69-1.9-.69-2.622 0a.5.5 0 0 1-.692 0c-.721-.69-1.9-.69-2.622 0-.71.679-.71 1.77 0 2.45z'
-                      clip-rule='evenodd'
-                    ></path>
-                  </svg>
+                  <BsPersonHearts />
                 </div>
-                <span>10</span> followings
+                <span>10 followings</span>
               </article>
             </div>
           </aside>

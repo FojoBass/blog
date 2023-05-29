@@ -9,7 +9,7 @@ const BlogContext = createContext<ContextInt>({});
 export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isUserLogged, setIsUserLogged] = useState(false); //todo This will be changed once auth is setup
+  const [isUserLogged, setIsUserLogged] = useState(true); //todo This will be changed once auth is setup
 
   const sharedProps: ContextInt = { isUserLogged };
 

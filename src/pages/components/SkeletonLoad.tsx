@@ -1,9 +1,8 @@
 import React from 'react';
-import { v4 } from 'uuid';
 
-const SkeletonLoad = () => {
+const SkeletonLoad: React.FC<{ keyz: string }> = ({ keyz }) => {
   return (
-    <article key={v4()} className='single_post dummy_single_post'>
+    <article key={keyz} className='single_post dummy_single_post'>
       <div className='post_wrapper'>
         <div className='top'>
           <div className='top_child'>

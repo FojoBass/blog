@@ -1,0 +1,250 @@
+#dashboard_sect {
+  .center_sect {
+    max-width: 1300px;
+    min-height: 75vh;
+
+    h1 {
+      padding: 10px 0;
+      font-size: $txt_size4;
+      font-family: $fnt_hdg1;
+    }
+
+    .dash_nav {
+      @include flexDisplay(center, center);
+      @include mediaQueries(min, 800px) {
+        display: none;
+      }
+
+      .nav_opt {
+        margin: 0 5px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 1.5rem;
+        font-family: $fnt_spc2;
+        color: var(--txt_clr1);
+        border: 2px solid var(--brd_clr);
+        text-decoration: underline;
+
+        &.active {
+          background-color: var(--bg_clr3);
+          color: var(--acc_clr);
+          pointer-events: none;
+          text-decoration: none;
+        }
+      }
+    }
+
+    .dash_boxes {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      padding: 10px 0;
+      grid-gap: 10px;
+      @include mediaQueries(min, 800px) {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .dash_box {
+        background-color: var(--bg_clr3);
+        border-radius: 5px;
+        @include flexDisplay(flex-start, center, column);
+        padding: 15px;
+        font-size: 1.5rem;
+        border: 2px solid var(--brd_clr);
+
+        &:last-of-type {
+          align-items: flex-end;
+          @include mediaQueries(min, 800px) {
+            grid-column: 4 / span 1;
+          }
+        }
+
+        .count {
+          margin-bottom: 5px;
+          font-size: $txt_size4;
+          font-weight: bold;
+        }
+      }
+    }
+
+    main {
+      @include mediaQueries(min, 800px) {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        align-items: flex-start;
+        grid-gap: 10px;
+      }
+      .side_dash_nav_wrapper {
+        display: none;
+        @include mediaQueries(min, 800px) {
+          @include flexDisplay(flex-start, flex-start, column);
+
+          .side_dash_nav {
+            padding: 10px;
+            width: 100%;
+            font-size: 1.5rem;
+            font-family: $fnt_spc2;
+            color: var(--txt_clr1);
+            @include flexDisplay(center, space-between);
+
+            &:hover {
+              color: var(--acc_clr);
+              background-color: var(--acc_clr_shd);
+            }
+
+            &:first-of-type {
+              border-radius: 5px 5px 0 0;
+            }
+
+            &:last-of-type {
+              border-radius: 0 0 5px 5px;
+            }
+
+            &.active {
+              background-color: var(--bg_clr3);
+              color: var(--acc_clr);
+              pointer-events: none;
+              text-decoration: none;
+              font-weight: bold;
+              color: var(--txt_clr3);
+              border-radius: 5px;
+            }
+          }
+        }
+      }
+
+      .user_posts {
+        background-color: var(--bg_clr3);
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 2px solid var(--brd_clr);
+        @include mediaQueries(min, 800px) {
+          margin: 0;
+        }
+
+        .user_post {
+          @include flexDisplay(flex-start, center, column);
+          border-bottom: 1px solid var(--brd_clr);
+          padding: 15px;
+          transition: all ease $vfast_trans;
+          font-size: 1.5rem;
+          color: var(--txt_clr1);
+          @include mediaQueries(min, 900px) {
+            @include flexDisplay(center, space-between);
+          }
+
+          .left_sect {
+            @include flexDisplay(flex-start, center, column);
+            margin-bottom: 10px;
+            @include mediaQueries(min, 900px) {
+              width: 45%;
+            }
+
+            a {
+              color: var(--acc_clr);
+              font-size: $txt_size4;
+              font-weight: bold;
+              font-family: $fnt_hdg2;
+              letter-spacing: 0.1rem;
+            }
+
+            .pub_details {
+              span {
+                font-weight: bold;
+              }
+            }
+          }
+
+          .right_sect {
+            @include flexDisplay(center, space-between);
+            width: 100%;
+            @include mediaQueries(min, 900px) {
+              width: 55%;
+            }
+
+            .icons_info_wrapper {
+              @include flexDisplay(center, flex-start);
+
+              .icon_info {
+                @include flexDisplay(center, center);
+                margin-right: 15px;
+
+                .icon_wrapper {
+                  margin-right: 5px;
+                  font-size: $txt_size2;
+                }
+              }
+            }
+
+            .pub_draft {
+              background-color: var(--spc_clr2);
+              color: $dft_clr;
+              padding: 5px;
+              border-radius: 5px;
+            }
+
+            .btns_wrapper {
+              .post_btn {
+                margin: 0 7px;
+                color: var(--txt_clr1);
+                font-family: $fnt_spc2;
+                padding: 5px;
+                border-radius: 5px;
+
+                &:hover {
+                  background-color: var(--bg_clr2);
+                }
+              }
+
+              .del_btn {
+                color: $dlt_clr;
+              }
+            }
+          }
+
+          &:last-of-type {
+            border: none;
+          }
+
+          &:hover {
+            background-color: var(--bg_clr1);
+          }
+        }
+      }
+
+      .follows_sect {
+        margin: 10px 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-gap: 10px;
+        @include mediaQueries(min, 800px) {
+          margin: 0;
+        }
+
+        .card_wrapper {
+          @include flexDisplay(center, flex-start);
+          background-color: var(--bg_clr3);
+          padding: 10px;
+          border-radius: 5px;
+          border: 2px solid var(--brd_clr);
+
+          .img_wrapper {
+            width: 50px;
+            border-radius: 50%;
+            padding: 1px;
+            background-color: var(--txt_clr3);
+            margin-right: 15px;
+
+            img {
+              border-radius: 50%;
+            }
+          }
+
+          .user_name {
+            font-size: $txt_size2;
+            color: var(--acc_clr);
+          }
+        }
+      }
+    }
+  }
+}

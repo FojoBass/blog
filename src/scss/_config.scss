@@ -19,6 +19,8 @@ $txt_size1: 1.2rem;
 $txt_size2: 1.7rem;
 $txt_size3: 2.2rem;
 $txt_size4: 2.7rem;
+$dlt_clr: #dc2626;
+$dft_clr: #78350f;
 
 :root.light {
   --bg_clr1: #fafafa;
@@ -32,6 +34,7 @@ $txt_size4: 2.7rem;
   --spc_clr: #40404023;
   // --brd_clr: #0000001a;
   --brd_clr: #f0f0f0;
+  --spc_clr2: #fcd34d;
 }
 
 :root.dark {
@@ -45,6 +48,7 @@ $txt_size4: 2.7rem;
   --acc_clr_shd: #252953;
   --spc_clr: #5f5f5f93;
   --brd_clr: #222222;
+  --spc_clr2: #fbbf24;
 }
 
 // * Variables End

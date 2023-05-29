@@ -1,5 +1,3 @@
-// @import 'config';
-
 $acc_clr: var(--acc_clr);
 
 nav {
@@ -133,6 +131,9 @@ nav {
       font-size: $txt_size2;
       font-weight: 300;
       transition: all ease $vfast_trans;
+      @include mediaQueries(max, 300px) {
+        font-size: 1.2rem;
+      }
 
       &:hover {
         text-decoration: underline;

@@ -1,7 +1,7 @@
 import Home from './Home';
 import About from './About';
 import Contact from './Contact';
-import Dashboard from './Dashboard';
+import Dashboard, { Posts, Follows } from './dashboard';
 import FAQ from './FAQ';
 import Signup from './Signup';
 import Login from './Login';
@@ -35,4 +35,6 @@ export {
   Footer,
   Sidenav,
   CategoryPosts,
+  Posts,
+  Follows,
 };
