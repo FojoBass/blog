@@ -1,8 +1,8 @@
 import React from 'react';
 
-const SkeletonLoad: React.FC<{ keyz: string }> = ({ keyz }) => {
+const SkeletonLoad = () => {
   return (
-    <article key={keyz} className='single_post dummy_single_post'>
+    <article className='single_post dummy_single_post'>
       <div className='post_wrapper'>
         <div className='top'>
           <div className='top_child'>

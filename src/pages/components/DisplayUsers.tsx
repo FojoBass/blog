@@ -1,21 +1,21 @@
 import React from 'react';
-import { FollowsInt } from '../../App';
 import { Link } from 'react-router-dom';
+import { FollowsInt } from '../../types';
 
 interface PropInt {
-  items: FollowsInt[];
+  users: FollowsInt[];
 }
 
-const Follows: React.FC<PropInt> = ({ items }) => {
+const DisplayUsers: React.FC<PropInt> = ({ users }) => {
   return (
     <section className='follows_sect'>
-      {items.map((item) => (
-        <article className='card_wrapper' key={item.id}>
+      {users.map((user) => (
+        <article className='card_wrapper' key={user.id}>
           <Link to='/p/dummyUser' className='img_wrapper'>
-            <img src={item.avi} alt='' />
+            <img src={user.avi} alt='' />
           </Link>
           <Link to='/p/dummyUser' className='user_name'>
-            {item.userName}
+            {user.userName}
           </Link>
         </article>
       ))}
@@ -23,4 +23,4 @@ const Follows: React.FC<PropInt> = ({ items }) => {
   );
 };
 
-export default Follows;
+export default DisplayUsers;

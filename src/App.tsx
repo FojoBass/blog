@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import './scss/main.scss';
 import avi from './assets/Me cropped.jpg';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   Outlet,
   Route,
@@ -29,16 +31,13 @@ import {
   Sidenav,
   CategoryPosts,
   Posts,
-  Follows,
+  DisplayUsers,
+  ProfileSettings,
+  AccountSettings,
 } from './pages';
 import { useBlogSelector, useBlogDispatch } from './app/store';
 import { toggleTab } from './features/tabSlice';
-
-export interface FollowsInt {
-  userName: string;
-  id: string;
-  avi: string;
-}
+import { FollowsInt } from './types';
 
 const App = () => {
   const theme = useBlogSelector((state) => state.theme);
@@ -103,17 +102,20 @@ const App = () => {
           <Route path='/:username/dashboard/posts' element={<Posts />} />
           <Route
             path='/:username/dashboard/followers'
-            element={<Follows items={dummyFollows} />}
+            element={<DisplayUsers users={dummyFollows} />}
           />
           <Route
             path='/:username/dashboard/followings'
-            element={<Follows items={dummyFollows.slice(0, 3)} />}
+            element={<DisplayUsers users={dummyFollows.slice(0, 3)} />}
           />
         </Route>
         <Route path='/faqs' element={<FAQ />} />
         <Route path='/join' element={<Signup />} />
         <Route path='/enter' element={<Login />} />
-        <Route path='/settings' element={<Settings />} />
+        <Route path='/settings' element={<Settings />}>
+          <Route path='profile' element={<ProfileSettings />} />
+          <Route path='account' element={<AccountSettings />} />
+        </Route>
         <Route path='/new-post' element={<NewPost />} />
         <Route path='/notifications' element={<Notification />} />
         <Route path='/:username/:postId' element={<Post />} />
@@ -141,6 +143,7 @@ const Root = () => {
       <Navbar />
       <Sidenav />
       <Outlet />
+      <ToastContainer />
       <Footer />
     </>
   );

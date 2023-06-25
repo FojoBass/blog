@@ -1,11 +1,11 @@
 import Home from './Home';
 import About from './About';
 import Contact from './Contact';
-import Dashboard, { Posts, Follows } from './dashboard';
+import Dashboard, { Posts, DisplayUsers } from './dashboard';
 import FAQ from './FAQ';
 import Signup from './Signup';
 import Login from './Login';
-import Settings from './Settings';
+import Settings, { ProfileSettings, AccountSettings } from './settings';
 import NewPost from './NewPost';
 import Notification from './Notification';
 import Post from './Post';
@@ -36,5 +36,7 @@ export {
   Sidenav,
   CategoryPosts,
   Posts,
-  Follows,
+  DisplayUsers,
+  ProfileSettings,
+  AccountSettings,
 };

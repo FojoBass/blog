@@ -1,18 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { AiFillCaretDown } from 'react-icons/ai';
 import Posts from './UserPosts';
-import Follows from './Follows';
+import DisplayUsers from '../components/DisplayUsers';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import BoardSearchLayout, {
+  PostInt,
+  NavInt,
+} from '../../layouts/BoardSearchLayout';
 
 const Dashboard = () => {
   const { pathname } = useLocation();
-  const [isPosts, setisPosts] = useState(
-    pathname.split('/').length === 3 ? true : false
-  );
+  const [isPosts, setisPosts] = useState<PostInt>({
+    status: pathname.split('/').length === 3 ? true : false,
+    items: [],
+  });
+  const [navItems] = useState<NavInt[]>([
+    { title: 'Posts', count: 3, url: '/dummies/dashboard/posts' },
+    { title: 'Followers', count: 5, url: '/dummies/dashboard/followers' },
+    { title: 'Followings', count: 6, url: '/dummies/dashboard/followings' },
+  ]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setisPosts(pathname.split('/')[3] === 'posts' ? true : false);
+    setisPosts({
+      status: pathname.split('/')[3] === 'posts' ? true : false,
+      items: [
+        { count: 5, title: 'Total likes' },
+        { count: 3, title: 'Total views' },
+      ],
+    });
   }, [pathname]);
 
   useEffect(() => {
@@ -20,58 +36,16 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <section id='dashboard_sect'>
-      <div className='center_sect'>
-        <h1>Dashboard</h1>
-
-        <div className='dash_nav'>
-          <NavLink to='/dummies/dashboard/posts' className='nav_opt'>
-            Posts (3)
-          </NavLink>
-          <NavLink to='/dummies/dashboard/followers' className='nav_opt'>
-            Followers (5)
-          </NavLink>
-          <NavLink to='/dummies/dashboard/followings' className='nav_opt'>
-            Followings (6)
-          </NavLink>
-        </div>
-
-        {isPosts && (
-          <div className='dash_boxes'>
-            <article className='dash_box'>
-              <span className='count'>5</span>Total likes
-            </article>
-
-            <article className='dash_box'>
-              <span className='count'>3</span>Total views
-            </article>
-          </div>
-        )}
-
-        <main>
-          <aside className='side_dash_nav_wrapper'>
-            <NavLink to='/dummies/dashboard/posts' className='side_dash_nav'>
-              Posts <span>(3)</span>
-            </NavLink>
-            <NavLink
-              to='/dummies/dashboard/followers'
-              className='side_dash_nav'
-            >
-              Followers <span>(5)</span>
-            </NavLink>
-            <NavLink
-              to='/dummies/dashboard/followings'
-              className='side_dash_nav'
-            >
-              Followings <span>(6)</span>
-            </NavLink>
-          </aside>
-          <Outlet />
-        </main>
-      </div>
-    </section>
+    <BoardSearchLayout
+      isPosts={isPosts}
+      heading={'Dashboard'}
+      navItems={navItems}
+      modClass='dashboard'
+      isSearch={false}
+      isSettings={false}
+    />
   );
 };
 
 export default Dashboard;
-export { Posts, Follows };
+export { Posts, DisplayUsers };

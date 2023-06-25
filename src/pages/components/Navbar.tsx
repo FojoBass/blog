@@ -12,9 +12,9 @@ import { dropLinks } from '../../data';
 import { v4 } from 'uuid';
 import { blogSlice } from '../../features/blogSlice';
 import { useGlobalContext } from '../../context';
+import SearchForm from './SearchForm';
 
 const Navbar = () => {
-  const navigate = useNavigate();
   const theme = useBlogSelector((state) => state.theme);
   const dispatch = useBlogDispatch();
   const [isDropdown, setIsDropdown] = useState(false);
@@ -36,12 +36,7 @@ const Navbar = () => {
           <Link to='/' className='home_btn'>
             DB
           </Link>
-          <div className='search_wrapper'>
-            <input type='text' placeholder='Search...' />
-            <button className='search_btn'>
-              <CiSearch />
-            </button>
-          </div>
+          <SearchForm />
         </div>
 
         <div className='right_side'>

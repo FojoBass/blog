@@ -1,15 +1,34 @@
-#dashboard_sect {
+#bsl_sect {
   .center_sect {
-    max-width: 1300px;
     min-height: 75vh;
-
-    h1 {
-      padding: 10px 0;
-      font-size: $txt_size4;
-      font-family: $fnt_hdg1;
+    &.dashboard {
+      max-width: 1300px;
     }
 
-    .dash_nav {
+    .bsl_header {
+      @include flexDisplay(center, space-between);
+
+      h1 {
+        padding: 10px 0;
+        font-size: $txt_size4;
+        font-family: $fnt_hdg1;
+      }
+
+      .sort_by_opt {
+        margin-left: 10px;
+        text-transform: capitalize;
+        font-size: $txt_size2;
+        font-family: $fnt_hdg1;
+        color: var(--txt_clr1);
+
+        &.active {
+          font-weight: 500;
+          color: var(--txt_clr3);
+        }
+      }
+    }
+
+    .bsl_nav {
       @include flexDisplay(center, center);
       @include mediaQueries(min, 800px) {
         display: none;
@@ -34,7 +53,7 @@
       }
     }
 
-    .dash_boxes {
+    .bsl_boxes {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       padding: 10px 0;
@@ -43,7 +62,7 @@
         grid-template-columns: repeat(4, 1fr);
       }
 
-      .dash_box {
+      .bsl_box {
         background-color: var(--bg_clr3);
         border-radius: 5px;
         @include flexDisplay(flex-start, center, column);
@@ -66,19 +85,19 @@
       }
     }
 
-    main {
+    .bsl_main {
       @include mediaQueries(min, 800px) {
         display: grid;
         grid-template-columns: 250px 1fr;
         align-items: flex-start;
         grid-gap: 10px;
       }
-      .side_dash_nav_wrapper {
+      .side_bsl_nav_wrapper {
         display: none;
         @include mediaQueries(min, 800px) {
           @include flexDisplay(flex-start, flex-start, column);
 
-          .side_dash_nav {
+          .side_bsl_nav {
             padding: 10px;
             width: 100%;
             font-size: 1.5rem;
@@ -244,6 +263,13 @@
             color: var(--acc_clr);
           }
         }
+      }
+    }
+
+    .search_wrapper {
+      margin-bottom: 10px;
+      @include mediaQueries(min, 800px) {
+        display: none;
       }
     }
   }

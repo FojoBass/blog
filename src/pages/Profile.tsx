@@ -10,22 +10,23 @@ import {
   AiOutlineTwitter,
   AiFillFacebook,
   AiFillGithub,
-  AiOutlineInstagram,
+  AiFillInstagram,
   AiFillBehanceSquare,
 } from 'react-icons/ai';
 import { DisplayPosts } from './components';
-import { PostsInt } from './Home';
+import { PostsInt } from '../types';
+import { v4 } from 'uuid';
 
 const Profile = () => {
   const { isUserLogged } = useGlobalContext();
   const [userColor, setUserColor] = useState('#000000');
   // todo Dummy Posts to be replaced
   const userPosts: PostsInt[] = [
-    { isDummy: true },
-    { isDummy: true },
-    { isDummy: true },
-    { isDummy: true },
-    { isDummy: true },
+    { isDummy: true, id: v4() },
+    { isDummy: true, id: v4() },
+    { isDummy: true, id: v4() },
+    { isDummy: true, id: v4() },
+    { isDummy: true, id: v4() },
   ];
   return (
     <section id='profile_sect'>
@@ -125,7 +126,7 @@ const Profile = () => {
                 className='social_link'
                 target='_blank'
               >
-                <AiOutlineInstagram />
+                <AiFillInstagram />
               </a>
 
               <a

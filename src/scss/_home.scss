@@ -23,65 +23,7 @@
       }
 
       .not_logged_sect {
-        background-color: var(--bg_clr1);
-        border-radius: 10px;
-        padding: 20px;
-        border: 1.5px solid var(--brd_clr);
-        margin-bottom: 20px;
-
-        h3 {
-          line-height: 2.3rem;
-          margin-bottom: 10px;
-          color: var(--txt_clr2);
-          font-family: $fnt_hdg2;
-          font-size: $txt_size3;
-        }
-
-        p {
-          line-height: 2.1rem;
-          color: var(--txt_clr1);
-          margin-bottom: 10px;
-          font-family: $fnt_spc1;
-          font-weight: 300;
-        }
-
-        .btns_wrapper {
-          @include flexDisplay(center, center, column);
-
-          .create_acct_btn {
-            border: 1px solid var(--acc_clr);
-            width: 100%;
-            padding: 10px 0;
-            border-radius: 8px;
-            color: var(--acc_clr);
-            font-size: $txt_size2;
-            font-weight: 300;
-            transition: all ease $vfast_trans;
-            text-align: center;
-            margin-bottom: 5px;
-
-            &:hover {
-              text-decoration: underline;
-              background-color: var(--acc_clr);
-              color: #fff;
-            }
-          }
-
-          .login_btn {
-            color: var(--txt_clr2);
-            transition: all ease $vfast_trans;
-            font-size: $txt_size2;
-            padding: 10px 0;
-            width: 100%;
-            text-align: center;
-            border-radius: 5px;
-            font-weight: 300;
-
-            &:hover {
-              @include navHover();
-            }
-          }
-        }
+        @include notLoggedSect();
       }
 
       .side_nav_opts {

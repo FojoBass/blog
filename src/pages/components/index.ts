@@ -5,6 +5,10 @@ import Sidenav from './Sidenav';
 import SkeletonLoad from './SkeletonLoad';
 import SinglePost from './SinglePost';
 import DisplayPosts from './DisplayPosts';
+import DisplayUsers from './DisplayUsers';
+import ImageInputField from './form/ImageInputField';
+import LocationInput from './form/LocationInput';
+import GenderInput from './form/GenderInput';
 
 export {
   Loading,
@@ -14,4 +18,8 @@ export {
   SkeletonLoad,
   SinglePost,
   DisplayPosts,
+  DisplayUsers,
+  ImageInputField,
+  LocationInput,
+  GenderInput,
 };

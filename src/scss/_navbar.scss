@@ -43,38 +43,12 @@ nav {
 
       @include mediaQueries(min, 800px) {
         display: block;
-        position: relative;
         margin-left: 15px;
         overflow: hidden;
       }
 
       input {
-        border-radius: 8px;
-        border: 1.5px solid var(--brd_clr);
-        padding: 10px;
         width: 400px;
-        font-family: $fnt_spc2;
-        transition: all ease $fast_trans;
-        color: var(--txt_clr3);
-
-        &:focus {
-          border-color: var(--acc_clr);
-        }
-      }
-
-      .search_btn {
-        @include position(absolute, right, top, 0px, 0px);
-        @include flexDisplay(center, center);
-        height: 100%;
-        width: 10%;
-        border-radius: 8px;
-        color: var(--txt_clr2);
-        font-size: $icn_size;
-        transition: all ease $fast_trans;
-
-        &:hover {
-          @include navHover();
-        }
       }
     }
   }

@@ -1,0 +1,91 @@
+#contact_sect {
+  .center_sect {
+    margin-bottom: 20px;
+
+    .contact_heading {
+      padding: 15px 0;
+      font-size: 3.3rem;
+      margin-top: 10px;
+      color: var(--txt_clr2);
+      text-align: center;
+    }
+
+    .contact_wrapper {
+      @include flexDisplay(flex-start, flex-start, column);
+      @include mediaQueries(min, 800px) {
+        @include flexDisplay(center, space-between, row);
+      }
+
+      .left_side {
+        margin-bottom: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        width: 100%;
+        gap: 15px;
+        @include mediaQueries(min, 800px) {
+          width: 30%;
+        }
+
+        .contact_opt {
+          .title {
+            font-family: $fnt_hdg2;
+            font-size: $txt_size4;
+            letter-spacing: 0.1rem;
+            text-transform: uppercase;
+          }
+
+          .info {
+            color: var(--txt_clr1);
+            font-size: $txt_size2;
+            letter-spacing: 0.1rem;
+
+            &:hover {
+              color: var(--acc_clr);
+            }
+          }
+        }
+      }
+
+      .right_side {
+        margin-top: 15px;
+        width: 100%;
+
+        form {
+          background-color: var(--bg_clr3);
+          padding: 20px;
+          border-radius: 10px;
+          border: 2px solid var(--brd_clr);
+          @include flexDisplay(flex-start, flex-start, column);
+          width: 100%;
+
+          .form_heading {
+            text-transform: uppercase;
+            font-size: $txt_size4;
+            font-family: $fnt_hdg2;
+            font-weight: 400;
+            letter-spacing: 0.1rem;
+            margin-bottom: 20px;
+          }
+
+          input,
+          textarea {
+            padding: 10px;
+            border-bottom: 1.5px solid var(--brd_clr);
+            width: 100%;
+            color: var(--txt_clr2);
+            transition: all ease $mid_trans;
+            margin-bottom: 20px;
+
+            &:focus-within {
+              border-color: var(--acc_clr);
+            }
+          }
+
+          .submit_btn {
+            padding: 10px 30px;
+          }
+        }
+      }
+    }
+  }
+}

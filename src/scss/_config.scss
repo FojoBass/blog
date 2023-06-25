@@ -26,6 +26,7 @@ $dft_clr: #78350f;
   --bg_clr1: #fafafa;
   --bg_clr2: #f5f5f5;
   --bg_clr3: #ffffff;
+  --bg_form: #e2e2e2;
   --txt_clr1: #575757;
   --txt_clr2: #404040;
   --txt_clr3: #171717;
@@ -35,20 +36,30 @@ $dft_clr: #78350f;
   // --brd_clr: #0000001a;
   --brd_clr: #f0f0f0;
   --spc_clr2: #fcd34d;
+  --shw_clr_shd: #a5a5a5;
+  --shw_clr_tnt: #f1f1f1;
+  --shw_clr_txt: #a5a5a5;
+  --shw_clr_txt2: #777777;
 }
 
 :root.dark {
   --bg_clr1: #2b2b2b;
   --bg_clr2: #000000;
   --bg_clr3: #171717;
+  --bg_form: #1f1f1f;
   --txt_clr1: #bdbdbd;
   --txt_clr2: #e5e5e5;
   --txt_clr3: #fafafa;
-  --acc_clr: #818cf8;
+  // --acc_clr: #818cf8;
+  --acc_clr: #084cdf;
   --acc_clr_shd: #252953;
   --spc_clr: #5f5f5f93;
   --brd_clr: #222222;
   --spc_clr2: #fbbf24;
+  --shw_clr_shd: #0a0a0a;
+  --shw_clr_tnt: #353535;
+  --shw_clr_txt: #757575;
+  --shw_clr_txt2: #919191;
 }
 
 // * Variables End
@@ -145,6 +156,68 @@ $dft_clr: #78350f;
   padding: 5px 10px;
   border-radius: 10px;
   font-family: $fnt_spc2;
+}
+
+@mixin notLoggedSect {
+  background-color: var(--bg_clr1);
+  border-radius: 10px;
+  padding: 20px;
+  border: 1.5px solid var(--brd_clr);
+  margin-bottom: 20px;
+
+  h3 {
+    line-height: 2.3rem;
+    margin-bottom: 10px;
+    color: var(--txt_clr2);
+    font-family: $fnt_hdg2;
+    font-size: $txt_size3;
+  }
+
+  p {
+    line-height: 2.1rem;
+    color: var(--txt_clr1);
+    margin-bottom: 10px;
+    font-family: $fnt_spc1;
+    font-weight: 300;
+  }
+
+  .btns_wrapper {
+    @include flexDisplay(center, center, column);
+
+    .create_acct_btn {
+      border: 1px solid var(--acc_clr);
+      width: 100%;
+      padding: 10px 0;
+      border-radius: 8px;
+      color: var(--acc_clr);
+      font-size: $txt_size2;
+      font-weight: 300;
+      transition: all ease $vfast_trans;
+      text-align: center;
+      margin-bottom: 5px;
+
+      &:hover {
+        text-decoration: underline;
+        background-color: var(--acc_clr);
+        color: #fff;
+      }
+    }
+
+    .login_btn {
+      color: var(--txt_clr2);
+      transition: all ease $vfast_trans;
+      font-size: $txt_size2;
+      padding: 10px 0;
+      width: 100%;
+      text-align: center;
+      border-radius: 5px;
+      font-weight: 300;
+
+      &:hover {
+        @include navHover();
+      }
+    }
+  }
 }
 
 // * Mixins End

@@ -1,0 +1,165 @@
+@mixin neumorph {
+  box-shadow: 3px 3px 3px var(--shw_clr_shd), -3px -3px 3px var(--shw_clr_tnt);
+}
+
+@mixin neumorphPressed {
+  box-shadow: inset 3px 3px 3px var(--shw_clr_shd),
+    inset -3px -3px 3px var(--shw_clr_tnt);
+}
+
+.login_sect {
+  padding: 20px;
+  min-height: 80vh;
+  display: flex;
+  background-color: var(--bg_form);
+  position: fixed;
+  height: 100vh;
+  width: 100%;
+  z-index: 100;
+  top: 0;
+  left: 0;
+
+  .home_btn {
+    @include position(absolute, right, top, 20px, 20px);
+    font-size: 2rem;
+    color: var(--shw_clr_txt);
+    @include neumorph();
+    padding: 5px;
+    border-radius: 50%;
+    transition: all ease $fmid_trans;
+
+    &:hover {
+      color: var(--acc_clr);
+    }
+
+    &:active {
+      @include neumorphPressed();
+    }
+  }
+
+  .center_sect {
+    border-radius: 10px;
+    padding: 0;
+    box-shadow: 5px 5px 5px var(--shw_clr_shd), -5px -5px 5px var(--shw_clr_tnt);
+    height: fit-content;
+    margin: auto;
+    overflow: hidden;
+    width: 500px;
+
+    .top {
+      padding: 20px;
+
+      h1 {
+        text-align: center;
+        font-family: $fnt_hdg1;
+        font-size: $txt_size4;
+        text-transform: capitalize;
+        color: var(--shw_clr_txt);
+        margin-bottom: 20px;
+      }
+
+      .form_opt {
+        margin-bottom: 20px;
+        border-radius: 10px;
+        position: relative;
+        @include flexDisplay(center, flex-start);
+        @include neumorph();
+
+        &.focus {
+          @include neumorphPressed();
+        }
+
+        .icon_wrapper {
+          margin-left: 10px;
+        }
+
+        input {
+          width: 100%;
+          padding: 20px;
+          color: var(--shw_clr_txt2);
+          font-family: $fnt_spc2;
+          font-size: 1.4rem;
+          letter-spacing: 0.1rem;
+          font-weight: bold;
+
+          &::placeholder {
+            color: var(--shw_clr_txt);
+          }
+        }
+
+        .eye_icon_wrapper {
+          @include position(absolute, right, top, 20px, 50%);
+          font-size: $txt_size2;
+          color: var(--shw_clr_txt2);
+        }
+      }
+
+      .login_btn {
+        display: block;
+        width: 100px;
+        padding: 10px 0;
+        margin: 0 auto;
+        border-radius: 10px;
+        font-size: 1.3rem;
+        font-family: $fnt_spc1;
+        color: var(--shw_clr_txt);
+        transition: all ease $fmid_trans;
+        font-weight: bold;
+        @include neumorph();
+
+        &:hover {
+          color: var(--acc_clr);
+        }
+
+        &:active {
+          @include neumorphPressed();
+        }
+      }
+
+      .btns_wrapper {
+        @include flexDisplay(center, center);
+        margin: 20px 0;
+
+        .other_login_btn {
+          @include neumorph();
+          margin: 0 5px;
+          padding: 10px;
+          font-size: 1.5rem;
+          color: var(--shw_clr_txt);
+          border-radius: 50%;
+          transition: all ease $fmid_trans;
+
+          &.git_btn:hover {
+            color: #000;
+          }
+
+          &.tw_btn:hover {
+            color: #1da0f2;
+          }
+
+          &.goo_btn:hover {
+            color: #e72734;
+          }
+
+          &:active {
+            @include neumorphPressed();
+          }
+        }
+      }
+
+      .signup_btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        text-decoration: underline;
+        font-size: 1.8rem;
+        font-family: $fnt_hdg2;
+        color: var(--shw_clr_txt);
+
+        &:hover {
+          color: var(--acc_clr);
+        }
+      }
+    }
+  }
+}

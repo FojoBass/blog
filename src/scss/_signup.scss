@@ -1,0 +1,176 @@
+.signup_sect {
+  padding: 50px 10px;
+  min-height: 80vh;
+  display: flex;
+  background-color: var(--bg_clr2);
+  position: fixed;
+  height: 100vh;
+  width: 100%;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  overflow: auto;
+
+  .home_btn {
+    @include position(absolute, right, top, 20px, 10px);
+    font-size: 2rem;
+    color: var(--txt_clr2);
+    padding: 5px;
+    border-radius: 50%;
+    transition: all ease $fmid_trans;
+
+    &:hover {
+      color: var(--acc_clr);
+      background-color: var(--bg_clr2);
+    }
+  }
+
+  .center_sect {
+    border-radius: 10px;
+    padding: 0;
+    box-shadow: 0 0 6px 2px var(--shw_clr_shd);
+    height: fit-content;
+    margin: auto;
+    overflow: hidden;
+    width: 800px;
+    background-color: var(--bg_clr3);
+    max-width: 700px;
+
+    .top {
+      padding: 20px;
+
+      h1 {
+        text-align: center;
+        font-family: $fnt_hdg1;
+        font-size: 3.5rem;
+        text-transform: capitalize;
+        color: var(--txt_clr1);
+        margin-bottom: 20px;
+        @include flexDisplay(center, center);
+
+        .before,
+        .after {
+          width: 50px;
+          height: 2px;
+          background-color: var(--shw_clr_tnt);
+          display: inline-block;
+          margin: 0 10px;
+        }
+      }
+
+      .info_wrapper {
+        margin-bottom: 20px;
+
+        .form_opt_wrapper {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          grid-column-gap: 20px;
+        }
+
+        .form_opt {
+          margin-bottom: 15px;
+        }
+
+        h3 {
+          font-family: $fnt_hdg2;
+          color: var(--txt_clr1);
+          margin-bottom: 8px;
+          font-size: $txt_size3;
+          font-style: italic;
+        }
+
+        textarea {
+          border: 2px solid var(--brd_clr);
+          width: 100%;
+          padding: 10px;
+          border-radius: 10px;
+          color: var(--txt_clr1);
+          line-height: 2.5rem;
+          letter-spacing: 0.1rem;
+          font-family: $fnt_spc1;
+        }
+
+        .social_opt {
+          @include flexDisplay(center, flex-start);
+          margin-bottom: 10px;
+          position: relative;
+
+          &:last-of-type {
+            margin-bottom: 0;
+          }
+
+          .social_icon {
+            margin-right: 12px;
+            font-size: $txt_size2;
+            @include position(absolute, left, top, 0px, 50%);
+          }
+
+          input {
+            width: 100%;
+            border-bottom: 2px solid var(--brd_clr);
+            padding: 5px 0 5px 30px;
+            color: var(--txt_clr1);
+            letter-spacing: 0.1rem;
+          }
+        }
+      }
+
+      .basics {
+        .form_opt {
+          position: relative;
+
+          &_icon {
+            font-size: $txt_size2;
+            color: var(--txt_clr1);
+            @include position(absolute, left, top, 0px, 0px);
+          }
+
+          input {
+            width: 100%;
+            border-bottom: 2px solid var(--brd_clr);
+            padding: 0 0 6px 20px;
+            transition: all ease $fmid_trans;
+            display: block;
+            color: var(--txt_clr1);
+
+            &:focus {
+              border-bottom-color: var(--acc_clr);
+            }
+          }
+
+          .eye_icon_wrapper {
+            @include position(absolute, right, top, 20px, -5px);
+            font-size: $txt_size2;
+            color: var(--txt_clr1);
+            padding: 5px;
+          }
+        }
+      }
+
+      .reg_btn {
+        display: block;
+        width: 100px;
+        padding: 10px 0;
+        margin: 0 auto;
+        border-radius: 10px;
+        font-size: 1.3rem;
+        font-family: $fnt_spc1;
+      }
+
+      .login_btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        text-decoration: underline;
+        font-size: 1.8rem;
+        font-family: $fnt_hdg2;
+        color: var(--txt_clr1);
+        margin-top: 5px;
+
+        &:hover {
+          color: var(--acc_clr);
+        }
+      }
+    }
+  }
+}

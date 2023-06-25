@@ -4,28 +4,30 @@ import SidenavPart from './components/SidenavPart';
 import dummyImg from '../assets/Me cropped.jpg';
 import { SkeletonLoad, SinglePost, DisplayPosts } from './components';
 import { useGlobalContext } from '../context';
+import { v4 } from 'uuid';
+import { PostsInt } from '../types';
 
 export interface HandleStickInt {
   (el: HTMLDivElement, stick: boolean, posValue?: number): void;
-}
-
-export interface PostsInt {
-  isDummy: boolean;
 }
 
 // TODO IMPLEMNET RESPONSE SCROLL FOR ASIDE
 
 const Home = () => {
   const asideRef = useRef<HTMLDivElement>(null);
-  const { isUserLogged } = useGlobalContext();
+  const { isUserLogged, setSearchString } = useGlobalContext();
   // TODO Placeholder for loading purposes
   const homePosts: PostsInt[] = [
-    { isDummy: true },
-    { isDummy: true },
-    { isDummy: true },
-    { isDummy: true },
-    { isDummy: true },
+    { isDummy: true, id: v4() },
+    { isDummy: true, id: v4() },
+    { isDummy: true, id: v4() },
+    { isDummy: true, id: v4() },
+    { isDummy: true, id: v4() },
   ];
+
+  useEffect(() => {
+    if (setSearchString) setSearchString('');
+  }, []);
 
   return (
     <section id='home_sect'>

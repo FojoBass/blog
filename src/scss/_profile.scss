@@ -20,6 +20,7 @@ $padding: 10px;
         width: 50px;
         border-radius: 50%;
         padding: 5px;
+        box-sizing: content-box;
         @include position(absolute, left, top, 0px, -40px);
 
         @include mediaQueries(min, 800px) {

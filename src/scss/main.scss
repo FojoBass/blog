@@ -10,5 +10,180 @@
 @import 'display_posts';
 @import 'profile';
 @import 'single_post';
-@import 'dashboard';
 @import 'about';
+@import 'contact';
+@import 'login';
+@import 'signup';
+@import 'bs_layout';
+@import 'search';
+@import 'settings';
+
+.search_wrapper {
+  position: relative;
+
+  input {
+    border-radius: 8px;
+    border: 1.5px solid var(--brd_clr);
+    padding: 10px;
+    width: 100%;
+    font-family: $fnt_spc2;
+    transition: all ease $fast_trans;
+    color: var(--txt_clr3);
+    background-color: var(--bg_clr3);
+
+    &:focus {
+      border-color: var(--acc_clr);
+    }
+  }
+
+  .search_btn {
+    @include position(absolute, right, top, 0px, 0px);
+    @include flexDisplay(center, center);
+    height: 100%;
+    width: 10%;
+    border-radius: 8px;
+    color: var(--txt_clr2);
+    font-size: $icn_size;
+    transition: all ease $fast_trans;
+
+    &:hover {
+      @include navHover();
+    }
+  }
+}
+
+// * For Image Input Field
+.avi {
+  .form_opt {
+    @include flexDisplay(center, flex-start);
+
+    input {
+      border: 2px solid var(--brd_clr);
+      padding: 10px;
+      width: 80%;
+      border-radius: 10px;
+      cursor: pointer;
+      color: var(--txt_clr1);
+
+      &::file-selector-button {
+        margin-right: 20px;
+        border: none;
+        background: var(--bg_clr1);
+        padding: 10px 20px;
+        border-radius: 10px;
+        transition: background 0.2s ease-in-out;
+        color: var(--txt_clr1);
+        cursor: pointer;
+      }
+    }
+
+    .img_wrapper {
+      background-color: var(--txt_clr3);
+      width: 50px;
+      // height: 50px;
+      display: inline-block;
+      margin-right: 20px;
+      border-radius: 50%;
+      padding: 2px;
+
+      img {
+        // height: 100%;
+        border-radius: 50%;
+        // object-fit: cover;
+      }
+    }
+  }
+}
+
+// * For Location Input fields
+.form_opt:not(.basics .form_opt, .avi .form_opt, .gen_opt_wrapper) {
+  @include flexDisplay(flex-start, flex-start, column);
+
+  label {
+    font-size: 1.6rem;
+    color: var(--txt_clr1);
+    margin-bottom: 10px;
+  }
+
+  select {
+    width: 60%;
+    padding: 10px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    border: none;
+    background-color: var(--brd_clr);
+    border-radius: 5px;
+    color: var(--txt_clr3);
+
+    &#states {
+      margin-bottom: 0px;
+    }
+  }
+
+  input {
+    color: var(--txt_clr3);
+  }
+}
+
+// * For Gender Input Fields
+.gen_opt_wrapper {
+  .radio_head {
+    font-size: 1.6rem;
+    color: var(--txt_clr1);
+    margin-bottom: 10px;
+    cursor: default;
+  }
+
+  .gen_opt_sub_wrapper {
+    @include flexDisplay(flex-start, flex-start);
+    border: 2px solid var(--brd_clr);
+    padding: 0 10px;
+    width: fit-content;
+    border-radius: 10px;
+
+    .gen_opt {
+      margin-right: 30px;
+      padding: 5px 0px;
+
+      label {
+        cursor: pointer;
+        // width: 80px;
+        display: inline-block;
+        // background-color: blue;
+        position: relative;
+        font-family: $fnt_spc2;
+        font-size: 1.3rem;
+      }
+
+      span {
+        @include position(absolute, right, top, -20px, 50%);
+        background-color: var(--acc_clr_shd);
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+
+        &::after {
+          @include position(absolute, right, top, 50%, 50%);
+          content: '';
+          background-color: var(--acc_clr);
+          background-color: transparent;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          transition: all ease $fmid_trans;
+        }
+      }
+
+      input {
+        visibility: hidden;
+        display: block;
+        width: 0;
+        height: 0;
+
+        &:checked + label span::after {
+          background-color: var(--acc_clr);
+        }
+      }
+    }
+  }
+}

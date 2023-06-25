@@ -13,9 +13,13 @@
     @include visibilityShow;
   }
 
+  .not_logged_sect {
+    @include notLoggedSect();
+  }
+
   .side_nav {
     width: 300px;
-    min-height: 94vh;
+    min-height: 100vh;
     background-color: var(--bg_clr3);
     border-radius: 0 10px 10px 0;
     padding: 0 10px;
@@ -52,7 +56,7 @@
     }
 
     &_socials {
-      @include position(absolute, left, bottom, 0px, 0px);
+      @include position(absolute, left, bottom, 0px, 25px);
       @include flexDisplay(center, center);
       width: 100%;
       padding: 10px 20px;
