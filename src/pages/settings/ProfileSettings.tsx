@@ -14,21 +14,30 @@ const ProfileSettings = () => {
     [userName, setUsername] = useState(''),
     [url, setUrl] = useState(''),
     [bio, setBio] = useState(''),
-    [brandColor, setBrandColor] = useState(''),
-    [hexPattern] = useState(/^[0-9A-Fa-f]+$/),
-    [brandColorChar, setBrandColorChar] = useState('');
+    // TODO Brand color is to be fetched
+    [brandColor, setBrandColor] = useState('#000000'),
+    [brandColorChar, setBrandColorChar] = useState('#000000'),
+    [hexPattern] = useState(/^(?!.*#.*#)[0-9A-Fa-f-#]+$/);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     console.log('Profile settings submitted');
   };
 
-  const handleBrandColorTextChange = (e: ChangeEvent) => {
-    console.log('Yeah I changed');
+  const handleBrandColorTextChange = (e: ChangeEvent<HTMLInputElement>) => {
+    let finalValue = '';
+    if (e.target.value && e.target.value.charAt(0) !== '#')
+      finalValue = '#' + e.target.value;
+    else finalValue = e.target.value;
+
+    if (hexPattern.test(finalValue) && finalValue.length <= 7) {
+      setBrandColorChar(finalValue);
+      if (finalValue.length === 7) setBrandColor(finalValue);
+    } else if (!finalValue.length) setBrandColorChar(finalValue);
   };
 
   return (
-    <form className='set_prof_form' onSubmit={handleSubmit}>
+    <form className='set_prof_form settings_form' onSubmit={handleSubmit}>
       <fieldset className='form_segment'>
         <legend>User</legend>
 
@@ -119,18 +128,21 @@ const ProfileSettings = () => {
         <legend>Branding</legend>
 
         <article className='form_opt'>
-          <div className='top_field'>
+          <div className='top'>
             <label htmlFor='brand_color'>Brand color</label>
             <p className='info'>Used for backgrounds, borders, etc.</p>
           </div>
 
-          <div className='bottom_field'>
+          <div className='bottom'>
             <input
               type='color'
               name='brand_color'
               id='brand_color'
-              value={brandColor}
-              onChange={(e) => setBrandColor(e.target.value)}
+              value={brandColor || '#000000'}
+              onChange={(e) => {
+                setBrandColor(e.target.value);
+                setBrandColorChar(e.target.value);
+              }}
             />
             <input
               type='text'

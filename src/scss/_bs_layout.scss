@@ -96,6 +96,8 @@
         display: none;
         @include mediaQueries(min, 800px) {
           @include flexDisplay(flex-start, flex-start, column);
+          position: sticky;
+          top: 74.16px;
 
           .side_bsl_nav {
             padding: 10px;

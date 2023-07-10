@@ -1,10 +1,13 @@
-.set_prof_form {
+$danger_clr: #d80000;
+$danger_clr_shd: #ff0000a6;
+
+.settings_form {
   .form_segment {
     background-color: var(--bg_clr3);
     border: 1.5px solid var(--brd_clr);
     border-radius: 10px;
     padding: 10px;
-    margin-top: 10px;
+    margin-bottom: 10px;
 
     &:hover legend {
       // background-color: var(--txt_clr1);
@@ -55,13 +58,153 @@
         margin-bottom: 20px;
       }
 
-      label {
+      input[type='text'],
+      input[type='url'],
+      input[type='password'],
+      textarea {
+        border: 2px solid var(--brd_clr);
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        transition: border 0.3s ease;
+
+        &:focus-within {
+          border-color: var(--acc_clr);
+        }
+      }
+    }
+  }
+
+  .spc_btn {
+    margin: 10px 0;
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+  }
+}
+
+.set_prof_form {
+  .form_segment {
+    .form_opt {
+      .top_field {
+        @include flexDisplay(flex-start, center, column);
+        margin-bottom: 10px;
+        width: 100%;
+
+        input {
+          border: 2px solid var(--brd_clr);
+          width: 100%;
+          padding: 10px;
+          border-radius: 5px;
+          transition: border 0.3s ease;
+
+          &:focus-within {
+            border-color: var(--acc_clr);
+          }
+        }
+      }
+
+      .bottom_field {
+        input {
+          cursor: pointer;
+        }
+
+        label {
+          padding-left: 10px;
+          cursor: pointer;
+        }
+      }
+
+      label:not(.gen_opt label) {
         margin-bottom: 10px !important;
       }
 
-      input[type='text'] {
-        border: 2px solid var(--brd_clr);
+      .top {
+        .info {
+          color: var(--txt_clr1);
+        }
+      }
+
+      .bottom {
+        position: relative;
         width: 100%;
+        margin-top: 10px;
+
+        input[type='color'] {
+          @include position(absolute, left, top, 7px, 50%);
+          height: 80%;
+          cursor: pointer;
+        }
+
+        input[type='text'] {
+          padding-left: 65px;
+        }
+      }
+    }
+  }
+}
+
+.acct_settings_wrapper {
+  padding-bottom: 20px;
+
+  .input_wrapper {
+    position: relative;
+    width: 100%;
+
+    .eye_icon_wrapper {
+      @include position(absolute, right, top, 10px, 50%);
+      color: var(--txt_clr1);
+      padding: 5px;
+      font-size: 1.5rem;
+    }
+  }
+
+  .delete_acct {
+    .form_segment {
+      &:hover legend {
+        color: $danger_clr;
+        outline-color: $danger_clr_shd;
+        border-color: transparent;
+        border-radius: 5px 5px 0 0;
+
+        &:after,
+        &:before {
+          opacity: 0;
+        }
+      }
+
+      h3 {
+        color: $danger_clr;
+        font-size: $txt_size2;
+        margin-bottom: 10px;
+        font-family: $fnt_hdg1;
+      }
+
+      p {
+        font-size: 1.5rem;
+        line-height: 20px;
+        font-family: $fnt_spc1;
+      }
+
+      input {
+        margin: 10px 0;
+
+        &:focus-within {
+          border-color: $danger_clr_shd !important;
+        }
+      }
+
+      .delete_btn {
+        display: block;
+        width: 50%;
+        text-align: center;
+        background-color: $danger_clr_shd;
+        transition: background-color ease 0.3s;
+
+        &:hover {
+          background-color: $danger_clr;
+        }
       }
     }
   }

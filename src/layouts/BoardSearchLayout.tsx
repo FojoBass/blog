@@ -46,11 +46,14 @@ const BoardSearchLayout: FC<BSLInt> = ({
   useEffect(() => {
     if (!isSettings) {
       if (!searchParams.get('filters'))
-        setSearchParams({
-          s: searchString ? searchString : '',
-          filters: filters ?? '',
-          orderBy: orderBy ?? '',
-        });
+        setSearchParams(
+          {
+            s: searchString ? searchString : '',
+            filters: filters ?? '',
+            orderBy: orderBy ?? '',
+          },
+          { replace: true }
+        );
       else {
         if (setFilters && setOrderBy) {
           setFilters(searchParams.get('filters') ?? '');

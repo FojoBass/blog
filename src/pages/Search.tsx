@@ -39,24 +39,17 @@ const Search = () => {
 
   useEffect(() => {
     if (setSearchString && setIsSearch && isSearch) {
-      setSearchParams({
-        s: searchString ? searchString : '',
-        filters: filters ?? '',
-        orderBy: orderBy ?? '',
-      });
+      setSearchParams(
+        {
+          s: searchString ? searchString : '',
+          filters: filters ?? '',
+          orderBy: orderBy ?? '',
+        },
+        { replace: true }
+      );
       setIsSearch(false);
     }
   }, [isSearch]);
-
-  // useEffect(() => {
-  //   if (
-  //     filters !== 'posts' &&
-  //     filters !== 'users' &&
-  //     filters !== 'my posts only' &&
-  //     setFilters
-  //   )
-  //     setFilters('posts');
-  // }, []);
 
   return (
     <BoardSearchLayout

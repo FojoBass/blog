@@ -18,7 +18,7 @@ const Settings = () => {
   ]);
 
   useEffect(() => {
-    navigate('/settings/profile');
+    navigate('/settings/profile', { replace: true });
   }, []);
 
   return (
