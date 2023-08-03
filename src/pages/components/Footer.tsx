@@ -1,9 +1,17 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const Footer = () => {
+  const location = useLocation();
+  const [isFooterFixed, setIsFooterFixed] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname.includes('new-post')) setIsFooterFixed(true);
+    else setIsFooterFixed(false);
+  }, [location.pathname]);
   return (
-    <footer id='footer_sect'>
+    <footer id='footer_sect' className={isFooterFixed ? 'bottom_fixed' : ''}>
       <div className='footer_wrapper'>
         <ul className='nav_links'>
           <li>

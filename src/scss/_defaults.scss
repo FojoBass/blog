@@ -36,6 +36,8 @@ button {
   border: none;
   cursor: pointer;
   font-size: inherit;
+  transition: all ease $fast_trans;
+  color: var(--txt_clr3);
 }
 
 a {

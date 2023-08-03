@@ -9,6 +9,13 @@
 #footer_sect {
   background-color: var(--fbg_clr);
 
+  &.bottom_fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+  }
+
   .footer_wrapper {
     padding: 20px;
     max-width: 700px;

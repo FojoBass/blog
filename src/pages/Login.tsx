@@ -8,6 +8,10 @@ const Login = () => {
   const inputRef = useRef<Array<HTMLInputElement | null>>([]);
 
   useEffect(() => {
+    console.log('inputRef: ', inputRef);
+  }, [inputRef]);
+
+  useEffect(() => {
     if (inputRef.current.find((item) => item)) {
       const els = [...new Set(inputRef.current.filter((item) => item))];
 

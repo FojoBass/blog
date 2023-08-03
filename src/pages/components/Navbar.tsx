@@ -23,7 +23,7 @@ const Navbar = () => {
   const profileOptsRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <nav>
+    <nav id='nav_sect'>
       <div className='center_sect'>
         <div className='left_side'>
           <button

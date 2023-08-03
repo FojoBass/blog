@@ -1,0 +1,170 @@
+$maxWidth: 820px;
+
+#editor_sect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 200;
+  background-color: var(--bg_clr2);
+  overflow-y: auto;
+
+  button:not(.action_btn) {
+    padding: 10px 20px;
+    border-radius: 7px;
+    font-size: $txt_size2;
+    font-family: $fnt_spc1;
+  }
+
+  button:not(.action_btn, .publish_btn, .change_img_btn):hover {
+    background-color: var(--acc_clr_shd);
+    color: var(--acc_clr2);
+  }
+
+  .editor_nav {
+    margin: auto;
+    max-width: $maxWidth;
+    padding: 10px 15px;
+    @include flexDisplay(center, space-between);
+
+    button.active {
+      font-weight: bold;
+      pointer-events: none;
+    }
+  }
+
+  .center_sect {
+    max-width: $maxWidth;
+    // height: 75%;
+
+    .center_content {
+      background-color: var(--bg_clr3);
+      // height: 100%;
+      padding: 10px 0 0;
+      border: 2px solid var(--brd_clr);
+      border-radius: 10px;
+
+      .editor_head {
+        padding: 0 10px;
+
+        .add_banner_btn,
+        .change_img_btn {
+          border: 2px solid var(--brd_clr);
+          padding: 10px 20px;
+          display: inline-block;
+          border-radius: 10px;
+          font-size: $txt_size2;
+          color: var(--txt_clr1);
+          cursor: pointer;
+        }
+
+        .upload_progress {
+          width: fit-content;
+          padding: 5px;
+          font-size: $txt_size2;
+          position: relative;
+          overflow: hidden;
+          border-radius: 10px 0 0 0;
+
+          span {
+            @include position(absolute, left, top, 0px, 0px);
+            width: 0;
+            height: 100%;
+            background-color: var(--spc_clr2);
+            opacity: 0.4;
+          }
+        }
+
+        .remove_img_btn {
+          color: $dlt_clr;
+          margin-left: 10px;
+        }
+
+        .img_btns {
+          margin-top: 10px;
+        }
+
+        .img_wrapper {
+          border-radius: 10px 10px 0 0;
+        }
+
+        .post_title {
+          margin: 15px 0;
+          color: var(--txt_clr2);
+          font-size: 4rem;
+          font-family: $fnt_hdg1;
+          width: 100%;
+          font-weight: 700;
+          scrollbar-width: none;
+
+          &::-webkit-scrollbar {
+            width: 0;
+          }
+        }
+      }
+
+      .action_btns_wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+        grid-auto-rows: 40px;
+        background-color: var(--bg_clr2);
+        padding: 10px 10px;
+
+        .btn_wrapper {
+          position: relative;
+
+          .action_btn {
+            @include flexDisplay(center, center);
+            width: 100%;
+            height: 100%;
+            font-size: $txt_size3;
+            border-radius: 10px;
+            font-family: $fnt_spc2;
+            font-weight: bold;
+            color: var(--txt_clr1);
+
+            &:hover {
+              background-color: var(--acc_clr_shd);
+              color: var(--acc_clr2);
+            }
+          }
+        }
+      }
+
+      .post_editor {
+        padding: 10px 10px 0;
+        width: 100%;
+        height: 48vh;
+        font-size: $txt_size2;
+        color: var(--txt_clr3);
+        font-family: $fnt_spc1;
+        line-height: 2.8rem;
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+          width: 5px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background-color: var(--bg_clr1);
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background-color: var(--txt_clr1);
+        }
+      }
+    }
+  }
+
+  .editor_footer {
+    max-width: $maxWidth;
+    margin: 10px auto 0;
+    @include flexDisplay(center, space-between);
+    padding: 0 15px;
+
+    .publish_btn {
+      margin-right: 10px;
+    }
+  }
+}

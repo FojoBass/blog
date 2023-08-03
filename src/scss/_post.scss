@@ -124,6 +124,9 @@ $brd_clr: #9c9c9cbd;
 
 #single_post_sect {
   padding: 10px 0;
+  .center_sect {
+    max-width: 1300px;
+  }
   @include mediaQueries(min, 800px) {
     .center_sect {
       display: grid;
@@ -135,7 +138,7 @@ $brd_clr: #9c9c9cbd;
 
   @include mediaQueries(min, 1000px) {
     .center_sect {
-      grid-template-columns: 1fr 8fr 4fr;
+      grid-template-columns: 1fr 8fr 3fr;
     }
   }
 

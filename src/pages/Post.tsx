@@ -141,20 +141,6 @@ const Post = () => {
               <p>
                 Lorem <em>ipsum</em> dolor sit amet, consectetur adipisicing.
               </p>
-              <ul>
-                <li>
-                  Lorem <em>ipsum</em> dolor sit amet consectetur adipisicing
-                  elit. Porro, voluptatum.
-                </li>
-                <li>
-                  Lorem <em>ipsum</em> dolor sit amet consectetur adipisicing
-                  elit. Porro, voluptatum.
-                </li>
-                <li>
-                  Lorem <em>ipsum</em> dolor sit amet consectetur adipisicing
-                  elit. Porro, voluptatum.
-                </li>
-              </ul>
               <p>
                 Lorem <em>ipsum</em> dolor sit amet consectetur adipisicing
                 elit. Nisi, amet <strong>distinctio</strong> suscipit sequi
@@ -176,20 +162,8 @@ const Post = () => {
                 Lorem <em>ipsum</em> dolor sit amet consectetur adipisicing
                 elit. Quos aut maiores numquam cumque dolores fugiat!
               </p>
-              <ol>
-                <li>
-                  Lorem <em>ipsum</em> dolor sit amet consectetur, adipisicing
-                  elit.
-                </li>
-                <li>
-                  Cum cupiditate enim consectetur itaque quae nisi nostrum?
-                  Eligendi ratione assumenda modi!
-                </li>
-              </ol>
             </div>
-            {
-              //todo BUILD COMMENT SECTION AFTER STYLINGS
-            }
+
             <div className='comments_super_wrapper'>
               <h3>Comments (5)</h3>
               <div className='make_comment_wrapper'>
@@ -212,9 +186,6 @@ const Post = () => {
                 <Comment comments={comments} />
               </div>
             </div>
-            {
-              //todo BUILD COMMENT SECTION AFTER STYLINGS
-            }
           </div>
 
           <div className='read_next_sect'>
