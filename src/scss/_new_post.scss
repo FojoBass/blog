@@ -40,13 +40,13 @@ $maxWidth: 820px;
 
     .center_content {
       background-color: var(--bg_clr3);
-      // height: 100%;
-      padding: 10px 0 0;
+      min-height: 75vh;
+      // padding: 10px 0 0;
       border: 2px solid var(--brd_clr);
       border-radius: 10px;
 
       .editor_head {
-        padding: 0 10px;
+        padding: 10px 10px 0;
 
         .add_banner_btn,
         .change_img_btn {
@@ -114,6 +114,10 @@ $maxWidth: 820px;
         .btn_wrapper {
           position: relative;
 
+          &:hover .tooltip_wrapper {
+            opacity: 1;
+          }
+
           .action_btn {
             @include flexDisplay(center, center);
             width: 100%;
@@ -127,6 +131,30 @@ $maxWidth: 820px;
             &:hover {
               background-color: var(--acc_clr_shd);
               color: var(--acc_clr2);
+            }
+          }
+
+          .tooltip_wrapper {
+            @include position(absolute, left, top, 50%, 50px);
+            background-color: var(--txt_clr1);
+            color: var(--bg_clr3);
+            pointer-events: none;
+            font-size: $txt_size2;
+            padding: 10px;
+            text-align: center;
+            border-radius: 0 0 5px 5px;
+            opacity: 0;
+            transition: opacity ease 0.3s;
+            white-space: pre;
+            z-index: 1;
+
+            &:after {
+              content: '';
+              @include position(absolute, left, top, 50%, -16px);
+              border-top: 10px solid transparent;
+              border-left: 10px solid transparent;
+              border-right: 10px solid transparent;
+              border-bottom: 10px solid var(--txt_clr1);
             }
           }
         }
@@ -159,7 +187,7 @@ $maxWidth: 820px;
 
   .editor_footer {
     max-width: $maxWidth;
-    margin: 10px auto 0;
+    margin: 10px auto;
     @include flexDisplay(center, space-between);
     padding: 0 15px;
 

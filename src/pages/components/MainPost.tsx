@@ -21,24 +21,30 @@ const MainPost: React.FC<MainPostType> = ({
   return (
     <>
       <header className='mid_side_head'>
-        <div className='img_wrapper main_img'>
-          <img src={bannerImgUrl} alt='' />
-        </div>
+        {bannerImgUrl && (
+          <div className='img_wrapper main_img'>
+            <img src={bannerImgUrl} alt='' />
+          </div>
+        )}
 
         <div className='poster'>
           <Link to='/p/dummyUser' className='img_wrapper poster_avi'>
             <img src={userAvi} alt='' />
           </Link>
-          <div className='info'>
-            <Link to='/p/dummyUser'>{userName}</Link>
-            <p>Posted on {createdAt}</p>
-          </div>
+          {userName && (
+            <div className='info'>
+              <Link to='/p/dummyUser'>{userName}</Link>
+              <p>Posted on {createdAt}</p>
+            </div>
+          )}
         </div>
 
         <h1 className='main_heading'>{title}</h1>
-        <Link className='category' to='/categories/dummy'>
-          {category}
-        </Link>
+        {category && (
+          <Link className='category' to='/categories/dummy'>
+            {category}
+          </Link>
+        )}
       </header>
 
       <div
