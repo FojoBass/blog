@@ -11,6 +11,7 @@ import {
   createRoutesFromElements,
   useLocation,
 } from 'react-router-dom';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import {
   Home,
   About,
@@ -40,6 +41,7 @@ import { toggleTab } from './features/tabSlice';
 import { FollowsInt } from './types';
 
 const App = () => {
+  const auth = getAuth();
   const theme = useBlogSelector((state) => state.theme);
   const tabStatus = useBlogSelector((state) => state.tab);
   const dispatch = useBlogDispatch();
@@ -128,12 +130,22 @@ const App = () => {
 
   useEffect(() => {
     document.documentElement.classList.add('mouse');
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        console.log('signed in');
+      } else {
+        console.log('signed out');
+      }
+    });
   }, []);
   return <RouterProvider router={router} />;
 };
 
 const Root = () => {
   const location = useLocation();
+  const theme = useBlogSelector((state) => state.theme);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -143,7 +155,7 @@ const Root = () => {
       <Navbar />
       <Sidenav />
       <Outlet />
-      <ToastContainer />
+      <ToastContainer theme={theme === 'light' ? 'light' : 'dark'} />
       <Footer />
     </>
   );

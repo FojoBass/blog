@@ -19,7 +19,7 @@ const Navbar = () => {
   const dispatch = useBlogDispatch();
   const [isDropdown, setIsDropdown] = useState(false);
   const { handleSideNav } = blogSlice.actions;
-  const { isUserLogged } = useGlobalContext();
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   const profileOptsRef = useRef<HTMLButtonElement>(null);
 
   return (
@@ -40,7 +40,7 @@ const Navbar = () => {
         </div>
 
         <div className='right_side'>
-          {isUserLogged && (
+          {isUserLoggedIn && (
             <Link to='/new-post' className='create_post_btn create_btn'>
               Create post
             </Link>
@@ -61,19 +61,19 @@ const Navbar = () => {
             <CiSearch />
           </NavLink>
 
-          {!isUserLogged && (
+          {!isUserLoggedIn && (
             <Link to='/enter' className='login_btn'>
               Log in
             </Link>
           )}
 
-          {!isUserLogged && (
+          {!isUserLoggedIn && (
             <Link to='/join' className='create_acct_btn create_btn'>
               Create account
             </Link>
           )}
 
-          {isUserLogged && (
+          {isUserLoggedIn && (
             <>
               <NavLink to={'/notifications'} className='notification_btn'>
                 <IoNotificationsOutline />

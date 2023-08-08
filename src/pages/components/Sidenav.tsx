@@ -16,7 +16,7 @@ const Sidenav = () => {
       dispatch(handleSideNav());
     }
   };
-  const { isUserLogged } = useGlobalContext();
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
 
   return (
     <section
@@ -31,7 +31,7 @@ const Sidenav = () => {
           </button>
         </h3>
 
-        {!isUserLogged ? (
+        {!isUserLoggedIn ? (
           <div className='not_logged_sect'>
             <h3>
               Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nobis,

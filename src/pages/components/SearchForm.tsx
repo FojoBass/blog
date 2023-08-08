@@ -2,10 +2,11 @@ import React, { FormEvent } from 'react';
 import { useGlobalContext } from '../../context';
 import { useNavigate } from 'react-router-dom';
 import { CiSearch } from 'react-icons/ci';
+import { useBlogSelector } from '../../app/store';
 
 const SearchForm = () => {
-  const { isUserLogged, setSearchString, searchString, setIsSearch } =
-    useGlobalContext();
+  const { setSearchString, searchString, setIsSearch } = useGlobalContext();
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   const navigate = useNavigate();
 
   const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {

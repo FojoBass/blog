@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useBlogSelector } from '../app/store';
+import { useNavigate } from 'react-router-dom';
 
 const Notification = () => {
-  return <div>Notification</div>;
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isUserLoggedIn) navigate('/enter', { replace: true });
+  }, [isUserLoggedIn]);
+  return <>{isUserLoggedIn && <div>Notification</div>}</>;
 };
 
 export default Notification;

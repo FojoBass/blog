@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import themeReducer from '../features/themeSlice';
 import tabReducer from '../features/tabSlice';
 import blogReducer from '../features/blogSlice';
+import userReducer from '../features/userSlice';
 import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
 
 export const store = configureStore({
@@ -9,6 +10,7 @@ export const store = configureStore({
     theme: themeReducer,
     tab: tabReducer,
     blog: blogReducer,
+    user: userReducer,
   },
 });
 

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Country, State } from 'country-state-city';
+import { useGlobalContext } from '../../../context';
 
 // TODO Add props to check for fetched location info for both sign up and settings form
 
 const LocationInput = () => {
   const [countries] = useState(Country.getAllCountries()),
-    [states, setStates] = useState<string[]>([]),
-    [country, setCountry] = useState({ name: '', code: '' }),
-    [state, setState] = useState('');
+    [states, setStates] = useState<string[]>([]);
+  const { state, setState, country, setCountry } = useGlobalContext();
 
   useEffect(() => {
-    if (country.name)
+    if (country && country.name)
       setStates(
         State.getStatesOfCountry(country.code).map((state) => state.name)
       );
@@ -24,6 +24,7 @@ const LocationInput = () => {
           name='countries'
           id='countries'
           onChange={(e) =>
+            setCountry &&
             setCountry({
               code: e.target.value.split('/')[1],
               name: e.target.value.split('/')[0],
@@ -51,7 +52,7 @@ const LocationInput = () => {
           name='states'
           id='states'
           value={state}
-          onChange={(e) => setState(e.target.value)}
+          onChange={(e) => setState && setState(e.target.value)}
         >
           <option value='' disabled>
             Select State

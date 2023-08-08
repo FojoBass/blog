@@ -115,8 +115,16 @@ export const sideNavLinks: SideNavLinkType[] = [
   { Icon: AiOutlineMail, title: 'Contact', link: '/meet-us' },
 ];
 export const socialLinks: SocialLinkType[] = [
-  { Icon: AiOutlineTwitter, link: 'https://twitter.com/Fojobass' },
+  { Icon: AiOutlineTwitter, link: 'https://x.com/Fojobass' },
   { Icon: AiFillFacebook, link: 'https://facebook.com/fosimubo.olubo' },
   { Icon: AiFillGithub, link: 'https://github.com/Fojobass' },
   { Icon: AiOutlineInstagram, link: 'https://instagram.com/fojo_bass/' },
 ];
+
+export const regex = {
+  alpha: /^[A-Za-z\s]+$/,
+  alphaNumberic: /^[a-zA-Z0-9]+$/,
+  email: /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/,
+  url: /^(http|https|ftp):\/\/([^\s/$.?#].[^\s]*)?$/,
+  strongPword: /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/,
+};

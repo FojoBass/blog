@@ -51,8 +51,8 @@ const About = () => {
                     <img src={avi} alt='team member' />
                   </div>
 
-                  <div className='social_icon_wrapper twi'>
-                    <button className='social_icon twi'>
+                  <div className='social_icon_wrapper X'>
+                    <button className='social_icon X'>
                       <AiOutlineTwitter />
                     </button>
                   </div>

@@ -6,6 +6,7 @@ import { SkeletonLoad, SinglePost, DisplayPosts } from './components';
 import { useGlobalContext } from '../context';
 import { v4 } from 'uuid';
 import { PostsInt } from '../types';
+import { useBlogSelector } from '../app/store';
 
 export interface HandleStickInt {
   (el: HTMLDivElement, stick: boolean, posValue?: number): void;
@@ -15,7 +16,8 @@ export interface HandleStickInt {
 
 const Home = () => {
   const asideRef = useRef<HTMLDivElement>(null);
-  const { isUserLogged, setSearchString } = useGlobalContext();
+  const { setSearchString } = useGlobalContext();
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   // TODO Placeholder for loading purposes
   const homePosts: PostsInt[] = [
     { isDummy: true, id: v4() },
@@ -33,7 +35,7 @@ const Home = () => {
     <section id='home_sect'>
       <div className='center_sect home_wrapper'>
         <aside className='left_side' ref={asideRef}>
-          {!isUserLogged ? (
+          {!isUserLoggedIn ? (
             <div className='not_logged_sect'>
               <h3>
                 Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nobis,

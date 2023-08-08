@@ -27,7 +27,7 @@ const Contact = () => {
 
             <article className='contact_opt'>
               <div className='title'>Twitter:</div>
-              <a className='info' href='https://twitter.com'>
+              <a className='info' href='https://x.com'>
                 Devies
               </a>
             </article>

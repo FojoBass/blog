@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useGlobalContext } from '../../../context';
 
 const GenderInput = () => {
-  const [gender, setGender] = useState('male');
+  // const [gender, setGender] = useState('male');
+  const { gender, setGender } = useGlobalContext();
 
   return (
     <article className='form_opt gen_opt_wrapper'>
@@ -15,7 +17,7 @@ const GenderInput = () => {
             id='male'
             value='male'
             checked={gender === 'male'}
-            onChange={(e) => setGender(e.target.value)}
+            onChange={(e) => setGender && setGender(e.target.value)}
           />
           <label htmlFor='male'>
             Male <span></span>
@@ -29,7 +31,7 @@ const GenderInput = () => {
             id='female'
             value='female'
             checked={gender === 'female'}
-            onChange={(e) => setGender(e.target.value)}
+            onChange={(e) => setGender && setGender(e.target.value)}
           />
           <label htmlFor='female'>
             Female <span></span>
@@ -43,7 +45,7 @@ const GenderInput = () => {
             id='others'
             value='others'
             checked={gender === 'others'}
-            onChange={(e) => setGender(e.target.value)}
+            onChange={(e) => setGender && setGender(e.target.value)}
           />
           <label htmlFor='others'>
             Others <span></span>

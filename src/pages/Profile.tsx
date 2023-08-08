@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import avi from '../assets/Me cropped.jpg';
-import { useGlobalContext } from '../context';
 import { BsThreeDots, BsBoxArrowUpRight, BsPersonHearts } from 'react-icons/bs';
 import { ImLocation2 } from 'react-icons/im';
 import { MdCake, MdMail } from 'react-icons/md';
@@ -16,9 +15,11 @@ import {
 import { DisplayPosts } from './components';
 import { PostsInt } from '../types';
 import { v4 } from 'uuid';
+import { useBlogSelector } from '../app/store';
+import { useGlobalContext } from '../context';
 
 const Profile = () => {
-  const { isUserLogged } = useGlobalContext();
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   const [userColor, setUserColor] = useState('#000000');
   // todo Dummy Posts to be replaced
   const userPosts: PostsInt[] = [
@@ -43,7 +44,7 @@ const Profile = () => {
             </div>
 
             <div className='right_side'>
-              {isUserLogged ? (
+              {isUserLoggedIn ? (
                 <button className='spc_btn edit_btn'>Edit Profile</button>
               ) : (
                 <>
@@ -109,11 +110,7 @@ const Profile = () => {
                 <AiFillGithub />
               </a>
 
-              <a
-                href='https://twitter.com'
-                className='social_link'
-                target='_blank'
-              >
+              <a href='https://x.com' className='social_link' target='_blank'>
                 <AiOutlineTwitter />
               </a>
 

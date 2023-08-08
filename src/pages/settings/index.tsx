@@ -3,8 +3,10 @@ import ProfileSettings from './ProfileSettings';
 import AccountSettings from './AccountSettings';
 import BoardSearchLayout from '../../layouts/BoardSearchLayout';
 import { useNavigate } from 'react-router-dom';
+import { useBlogSelector } from '../../app/store';
 
 const Settings = () => {
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   const navigate = useNavigate();
   const [navItems] = useState([
     {
@@ -18,17 +20,22 @@ const Settings = () => {
   ]);
 
   useEffect(() => {
-    navigate('/settings/profile', { replace: true });
-  }, []);
+    if (!isUserLoggedIn) navigate('/enter', { replace: true });
+    else navigate('/settings/profile', { replace: true });
+  }, [isUserLoggedIn]);
 
   return (
-    <BoardSearchLayout
-      isPosts={{ status: false, items: [] }}
-      heading={`Settings for @dummyUser`}
-      navItems={navItems}
-      isSearch={false}
-      isSettings={true}
-    />
+    <>
+      {isUserLoggedIn && (
+        <BoardSearchLayout
+          isPosts={{ status: false, items: [] }}
+          heading={`Settings for @dummyUser`}
+          navItems={navItems}
+          isSearch={false}
+          isSettings={true}
+        />
+      )}
+    </>
   );
 };
 

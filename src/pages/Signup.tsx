@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FormEvent, useState, useRef, useEffect } from 'react';
 import {
   AiOutlineHome,
   AiOutlineTwitter,
@@ -14,13 +14,48 @@ import {
   BsFillLockFill,
 } from 'react-icons/bs';
 import { MdMail } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaLink } from 'react-icons/fa';
 import { GenderInput, ImageInputField, LocationInput } from './components';
+import { useGlobalContext, CountryInt } from '../context';
+import { useBlogSelector, useBlogDispatch } from '../app/store';
+import { regex } from '../data';
+import { toast } from 'react-toastify';
+import { userSignUp } from '../features/userAsyncThunk';
 
 // TODO For input componenets, make the needed involve global variables
 
+interface FormRefsInt {
+  fullNameInputRef: React.RefObject<HTMLInputElement>;
+  userNameInputRef: React.RefObject<HTMLInputElement>;
+  emailInputRef: React.RefObject<HTMLInputElement>;
+  passwordInputRef: React.RefObject<HTMLInputElement>;
+  conPasswordInputRef: React.RefObject<HTMLInputElement>;
+}
+
+export interface FormDataInt {
+  fullName: string;
+  userName: string;
+  country: CountryInt;
+  state: string;
+  dob: string;
+  bio: string;
+  gender: string;
+  socials: {
+    git: string;
+    X: string;
+    fb: string;
+    ins: string;
+    be: string;
+    url: string;
+  };
+}
+
 const Signup = () => {
+  const blogTheme = useBlogSelector((state) => state.theme);
+  const { isSignedUp, isSignupLoading } = useBlogSelector(
+    (state) => state.user
+  );
   const [showPassword, setShowPassword] = useState(false),
     [showConPassword, setShowConPassword] = useState(false),
     [fullName, setFullName] = useState(''),
@@ -29,16 +64,159 @@ const Signup = () => {
     [password, setPassword] = useState(''),
     [conPassword, setConPassword] = useState(''),
     [dob, setDob] = useState(''),
-    [gender, setGender] = useState('male'),
     [bio, setBio] = useState(''),
     [socials, setSocials] = useState({
       git: '',
-      twi: '',
+      X: '',
       ins: '',
       be: '',
       fb: '',
       url: '',
     });
+  const { gender, country, state, aviBigFile, aviSmallFile } =
+    useGlobalContext();
+  const dispatch = useBlogDispatch();
+  const navigate = useNavigate();
+
+  const formRefs: FormRefsInt = {
+    fullNameInputRef: useRef<HTMLInputElement>(null),
+    userNameInputRef: useRef<HTMLInputElement>(null),
+    emailInputRef: useRef<HTMLInputElement>(null),
+    passwordInputRef: useRef<HTMLInputElement>(null),
+    conPasswordInputRef: useRef<HTMLInputElement>(null),
+  };
+
+  const formRefsAction = (ref: keyof FormRefsInt, msg: string) => {
+    toast.warn(msg);
+    formRefs[ref].current?.focus();
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (
+      validateFullName() &&
+      validateEmail() &&
+      validatePassword() &&
+      validateConPassword() &&
+      validateUsername() &&
+      validateCountryState() &&
+      validateDob() &&
+      validateSocials() &&
+      validateAvi()
+    ) {
+      if (country && state && gender && aviBigFile && aviSmallFile) {
+        const formData: FormDataInt = {
+          fullName,
+          userName,
+          country,
+          state,
+          dob,
+          bio,
+          gender,
+          socials,
+        };
+        dispatch(
+          userSignUp({
+            email,
+            password,
+            formData,
+            bigAviFile: aviBigFile,
+            smallAviFile: aviSmallFile,
+          })
+        );
+      }
+    }
+  };
+
+  const validateFullName = (): boolean => {
+    if (regex.alpha.test(fullName)) return true;
+
+    formRefsAction('fullNameInputRef', 'Invalid fullname');
+    return false;
+  };
+
+  const validateUsername = (): boolean => {
+    if (regex.alphaNumberic.test(userName)) return true;
+
+    formRefsAction('userNameInputRef', 'Invalid username');
+    return false;
+
+    // todo check if any any user has that username
+    // todo can create a username collection for that
+  };
+
+  const validateSocials = (): boolean => {
+    let returnValue = true;
+    [
+      socials.git,
+      socials.fb,
+      socials.be,
+      socials.ins,
+      socials.X,
+      socials.url,
+    ].forEach((url) => {
+      if (url.length && !regex.url.test(url)) {
+        toast.warn('Enter valid social link');
+        returnValue = false;
+      }
+    });
+
+    return returnValue;
+  };
+
+  const validateCountryState = (): boolean => {
+    if (country?.name && state) return true;
+    toast.warn('Select Country and State');
+    return false;
+  };
+
+  const validateDob = (): boolean => {
+    if (dob) return true;
+    toast.warn('Enter Date of Birth');
+    return false;
+  };
+
+  const validateEmail = (): boolean => {
+    if (regex.email.test(email)) return true;
+    formRefsAction('emailInputRef', 'Enter valid email');
+    return false;
+  };
+
+  const validatePassword = (): boolean => {
+    if (password.length < 8) {
+      formRefsAction(
+        'passwordInputRef',
+        "Password's char should be at least 8"
+      );
+      return false;
+    }
+    if (regex.strongPword.test(password)) return true;
+
+    formRefsAction(
+      'passwordInputRef',
+      'Password should contain at least one; uppercase letter, lowercase letter, digit, and spceial character'
+    );
+    return false;
+  };
+
+  const validateConPassword = (): boolean => {
+    if (conPassword === password) return true;
+    formRefsAction('conPasswordInputRef', 'Must be same with password');
+    return false;
+  };
+
+  const validateAvi = (): boolean => {
+    if (aviBigFile && aviSmallFile) return true;
+
+    toast.warn('Select Profile Image');
+    return false;
+  };
+
+  useEffect(() => {
+    if (isSignedUp) {
+      navigate('/enter');
+    }
+  }, [isSignedUp]);
 
   return (
     <section className='signup_sect'>
@@ -53,7 +231,7 @@ const Signup = () => {
             <span className='after'></span>
           </h1>
 
-          <form className='signup_form'>
+          <form className='signup_form' onSubmit={handleSubmit}>
             <article className='info_wrapper basics'>
               <h3>Basic</h3>
 
@@ -69,6 +247,8 @@ const Signup = () => {
                     spellCheck='false'
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
+                    maxLength={25}
+                    ref={formRefs.fullNameInputRef}
                   />
                 </article>
 
@@ -82,6 +262,7 @@ const Signup = () => {
                     placeholder='Email'
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    ref={formRefs.emailInputRef}
                   />
                 </article>
 
@@ -95,6 +276,7 @@ const Signup = () => {
                     placeholder='Password'
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    ref={formRefs.passwordInputRef}
                   />
 
                   <button
@@ -116,6 +298,7 @@ const Signup = () => {
                     placeholder='Confirm Password'
                     value={conPassword}
                     onChange={(e) => setConPassword(e.target.value)}
+                    ref={formRefs.conPasswordInputRef}
                   />
 
                   <button
@@ -137,7 +320,9 @@ const Signup = () => {
                     placeholder='User name (25 chars max)'
                     spellCheck='false'
                     value={userName}
+                    maxLength={25}
                     onChange={(e) => setUserName(e.target.value)}
+                    ref={formRefs.userNameInputRef}
                   />
                 </article>
               </div>
@@ -211,9 +396,9 @@ const Signup = () => {
                     type='url'
                     name='twi_link'
                     placeholder='Twitter'
-                    value={socials.twi}
+                    value={socials.X}
                     onChange={(e) =>
-                      setSocials({ ...socials, twi: e.target.value })
+                      setSocials({ ...socials, X: e.target.value })
                     }
                   />
                 </article>
@@ -286,8 +471,11 @@ const Signup = () => {
               <ImageInputField />
             </article>
 
-            <button type='submit' className='reg_btn spc_btn'>
-              Register
+            <button
+              type='submit'
+              className={`reg_btn spc_btn ${isSignupLoading ? 'loading' : ''}`}
+            >
+              {isSignupLoading ? 'Registering...' : 'Register'}
             </button>
             <Link className='login_btn' to='/enter'>
               Already have an account?

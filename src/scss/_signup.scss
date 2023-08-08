@@ -129,13 +129,8 @@
             width: 100%;
             border-bottom: 2px solid var(--brd_clr);
             padding: 0 0 6px 20px;
-            transition: all ease $fmid_trans;
             display: block;
             color: var(--txt_clr1);
-
-            &:focus {
-              border-bottom-color: var(--acc_clr);
-            }
           }
 
           .eye_icon_wrapper {
@@ -149,8 +144,8 @@
 
       .reg_btn {
         display: block;
-        width: 100px;
-        padding: 10px 0;
+        width: fit-content;
+        padding: 10px 20px;
         margin: 0 auto;
         border-radius: 10px;
         font-size: 1.3rem;
@@ -172,5 +167,21 @@
         }
       }
     }
+  }
+}
+
+.signup_form {
+  input,
+  textarea {
+    transition: all ease $fmid_trans !important;
+  }
+
+  input:not(input[type='date']):focus {
+    border-bottom-color: var(--acc_clr) !important;
+  }
+
+  textarea:focus,
+  input[type='file']:focus {
+    border-color: var(--acc_clr) !important;
   }
 }

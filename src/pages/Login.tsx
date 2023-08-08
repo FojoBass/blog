@@ -2,14 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { BsEyeSlash, BsEye, BsGoogle } from 'react-icons/bs';
 import { AiOutlineTwitter, AiFillGithub, AiOutlineHome } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
+import { userSlice } from '../features/userSlice';
+import { toast } from 'react-toastify';
+import { useBlogSelector, useBlogDispatch } from '../app/store';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const inputRef = useRef<Array<HTMLInputElement | null>>([]);
-
-  useEffect(() => {
-    console.log('inputRef: ', inputRef);
-  }, [inputRef]);
+  const { setIsSignedUp } = userSlice.actions;
+  const { isSignedUp } = useBlogSelector((state) => state.user);
+  const dispatch = useBlogDispatch();
 
   useEffect(() => {
     if (inputRef.current.find((item) => item)) {
@@ -32,6 +34,13 @@ const Login = () => {
       });
     }
   }, [inputRef]);
+
+  useEffect(() => {
+    if (isSignedUp) {
+      toast.success('Signup successful');
+      dispatch(setIsSignedUp(false));
+    }
+  }, [isSignedUp]);
 
   return (
     <section className='login_sect'>

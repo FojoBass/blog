@@ -7,8 +7,10 @@ import BoardSearchLayout, {
   PostInt,
   NavInt,
 } from '../../layouts/BoardSearchLayout';
+import { useBlogSelector } from '../../app/store';
 
 const Dashboard = () => {
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   const { pathname } = useLocation();
   const [isPosts, setisPosts] = useState<PostInt>({
     status: pathname.split('/').length === 3 ? true : false,
@@ -22,6 +24,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!isUserLoggedIn) navigate('/enter', { replace: true });
+    else navigate('/dummies/dashboard/posts');
+  }, [isUserLoggedIn]);
+
+  useEffect(() => {
     setisPosts({
       status: pathname.split('/')[3] === 'posts' ? true : false,
       items: [
@@ -31,19 +38,19 @@ const Dashboard = () => {
     });
   }, [pathname]);
 
-  useEffect(() => {
-    navigate('/dummies/dashboard/posts');
-  }, []);
-
   return (
-    <BoardSearchLayout
-      isPosts={isPosts}
-      heading={'Dashboard'}
-      navItems={navItems}
-      modClass='dashboard'
-      isSearch={false}
-      isSettings={false}
-    />
+    <>
+      {isUserLoggedIn && (
+        <BoardSearchLayout
+          isPosts={isPosts}
+          heading={'Dashboard'}
+          navItems={navItems}
+          modClass='dashboard'
+          isSearch={false}
+          isSettings={false}
+        />
+      )}
+    </>
   );
 };
 

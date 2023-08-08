@@ -61,6 +61,7 @@ const NewPost = () => {
 
   const dispatch = useBlogDispatch();
   const { parsedPost } = useBlogSelector((state) => state.blog);
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   const { handleParsePost } = blogSlice.actions;
 
   const handleBannerFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -268,7 +269,7 @@ const NewPost = () => {
     if (!isPostImgReady) setIsUploadingBannerImg(true);
     setIsUploadingImg(true);
 
-    const uploadTask = new BlogServices().uploadImage(
+    const uploadTask = new BlogServices().uploadBannerPostImg(
       dummyUserId.current,
       postId.current,
       file,
@@ -349,221 +350,227 @@ const NewPost = () => {
   }, [route]);
 
   useEffect(() => {
-    console.log('parsedPost: ', parsedPost);
-  }, [parsedPost]);
+    if (!isUserLoggedIn) navigate('/enter', { replace: true });
+  }, [isUserLoggedIn]);
 
   return (
     <section id='editor_sect'>
-      <nav className='editor_nav'>
-        <div className='left_side_btns'>
-          <button
-            className={route === 'edit' ? 'active edit_btn' : 'edit_btn'}
-            onClick={() => setRoute('edit')}
-          >
-            Edit
-          </button>
-          <button
-            className={
-              route === 'preview' ? 'active preview_btn' : 'preview_btn'
-            }
-            onClick={() => setRoute('preview')}
-          >
-            Preview
-          </button>
-        </div>
+      {isUserLoggedIn && (
+        <>
+          <nav className='editor_nav'>
+            <div className='left_side_btns'>
+              <button
+                className={route === 'edit' ? 'active edit_btn' : 'edit_btn'}
+                onClick={() => setRoute('edit')}
+              >
+                Edit
+              </button>
+              <button
+                className={
+                  route === 'preview' ? 'active preview_btn' : 'preview_btn'
+                }
+                onClick={() => setRoute('preview')}
+              >
+                Preview
+              </button>
+            </div>
 
-        <button className='close_btn' onClick={() => navigate(-1)}>
-          <FaTimes />
-        </button>
-      </nav>
+            <button className='close_btn' onClick={() => navigate(-1)}>
+              <FaTimes />
+            </button>
+          </nav>
 
-      <div className='center_sect'>
-        <div className='center_content'>
-          {route === 'edit' ? (
-            <>
-              <header className='editor_head'>
-                <div className='editor_top'>
-                  <input
-                    type='file'
-                    name=''
-                    id='select_banner'
-                    hidden
-                    onChange={handleBannerFileChange}
-                    ref={bannerInputRef}
-                  />
-                  {bannerImgFile ? (
-                    isUploadingBannerImg ? (
-                      <p className='upload_progress'>
-                        <span
-                          style={{ width: `${bannerUploadProgress}%` }}
-                        ></span>
-                        Uploading...
-                      </p>
-                    ) : (
-                      <>
-                        <div className='img_wrapper'>
-                          <img src={bannerUrl} alt='Banner img' />
-                        </div>
+          <div className='center_sect'>
+            <div className='center_content'>
+              {route === 'edit' ? (
+                <>
+                  <header className='editor_head'>
+                    <div className='editor_top'>
+                      <input
+                        type='file'
+                        name=''
+                        id='select_banner'
+                        hidden
+                        onChange={handleBannerFileChange}
+                        ref={bannerInputRef}
+                      />
+                      {bannerImgFile ? (
+                        isUploadingBannerImg ? (
+                          <p className='upload_progress'>
+                            <span
+                              style={{ width: `${bannerUploadProgress}%` }}
+                            ></span>
+                            Uploading...
+                          </p>
+                        ) : (
+                          <>
+                            <div className='img_wrapper'>
+                              <img src={bannerUrl} alt='Banner img' />
+                            </div>
 
-                        <div className='img_btns'>
-                          <label
-                            htmlFor='select_banner'
-                            className='change_img_btn'
-                          >
-                            Change
-                          </label>
-                          <button
-                            className='remove_img_btn'
-                            onClick={handleRemove}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </>
-                    )
-                  ) : (
-                    <label
-                      className='add_banner_btn'
-                      htmlFor='select_banner'
-                      style={isBannerResizing ? { pointerEvents: 'none' } : {}}
-                    >
-                      Add a cover image
-                    </label>
-                  )}
-                </div>
+                            <div className='img_btns'>
+                              <label
+                                htmlFor='select_banner'
+                                className='change_img_btn'
+                              >
+                                Change
+                              </label>
+                              <button
+                                className='remove_img_btn'
+                                onClick={handleRemove}
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </>
+                        )
+                      ) : (
+                        <label
+                          className='add_banner_btn'
+                          htmlFor='select_banner'
+                          style={
+                            isBannerResizing ? { pointerEvents: 'none' } : {}
+                          }
+                        >
+                          Add a cover image
+                        </label>
+                      )}
+                    </div>
 
-                <input
-                  type='file'
-                  id='editor_img'
-                  accept='image/*'
-                  hidden
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
+                    <input
+                      type='file'
+                      id='editor_img'
+                      accept='image/*'
+                      hidden
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+
+                    <textarea
+                      className='post_title'
+                      rows={1}
+                      placeholder='Post title here...'
+                      value={postTitle}
+                      onChange={handleTitleChange}
+                    ></textarea>
+                  </header>
+
+                  <div className='action_btns_wrapper'>
+                    <div className='btn_wrapper'>
+                      <button
+                        className='action_btn bold_btn'
+                        onClick={() => handleFormating('B', '**')}
+                      >
+                        B
+                      </button>
+                      <ToolTip info={'Bold'} />
+                    </div>
+
+                    <div className='btn_wrapper'>
+                      <button
+                        className='action_btn italize_btn'
+                        onClick={() => handleFormating('I', '__')}
+                      >
+                        <em>I</em>
+                      </button>
+                      <ToolTip info={'Italicize'} />
+                    </div>
+
+                    <div className='btn_wrapper'>
+                      <button
+                        className='action_btn link_btn'
+                        onClick={() => handleFormating('L', '')}
+                      >
+                        <AiOutlineLink />{' '}
+                      </button>
+                      <ToolTip info={'Add Link'} />
+                    </div>
+
+                    <div className='btn_wrapper'>
+                      <button
+                        className='action_btn strike_btn'
+                        onClick={() => handleFormating('S', '~~')}
+                      >
+                        <s>S</s>
+                      </button>
+                      <ToolTip info={'Strikethrough'} />
+                    </div>
+
+                    <div className='btn_wrapper'>
+                      <button
+                        className='action_btn img_btn'
+                        onClick={() => handleFormating('Im', '')}
+                      >
+                        <BsFileImage />
+                      </button>
+                      <ToolTip info={'Add Image'} />
+                    </div>
+
+                    <div className='btn_wrapper'>
+                      <button
+                        className='action_btn underline_btn'
+                        onClick={() => handleFormating('U', '--')}
+                      >
+                        U
+                      </button>
+                      <ToolTip info={'Underline'} />
+                    </div>
+
+                    <div className='btn_wrapper'>
+                      <button
+                        className='action_btn big_H'
+                        onClick={() => handleFormating('H2', '##')}
+                      >
+                        H<sub>b</sub>
+                      </button>
+                      <ToolTip info={'Big Heading'} />
+                    </div>
+
+                    <div className='btn_wrapper'>
+                      <button
+                        className='action_btn small_H'
+                        onClick={() => handleFormating('H3', '###')}
+                      >
+                        H<sub>s</sub>
+                      </button>
+                      <ToolTip info={'Small Heading'} />
+                    </div>
+                  </div>
+
+                  <textarea
+                    className='post_editor'
+                    placeholder='Write your post content here...'
+                    value={postMain}
+                    onChange={(e) => setPostMain(e.target.value)}
+                    ref={postMainRef}
+                  ></textarea>
+                </>
+              ) : (
+                <MainPost
+                  postInfo={{
+                    bannerImgUrl: bannerUrl,
+                    title: postTitle ? postTitle : 'Post Title',
+                    createdAt: '',
+                    userName: '',
+                    userAvi: '',
+                    category: '',
+                    post: parsedPost,
+                  }}
                 />
+              )}
+            </div>
+          </div>
 
-                <textarea
-                  className='post_title'
-                  rows={1}
-                  placeholder='Post title here...'
-                  value={postTitle}
-                  onChange={handleTitleChange}
-                ></textarea>
-              </header>
+          <footer className='editor_footer'>
+            <div className='left_side'>
+              <button className='publish_btn spc_btn'>Publish</button>
+              <button className='save_btn'>Save</button>
+            </div>
 
-              <div className='action_btns_wrapper'>
-                <div className='btn_wrapper'>
-                  <button
-                    className='action_btn bold_btn'
-                    onClick={() => handleFormating('B', '**')}
-                  >
-                    B
-                  </button>
-                  <ToolTip info={'Bold'} />
-                </div>
-
-                <div className='btn_wrapper'>
-                  <button
-                    className='action_btn italize_btn'
-                    onClick={() => handleFormating('I', '__')}
-                  >
-                    <em>I</em>
-                  </button>
-                  <ToolTip info={'Italicize'} />
-                </div>
-
-                <div className='btn_wrapper'>
-                  <button
-                    className='action_btn link_btn'
-                    onClick={() => handleFormating('L', '')}
-                  >
-                    <AiOutlineLink />{' '}
-                  </button>
-                  <ToolTip info={'Add Link'} />
-                </div>
-
-                <div className='btn_wrapper'>
-                  <button
-                    className='action_btn strike_btn'
-                    onClick={() => handleFormating('S', '~~')}
-                  >
-                    <s>S</s>
-                  </button>
-                  <ToolTip info={'Strikethrough'} />
-                </div>
-
-                <div className='btn_wrapper'>
-                  <button
-                    className='action_btn img_btn'
-                    onClick={() => handleFormating('Im', '')}
-                  >
-                    <BsFileImage />
-                  </button>
-                  <ToolTip info={'Add Image'} />
-                </div>
-
-                <div className='btn_wrapper'>
-                  <button
-                    className='action_btn underline_btn'
-                    onClick={() => handleFormating('U', '--')}
-                  >
-                    U
-                  </button>
-                  <ToolTip info={'Underline'} />
-                </div>
-
-                <div className='btn_wrapper'>
-                  <button
-                    className='action_btn big_H'
-                    onClick={() => handleFormating('H2', '##')}
-                  >
-                    H<sub>b</sub>
-                  </button>
-                  <ToolTip info={'Big Heading'} />
-                </div>
-
-                <div className='btn_wrapper'>
-                  <button
-                    className='action_btn small_H'
-                    onClick={() => handleFormating('H3', '###')}
-                  >
-                    H<sub>s</sub>
-                  </button>
-                  <ToolTip info={'Small Heading'} />
-                </div>
-              </div>
-
-              <textarea
-                className='post_editor'
-                placeholder='Write your post content here...'
-                value={postMain}
-                onChange={(e) => setPostMain(e.target.value)}
-                ref={postMainRef}
-              ></textarea>
-            </>
-          ) : (
-            <MainPost
-              postInfo={{
-                bannerImgUrl: bannerUrl,
-                title: postTitle ? postTitle : 'Post Title',
-                createdAt: '',
-                userName: '',
-                userAvi: '',
-                category: '',
-                post: parsedPost,
-              }}
-            />
-          )}
-        </div>
-      </div>
-
-      <footer className='editor_footer'>
-        <div className='left_side'>
-          <button className='publish_btn spc_btn'>Publish</button>
-          <button className='save_btn'>Save</button>
-        </div>
-
-        <button className='revert_btn'>Revert</button>
-      </footer>
+            <button className='revert_btn'>Revert</button>
+          </footer>
+        </>
+      )}
     </section>
   );
 };

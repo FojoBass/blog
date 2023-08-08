@@ -56,9 +56,7 @@ export const resizeImg: ResizeFuncType = (
     );
     return resizePromise;
   } else {
-    toast.error('Only images are allowed!', {
-      theme: blogTheme === 'light' ? 'light' : 'dark',
-    });
+    toast.error('Only images are allowed!');
     return '';
   }
 };
