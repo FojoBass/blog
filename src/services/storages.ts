@@ -9,15 +9,16 @@ export class StorageFuncs {
     }
   }
 
-  static getStorage<T>(type: 'local' | 'session', key: string): T {
+  // ! ERROR WHEN KEY IS NOT FOUND IN STORAGE. FIX!
+  static getStorage<T>(type: 'local' | 'session', key: string): T | null {
     const storeInfo =
       (type === 'local'
         ? localStorage.getItem(key)
         : type === 'session'
         ? sessionStorage.getItem(key)
-        : '') ?? '';
+        : '') ?? null;
 
-    return JSON.parse(storeInfo) as T;
+    return storeInfo ? (JSON.parse(storeInfo) as T) : null;
   }
 
   static checkStorage(type: 'local' | 'session', key: string): boolean {

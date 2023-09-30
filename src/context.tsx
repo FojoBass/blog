@@ -34,7 +34,7 @@ interface ContextInt {
   setAviBigFile?: Dispatch<React.SetStateAction<File | null>>;
   aviSmallFile?: File | null;
   setAviSmallFile?: Dispatch<React.SetStateAction<File | null>>;
-  storageKeys?: { currUser: string };
+  storageKeys?: { currUser: string; logPers: string };
 }
 
 const BlogContext = createContext<ContextInt>({});
@@ -52,15 +52,16 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [aviBigFile, setAviBigFile] = useState<File | null>(null),
     [aviSmallFile, setAviSmallFile] = useState<File | null>(null);
 
+  const [storageKeys] = useState({
+    currUser: 'devie_current_user',
+    logPers: 'devie_login_persistence',
+  });
+
   const [loginPersistence, setLoginPersistence] = useState(
-    StorageFuncs.getStorage<boolean>('local', 'devie_login_persistence')
+    StorageFuncs.getStorage<boolean>('local', storageKeys.logPers) ?? false
   );
 
   const { userInfo } = useBlogSelector((state) => state.user);
-
-  const [storageKeys] = useState({
-    currUser: 'devie_current_user',
-  });
 
   const sharedProps: ContextInt = {
     searchString,
