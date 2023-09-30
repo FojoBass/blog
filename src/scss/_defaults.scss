@@ -40,6 +40,13 @@ button {
   color: var(--txt_clr3);
 }
 
+button {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 a {
   text-decoration: none;
   transition: all ease $fast_trans;
@@ -106,9 +113,9 @@ button.loading {
   pointer-events: none;
   opacity: 0.8;
   position: relative;
-  // overflow: hidden;
+  overflow: hidden;
 
-  &::after {
+  &[type='submit']::after {
     content: '';
     width: 100%;
     height: 100%;

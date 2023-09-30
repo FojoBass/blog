@@ -38,12 +38,16 @@ import {
 } from './pages';
 import { useBlogSelector, useBlogDispatch } from './app/store';
 import { toggleTab } from './features/tabSlice';
-import { FollowsInt } from './types';
+import { FollowsInt, UserInfoInt } from './types';
+import { userSlice } from './features/userSlice';
+import { StorageFuncs } from './services/storages';
+import { useGlobalContext } from './context';
 
 const App = () => {
   const auth = getAuth();
   const theme = useBlogSelector((state) => state.theme);
   const tabStatus = useBlogSelector((state) => state.tab);
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   const dispatch = useBlogDispatch();
   const [dummyFollows] = React.useState<FollowsInt[]>([
     { userName: 'Dummy name', id: 'asdf', avi },
@@ -53,6 +57,9 @@ const App = () => {
     { userName: 'Dummy name', id: 'asdfd4', avi },
     { userName: 'Dummy name', id: 'asdfsl', avi },
   ]);
+
+  const { setUserInfo, setIsUserLoggedIn } = userSlice.actions;
+  const { storageKeys } = useGlobalContext();
 
   const handleTabAdd = (e: KeyboardEvent) => {
     if (e.key === 'Tab' && !tabStatus) {
@@ -127,13 +134,26 @@ const App = () => {
       </Route>
     )
   );
+  // todo Effect 'Keep me Logged in' In Login page
 
   useEffect(() => {
     document.documentElement.classList.add('mouse');
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        const uid = user.uid;
+        if (
+          !isUserLoggedIn &&
+          storageKeys &&
+          StorageFuncs.checkStorage('local', storageKeys.currUser)
+        ) {
+          const userInfo = StorageFuncs.getStorage<UserInfoInt>(
+            'local',
+            storageKeys.currUser
+          );
+
+          dispatch(setUserInfo(userInfo));
+          dispatch(setIsUserLoggedIn(true));
+        }
         console.log('signed in');
       } else {
         console.log('signed out');
@@ -155,7 +175,10 @@ const Root = () => {
       <Navbar />
       <Sidenav />
       <Outlet />
-      <ToastContainer theme={theme === 'light' ? 'light' : 'dark'} />
+      <ToastContainer
+        theme={theme === 'light' ? 'light' : 'dark'}
+        position='top-center'
+      />
       <Footer />
     </>
   );

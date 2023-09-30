@@ -17,11 +17,12 @@ import { MdMail } from 'react-icons/md';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaLink } from 'react-icons/fa';
 import { GenderInput, ImageInputField, LocationInput } from './components';
-import { useGlobalContext, CountryInt } from '../context';
+import { useGlobalContext } from '../context';
 import { useBlogSelector, useBlogDispatch } from '../app/store';
 import { regex } from '../data';
 import { toast } from 'react-toastify';
 import { userSignUp } from '../features/userAsyncThunk';
+import { FormDataInt } from '../types';
 
 // TODO For input componenets, make the needed involve global variables
 
@@ -31,24 +32,6 @@ interface FormRefsInt {
   emailInputRef: React.RefObject<HTMLInputElement>;
   passwordInputRef: React.RefObject<HTMLInputElement>;
   conPasswordInputRef: React.RefObject<HTMLInputElement>;
-}
-
-export interface FormDataInt {
-  fullName: string;
-  userName: string;
-  country: CountryInt;
-  state: string;
-  dob: string;
-  bio: string;
-  gender: string;
-  socials: {
-    git: string;
-    X: string;
-    fb: string;
-    ins: string;
-    be: string;
-    url: string;
-  };
 }
 
 const Signup = () => {
@@ -190,7 +173,8 @@ const Signup = () => {
       );
       return false;
     }
-    if (regex.strongPword.test(password)) return true;
+    // ! ENSURE TO CHANGE BACK TO STRONG PASSWORD
+    if (regex.alphaNumberic.test(password)) return true;
 
     formRefsAction(
       'passwordInputRef',

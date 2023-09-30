@@ -1,4 +1,3 @@
-import { v4 } from 'uuid';
 import { storage, db, auth } from './config';
 import { ref, uploadBytesResumable, UploadTask } from 'firebase/storage';
 import {
@@ -6,17 +5,17 @@ import {
   UserCredential,
   signOut,
   signInWithEmailAndPassword,
+  GithubAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
-import { FormDataInt } from '../../pages/Signup';
+import ShortUniqueId from 'short-unique-id';
+import { UserInfoInt } from '../../types';
 
-interface userInfoInt extends FormDataInt {
-  aviUrls: {
-    bigAviUrl: string;
-    smallAviUrl: string;
-  };
-  userId: string;
-}
+const uidLong = new ShortUniqueId({ length: 10 });
+const uidShort = new ShortUniqueId({ length: 7 });
+
+const gitProvider = new GithubAuthProvider();
 
 export class BlogServices {
   // *Auth methods
@@ -32,8 +31,12 @@ export class BlogServices {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
+  signInGit(): Promise<UserCredential> {
+    return signInWithPopup(auth, gitProvider);
+  }
+
   // *Firestore methods
-  setUserInfo(data: userInfoInt) {
+  setUserInfo(data: UserInfoInt) {
     const docRef = doc(db, `users/${data.userId}`);
     return setDoc(docRef, data);
   }
@@ -47,14 +50,14 @@ export class BlogServices {
   ): UploadTask {
     const imgRef = isBanner
       ? ref(storage, `${userId}/banners/${postId}_banner`)
-      : ref(storage, `${userId}/posts/${postId}_post_${v4()}`);
+      : ref(storage, `${userId}/posts/${postId}_post_${uidShort.rnd()}`);
     return uploadBytesResumable(imgRef, imgFile);
   }
 
   uplaodAviImg(userId: string, isBig: boolean, imgFile: File) {
     const imgRef = ref(
       storage,
-      `${userId}/avi/${v4()}_${isBig ? 'big' : 'small'}`
+      `${userId}/avi/${uidShort.rnd()}_${isBig ? 'big' : 'small'}`
     );
     return uploadBytesResumable(imgRef, imgFile);
   }

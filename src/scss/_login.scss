@@ -96,8 +96,8 @@
 
       .login_btn {
         display: block;
-        width: 100px;
-        padding: 10px 0;
+        width: fit-content;
+        padding: 10px 20px;
         margin: 0 auto;
         border-radius: 10px;
         font-size: 1.3rem;
@@ -147,17 +147,69 @@
         }
       }
 
-      .signup_btn {
-        display: block;
-        width: 100%;
-        text-align: center;
-        text-decoration: underline;
-        font-size: 1.8rem;
-        font-family: $fnt_hdg2;
-        color: var(--shw_clr_txt);
+      footer {
+        @include flexDisplay(center, space-between);
 
-        &:hover {
-          color: var(--acc_clr);
+        .signup_btn {
+          text-align: center;
+          text-decoration: underline;
+          font-size: 1.8rem;
+          font-family: $fnt_hdg2;
+          color: var(--shw_clr_txt);
+
+          &:hover {
+            color: var(--acc_clr);
+          }
+        }
+
+        .box_wrapper {
+          position: relative;
+
+          label {
+            font-size: 1.8rem;
+            font-family: $fnt_hdg2;
+            color: var(--shw_clr_txt);
+            cursor: pointer;
+            transition: all ease $fmid_trans;
+
+            &:hover {
+              color: var(--acc_clr);
+
+              &::before {
+                border-color: var(--acc_clr);
+              }
+
+              &::after {
+                background-color: var(--acc_clr);
+              }
+            }
+
+            &::before {
+              content: '';
+              @include position(absolute, left, top, -6px, 45%);
+              width: 10px;
+              height: 10px;
+              border: 1.5px solid var(--shw_clr_shd);
+              border-radius: 2px;
+            }
+
+            &::after {
+              content: '';
+              @include position(absolute, left, top, -3px, 45%);
+              width: 6px;
+              height: 6px;
+              background-color: var(--shw_clr_shd);
+              opacity: 0;
+            }
+          }
+
+          #logged_in {
+            visibility: hidden;
+
+            &:checked + label:after {
+              opacity: 1;
+            }
+          }
         }
       }
     }

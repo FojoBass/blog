@@ -13,6 +13,8 @@ import { v4 } from 'uuid';
 import { blogSlice } from '../../features/blogSlice';
 import { useGlobalContext } from '../../context';
 import SearchForm from './SearchForm';
+import { BlogServices } from '../../services/firebase/blogServices';
+import { userSlice } from '../../features/userSlice';
 
 const Navbar = () => {
   const theme = useBlogSelector((state) => state.theme);
@@ -101,6 +103,7 @@ const Navbar = () => {
   );
 };
 
+// * DROP DOWN PART
 export interface DropType {
   drop: boolean;
   setDrop: React.Dispatch<React.SetStateAction<boolean>>;
@@ -109,17 +112,28 @@ export interface DropType {
 
 const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
   const dropRef = useRef<HTMLDivElement>(null);
+  const { setIsUserLoggedIn } = userSlice.actions;
+  const dispatch = useBlogDispatch();
+  const navigate = useNavigate();
 
-  const handleSignout = () => {
-    // setDrop(false);
+  const handleSignout = async () => {
+    try {
+      await new BlogServices().logOut();
+      dispatch(setIsUserLoggedIn(false));
+      setDrop(false);
+      navigate('/');
+      // todo depending on user choice, remove user info from storages
+    } catch (error) {
+      console.log(`Log out failed: ${error}`);
+    }
   };
 
   useEffect(() => {
-    if (dropRef.current && profileOptsRef.current) {
+    if (dropRef.current) {
       document.documentElement.onclick = (e: MouseEvent): void => {
         if (
           e.target !== dropRef.current &&
-          e.target !== profileOptsRef.current &&
+          e.target !== document.querySelector('.profile_opts_btn') &&
           e.target !== dropRef.current?.children[0] &&
           e.target !== dropRef.current?.children[1] &&
           e.target !== dropRef.current?.children[2]
