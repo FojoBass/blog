@@ -23,6 +23,7 @@ import { regex } from '../data';
 import { toast } from 'react-toastify';
 import { userSignUp } from '../features/userAsyncThunk';
 import { FormDataInt } from '../types';
+import InfoForm from './components/InfoForm';
 
 // TODO For input componenets, make the needed involve global variables
 
@@ -208,7 +209,9 @@ const Signup = () => {
         <AiOutlineHome />
       </Link>
 
-      <div className='center_sect'>
+      <InfoForm type={'signup'} loading={isSignupLoading} />
+
+      {/* <div className='center_sect'>
         <div className='top'>
           <h1>
             <span className='before'></span>Sign up
@@ -466,7 +469,7 @@ const Signup = () => {
             </Link>
           </form>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 };

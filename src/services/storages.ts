@@ -9,7 +9,6 @@ export class StorageFuncs {
     }
   }
 
-  // ! ERROR WHEN KEY IS NOT FOUND IN STORAGE. FIX!
   static getStorage<T>(type: 'local' | 'session', key: string): T | null {
     const storeInfo =
       (type === 'local'
@@ -26,8 +25,18 @@ export class StorageFuncs {
       type === 'local'
         ? localStorage.getItem(key)
         : type === 'session'
-        ? localStorage.getItem(key)
+        ? sessionStorage.getItem(key)
         : ''
     );
+  }
+
+  static clearStorage(type: 'local' | 'session', key: string): void {
+    if (type === 'local') {
+      localStorage.removeItem(key);
+    }
+
+    if (type === 'session') {
+      sessionStorage.removeItem(key);
+    }
   }
 }

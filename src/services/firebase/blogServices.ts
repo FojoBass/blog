@@ -7,6 +7,7 @@ import {
   signInWithEmailAndPassword,
   GithubAuthProvider,
   signInWithPopup,
+  GoogleAuthProvider,
 } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
@@ -16,6 +17,7 @@ const uidLong = new ShortUniqueId({ length: 10 });
 const uidShort = new ShortUniqueId({ length: 7 });
 
 const gitProvider = new GithubAuthProvider();
+const googleProvider = new GoogleAuthProvider();
 
 export class BlogServices {
   // *Auth methods
@@ -33,6 +35,10 @@ export class BlogServices {
 
   signInGit(): Promise<UserCredential> {
     return signInWithPopup(auth, gitProvider);
+  }
+
+  signInGoo(): Promise<UserCredential> {
+    return signInWithPopup(auth, googleProvider);
   }
 
   // *Firestore methods

@@ -24,38 +24,67 @@
       background-color: var(--bg_clr2);
     }
   }
+}
 
-  .center_sect {
-    border-radius: 10px;
-    padding: 0;
-    box-shadow: 0 0 6px 2px var(--shw_clr_shd);
-    height: fit-content;
-    margin: auto;
-    overflow: hidden;
-    width: 800px;
-    background-color: var(--bg_clr3);
-    max-width: 700px;
+#get_user_info_sect {
+  @include position(fixed, left, top, 0px, 0px);
+  padding: 50px 10px;
+  min-height: 80vh;
+  display: flex;
+  background-color: transparent;
+  backdrop-filter: blur(10px);
+  height: 100vh;
+  width: 100%;
+  z-index: 110;
+  overflow: auto;
+}
 
-    .top {
-      padding: 20px;
+.info_form_sect {
+  border-radius: 10px;
+  padding: 0;
+  box-shadow: 0 0 6px 2px var(--shw_clr_shd);
+  height: fit-content;
+  margin: auto;
+  overflow: hidden;
+  width: 800px;
+  background-color: var(--bg_clr3);
+  max-width: 700px;
 
-      h1 {
-        text-align: center;
-        font-family: $fnt_hdg1;
-        font-size: 3.5rem;
-        text-transform: capitalize;
-        color: var(--txt_clr1);
-        margin-bottom: 20px;
-        @include flexDisplay(center, center);
+  .top {
+    padding: 20px;
 
-        .before,
-        .after {
-          width: 50px;
-          height: 2px;
-          background-color: var(--shw_clr_tnt);
-          display: inline-block;
-          margin: 0 10px;
-        }
+    h1 {
+      text-align: center;
+      font-family: $fnt_hdg1;
+      font-size: 3.5rem;
+      text-transform: capitalize;
+      color: var(--txt_clr1);
+      margin-bottom: 20px;
+      @include flexDisplay(center, center);
+
+      .before,
+      .after {
+        width: 50px;
+        height: 2px;
+        background-color: var(--shw_clr_tnt);
+        display: inline-block;
+        margin: 0 10px;
+      }
+    }
+
+    .signup_form {
+      input,
+      textarea {
+        transition: all ease $fmid_trans !important;
+      }
+
+      input:not(input[type='date']):focus {
+        border-bottom-color: var(--acc_clr) !important;
+      }
+
+      textarea:focus,
+      input[type='file']:focus {
+        border-color: var(--acc_clr) !important;
       }
 
       .info_wrapper {
@@ -167,21 +196,5 @@
         }
       }
     }
-  }
-}
-
-.signup_form {
-  input,
-  textarea {
-    transition: all ease $fmid_trans !important;
-  }
-
-  input:not(input[type='date']):focus {
-    border-bottom-color: var(--acc_clr) !important;
-  }
-
-  textarea:focus,
-  input[type='file']:focus {
-    border-color: var(--acc_clr) !important;
   }
 }

@@ -1,5 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getUserInfo, userSignIn, userSignUp } from './userAsyncThunk';
+import {
+  getUserInfo,
+  userGitSignIn,
+  userGooSignIn,
+  userSignIn,
+  userSignUp,
+} from './userAsyncThunk';
 import { UserInfoInt } from '../types';
 
 interface InitialStateInt {
@@ -11,6 +17,7 @@ interface InitialStateInt {
   isJustLoggedIn: boolean;
   isLogInLoading: boolean;
   signInError: string;
+  noUserInfo: boolean;
 }
 
 const initialState: InitialStateInt = {
@@ -22,6 +29,7 @@ const initialState: InitialStateInt = {
   isJustLoggedIn: false,
   isLogInLoading: false,
   signInError: '',
+  noUserInfo: false,
 };
 
 export const userSlice = createSlice({
@@ -42,6 +50,9 @@ export const userSlice = createSlice({
     },
     resetIsJustLoggedIn(state, action) {
       state.isJustLoggedIn = false;
+    },
+    setNoUserInfo(state, action) {
+      state.noUserInfo = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -82,6 +93,32 @@ export const userSlice = createSlice({
         state.isJustLoggedIn = true;
       })
       .addCase(userSignIn.rejected, (state, error) => {
+        state.isLogInLoading = false;
+        state.signInError = error.payload as string;
+      });
+    builder
+      .addCase(userGitSignIn.pending, (state) => {
+        state.isLogInLoading = true;
+      })
+      .addCase(userGitSignIn.fulfilled, (state, action) => {
+        state.isLogInLoading = false;
+        state.isUserLoggedIn = true;
+        state.isJustLoggedIn = true;
+      })
+      .addCase(userGitSignIn.rejected, (state, error) => {
+        state.isLogInLoading = false;
+        state.signInError = error.payload as string;
+      });
+    builder
+      .addCase(userGooSignIn.pending, (state) => {
+        state.isLogInLoading = true;
+      })
+      .addCase(userGooSignIn.fulfilled, (state, action) => {
+        state.isLogInLoading = false;
+        state.isUserLoggedIn = true;
+        state.isJustLoggedIn = true;
+      })
+      .addCase(userGooSignIn.rejected, (state, error) => {
         state.isLogInLoading = false;
         state.signInError = error.payload as string;
       });

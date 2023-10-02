@@ -5,8 +5,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { userSlice } from '../features/userSlice';
 import { toast } from 'react-toastify';
 import { useBlogSelector, useBlogDispatch } from '../app/store';
-import { userGitSignIn, userSignIn } from '../features/userAsyncThunk';
+import {
+  userGitSignIn,
+  userGooSignIn,
+  userSignIn,
+} from '../features/userAsyncThunk';
 import { useGlobalContext } from '../context';
+import { BlogServices } from '../services/firebase/blogServices';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,8 +37,11 @@ const Login = () => {
   };
 
   const handleGitSignIn = () => {
-    console.log('git signin clicked');
     dispatch(userGitSignIn());
+  };
+
+  const handleGooSignIn = () => {
+    dispatch(userGooSignIn());
   };
 
   useEffect(() => {
@@ -157,6 +165,7 @@ const Login = () => {
                   isLogInLoading ? 'loading' : ''
                 }`}
                 type='button'
+                onClick={handleGooSignIn}
               >
                 <BsGoogle />
               </button>
@@ -180,10 +189,6 @@ const Login = () => {
             </footer>
           </form>
         </div>
-
-        {/* <div className='img_wrapper'>
-          <img src={signinImg} alt='' />
-        </div> */}
       </div>
     </section>
   );

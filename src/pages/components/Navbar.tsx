@@ -15,6 +15,7 @@ import { useGlobalContext } from '../../context';
 import SearchForm from './SearchForm';
 import { BlogServices } from '../../services/firebase/blogServices';
 import { userSlice } from '../../features/userSlice';
+import { StorageFuncs } from '../../services/storages';
 
 const Navbar = () => {
   const theme = useBlogSelector((state) => state.theme);
@@ -115,6 +116,7 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
   const { setIsUserLoggedIn } = userSlice.actions;
   const dispatch = useBlogDispatch();
   const navigate = useNavigate();
+  const { loginPersistence, storageKeys } = useGlobalContext();
 
   const handleSignout = async () => {
     try {
@@ -122,7 +124,15 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
       dispatch(setIsUserLoggedIn(false));
       setDrop(false);
       navigate('/');
-      // todo depending on user choice, remove user info from storages
+
+      if (storageKeys) {
+        !loginPersistence &&
+          StorageFuncs.clearStorage('session', storageKeys.currUser);
+        StorageFuncs.clearStorage(
+          loginPersistence ? 'local' : 'session',
+          storageKeys.isUserInfo
+        );
+      }
     } catch (error) {
       console.log(`Log out failed: ${error}`);
     }

@@ -13,6 +13,7 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
 } from 'firebase/auth';
+import { userSlice } from './features/userSlice';
 
 interface ContextInt {
   searchString?: string;
@@ -20,6 +21,7 @@ interface ContextInt {
   isSearch?: boolean;
   setIsSearch?: Dispatch<React.SetStateAction<boolean>>;
   setLoginPersistence?: Dispatch<React.SetStateAction<boolean>>;
+  loginPersistence?: boolean;
   filters?: string;
   setFilters?: Dispatch<React.SetStateAction<string>>;
   orderBy?: string;
@@ -34,7 +36,7 @@ interface ContextInt {
   setAviBigFile?: Dispatch<React.SetStateAction<File | null>>;
   aviSmallFile?: File | null;
   setAviSmallFile?: Dispatch<React.SetStateAction<File | null>>;
-  storageKeys?: { currUser: string; logPers: string };
+  storageKeys?: { currUser: string; logPers: string; isUserInfo: string };
 }
 
 const BlogContext = createContext<ContextInt>({});
@@ -55,13 +57,19 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [storageKeys] = useState({
     currUser: 'devie_current_user',
     logPers: 'devie_login_persistence',
+    isUserInfo: 'isUserInfo',
   });
 
   const [loginPersistence, setLoginPersistence] = useState(
     StorageFuncs.getStorage<boolean>('local', storageKeys.logPers) ?? false
   );
 
-  const { userInfo } = useBlogSelector((state) => state.user);
+  const { userInfo, noUserInfo, isUserLoggedIn } = useBlogSelector(
+    (state) => state.user
+  );
+  const dispatch = useBlogDispatch();
+
+  const { setNoUserInfo } = userSlice.actions;
 
   const sharedProps: ContextInt = {
     searchString,
@@ -84,6 +92,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     setAviSmallFile,
     storageKeys,
     setLoginPersistence,
+    loginPersistence,
   };
 
   useEffect(() => {
@@ -101,13 +110,31 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (userInfo) {
       StorageFuncs.setStorage<UserInfoInt>(
-        'local',
+        loginPersistence ? 'local' : 'session',
         storageKeys.currUser,
         userInfo
       );
     }
-    console.log('userInfo: ', userInfo);
-  }, [userInfo]);
+  }, [userInfo, loginPersistence]);
+
+  useEffect(() => {
+    const isUserInfo = StorageFuncs.getStorage<boolean>(
+      loginPersistence ? 'local' : 'session',
+      storageKeys.isUserInfo
+    );
+
+    if (isUserLoggedIn) {
+      StorageFuncs.setStorage<boolean>(
+        loginPersistence ? 'local' : 'session',
+        storageKeys.isUserInfo,
+        !noUserInfo
+      );
+    }
+
+    if (!isUserLoggedIn && !isUserInfo && typeof isUserInfo === 'boolean') {
+      dispatch(setNoUserInfo(!isUserInfo));
+    }
+  }, [noUserInfo, loginPersistence, isUserLoggedIn]);
 
   return (
     <BlogContext.Provider value={sharedProps}>{children}</BlogContext.Provider>

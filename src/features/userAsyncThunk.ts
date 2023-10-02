@@ -86,11 +86,21 @@ export const userGitSignIn = createAsyncThunk<void, void>(
   'user/userGitSignIn',
   async (payload, thunkApi) => {
     try {
-      console.log('git login try');
       const res = await blogServices.signInGit();
-      console.log('git login: ', res);
+      thunkApi.dispatch(getUserInfo({ email: res.user.email ?? '' }));
+    } catch (error) {
+      return thunkApi.rejectWithValue(`Signin failed: ${error}`);
+    }
+  }
+);
 
-      //  thunkApi.dispatch(getUserInfo({ email }));
+// ?  Google
+export const userGooSignIn = createAsyncThunk<void, void>(
+  'user/userGooSignIn',
+  async (payload, thunkApi) => {
+    try {
+      const res = await blogServices.signInGoo();
+      thunkApi.dispatch(getUserInfo({ email: res.user.email ?? '' }));
     } catch (error) {
       return thunkApi.rejectWithValue(`Signin failed: ${error}`);
     }
@@ -104,7 +114,9 @@ export const getUserInfo = createAsyncThunk<void, { email: string }>(
     const { email } = payload;
     let userInfo;
 
-    const { setUserInfo } = userSlice.actions;
+    console.log('in getUserinfo');
+
+    const { setUserInfo, setNoUserInfo } = userSlice.actions;
 
     try {
       const snapQuery = query(
@@ -114,7 +126,8 @@ export const getUserInfo = createAsyncThunk<void, { email: string }>(
 
       onSnapshot(snapQuery, (querySnapshot) => {
         querySnapshot.forEach((doc) => {
-          userInfo = doc.data();
+          userInfo = doc.data() ?? null;
+
           thunkApi.dispatch(
             setUserInfo({
               ...userInfo,
@@ -124,6 +137,8 @@ export const getUserInfo = createAsyncThunk<void, { email: string }>(
             })
           );
         });
+
+        !querySnapshot.size && thunkApi.dispatch(setNoUserInfo(true));
       });
     } catch (error) {
       return thunkApi.rejectWithValue(`Get user info ${error}`);
