@@ -86,7 +86,9 @@ export const userGitSignIn = createAsyncThunk<void, void>(
   'user/userGitSignIn',
   async (payload, thunkApi) => {
     try {
+      console.log('Start git auth');
       const res = await blogServices.signInGit();
+      console.log('End git auth');
       thunkApi.dispatch(getUserInfo({ email: res.user.email ?? '' }));
     } catch (error) {
       return thunkApi.rejectWithValue(`Signin failed: ${error}`);
