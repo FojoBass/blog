@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import avi from '../assets/Me cropped.jpg';
 import { BsThreeDots, BsBoxArrowUpRight, BsPersonHearts } from 'react-icons/bs';
 import { ImLocation2 } from 'react-icons/im';
@@ -12,15 +12,20 @@ import {
   AiFillInstagram,
   AiFillBehanceSquare,
 } from 'react-icons/ai';
-import { DisplayPosts } from './components';
-import { PostsInt } from '../types';
+import { DisplayPosts, Loading } from './components';
+import { PostsInt, UserInfoInt } from '../types';
 import { v4 } from 'uuid';
 import { useBlogSelector } from '../app/store';
 import { useGlobalContext } from '../context';
+import { useParams } from 'react-router-dom';
+import { userSlice } from '../features/userSlice';
 
 const Profile = () => {
-  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
-  const [userColor, setUserColor] = useState('#000000');
+  const { isUserLoggedIn, userInfo } = useBlogSelector((state) => state.user);
+  const { username } = useParams();
+  const [userInfoLoading, setUserInfoLoading] = useState(true);
+  const [displayInfo, setDisplayInfo] = useState<UserInfoInt | null>(null);
+
   // todo Dummy Posts to be replaced
   const userPosts: PostsInt[] = [
     { isDummy: true, id: v4() },
@@ -29,166 +34,213 @@ const Profile = () => {
     { isDummy: true, id: v4() },
     { isDummy: true, id: v4() },
   ];
+
+  useEffect(() => {
+    if (username === userInfo?.userId) {
+      setUserInfoLoading(false);
+      setDisplayInfo(userInfo);
+    }
+  }, [username, userInfo]);
+
   return (
     <section id='profile_sect'>
-      <div
-        className='head_overlay'
-        style={{ backgroundColor: userColor }}
-      ></div>
+      {userInfoLoading ? (
+        <Loading />
+      ) : (
+        <>
+          <div
+            className='head_overlay'
+            style={{ backgroundColor: displayInfo?.userColor }}
+          ></div>
 
-      <div className='center_sect profile_wrapper'>
-        <header className='profile_header'>
-          <div className='top'>
-            <div className='img_wrapper' style={{ backgroundColor: userColor }}>
-              <img src={avi} alt='' />
-            </div>
-
-            <div className='right_side'>
-              {isUserLoggedIn ? (
-                <button className='spc_btn edit_btn'>Edit Profile</button>
-              ) : (
-                <>
-                  <button className='spc_btn follow_btn'>Follow</button>
-                  <button className='more_opts'>
-                    <BsThreeDots />
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          <div className='mid'>
-            <div className='user_info'>
-              <h3 className='user_name'>user name</h3>
-              <p className='about_user'>
-                I am me, and I am also Lorem ipsum dolor sit amet consectetur,
-                adipisicing elit. Dolorum nostrum eligendi minus, esse adipisci
-                eum!
-              </p>
-            </div>
-
-            <div className='more_info'>
-              <article className='more_info_opt'>
-                <div className='icon_wrapper'>
-                  <ImLocation2 />
+          <div className='center_sect profile_wrapper'>
+            <header className='profile_header'>
+              <div className='top'>
+                <div
+                  className='img_wrapper'
+                  style={{ backgroundColor: displayInfo?.userColor }}
+                >
+                  <img
+                    src={`${displayInfo?.aviUrls.bigAviUrl}`}
+                    alt='user avatar'
+                  />
                 </div>
-                Africa, Earth
-              </article>
 
-              <article className='more_info_opt'>
-                <a href='mailto: fojo4god@gmail.com'>
+                <div className='right_side'>
+                  {isUserLoggedIn ? (
+                    username === userInfo?.userId ? (
+                      <button className='spc_btn edit_btn'>Edit Profile</button>
+                    ) : (
+                      <>
+                        <button className='spc_btn follow_btn'>Follow</button>
+                        <button className='more_opts'>
+                          <BsThreeDots />
+                        </button>
+                      </>
+                    )
+                  ) : (
+                    <>
+                      <button className='spc_btn follow_btn'>Follow</button>
+                      <button className='more_opts'>
+                        <BsThreeDots />
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className='mid'>
+                <div className='user_info'>
+                  <h3 className='user_name'>{displayInfo?.userName}</h3>
+                  <p className='about_user'>{displayInfo?.bio}</p>
+                </div>
+
+                <div className='more_info'>
+                  <article className='more_info_opt'>
+                    <div className='icon_wrapper'>
+                      <ImLocation2 />
+                    </div>
+                    {displayInfo?.country.name}, {displayInfo?.state}
+                  </article>
+
+                  <article className='more_info_opt'>
+                    <a href='mailto: fojo4god@gmail.com'>
+                      <div className='icon_wrapper'>
+                        <MdMail />
+                      </div>
+                      {displayInfo?.email}
+                    </a>
+                  </article>
+
+                  {displayInfo?.socials.url && (
+                    <article className='more_info_opt'>
+                      <a href='https://fast.com' target='_blank'>
+                        <div className='icon_wrapper'>
+                          <BsBoxArrowUpRight />
+                        </div>
+                        displayInfo?.socials.url
+                      </a>
+                    </article>
+                  )}
+
+                  <article className='more_info_opt'>
+                    <div className='icon_wrapper'>
+                      <MdCake />
+                    </div>
+                    Joined on {(displayInfo?.createdAt as string).split(' ')[1]}{' '}
+                    {(displayInfo?.createdAt as string).split(' ')[2]},{' '}
+                    {(displayInfo?.createdAt as string).split(' ')[3]}
+                  </article>
+                </div>
+
+                <div className='socials'>
+                  {displayInfo?.socials.git && (
+                    <a
+                      href={`${displayInfo?.socials.git}`}
+                      className='social_link'
+                      target='_blank'
+                    >
+                      <AiFillGithub />
+                    </a>
+                  )}
+
+                  {displayInfo?.socials.X && (
+                    <a
+                      href={`${displayInfo?.socials.X}`}
+                      className='social_link'
+                      target='_blank'
+                    >
+                      <AiOutlineTwitter />
+                    </a>
+                  )}
+
+                  {displayInfo?.socials.fb && (
+                    <a
+                      href={`${displayInfo?.socials.fb}`}
+                      className='social_link'
+                      target='_blank'
+                    >
+                      <AiFillFacebook />
+                    </a>
+                  )}
+
+                  {displayInfo?.socials.ins && (
+                    <a
+                      href={`${displayInfo?.socials.ins}`}
+                      className='social_link'
+                      target='_blank'
+                    >
+                      <AiFillInstagram />
+                    </a>
+                  )}
+
+                  {displayInfo?.socials.be && (
+                    <a
+                      href={`${displayInfo?.socials.be}`}
+                      className='social_link'
+                      target='_blank'
+                    >
+                      <AiFillBehanceSquare />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div className='bottom'>
+                <article className='bottom_opt'>
                   <div className='icon_wrapper'>
-                    <MdMail />
+                    <FaScroll />
                   </div>
-                  fojo4god@gmail.com
-                </a>
-              </article>
+                  <span>{displayInfo?.postCount} posts published</span>
+                </article>
 
-              <article className='more_info_opt'>
-                <a href='https://fast.com' target='_blank'>
+                <article className='bottom_opt'>
                   <div className='icon_wrapper'>
-                    <BsBoxArrowUpRight />
+                    <IoIosPeople />
                   </div>
-                  https://fast.com
-                </a>
-              </article>
+                  <span>{displayInfo?.followers.length} followers</span>
+                </article>
 
-              <article className='more_info_opt'>
-                <div className='icon_wrapper'>
-                  <MdCake />
+                <article className='bottom_opt'>
+                  <div className='icon_wrapper'>
+                    <BsPersonHearts />
+                  </div>
+                  <span>{displayInfo?.followings.length} followings</span>
+                </article>
+              </div>
+            </header>
+
+            <div className='user_posts'>
+              <aside>
+                <div className='side_opts'>
+                  <article className='side_opt'>
+                    <div className='icon_wrapper'>
+                      <FaScroll />
+                    </div>
+                    <span>{displayInfo?.postCount} posts published</span>
+                  </article>
+
+                  <article className='side_opt'>
+                    <div className='icon_wrapper'>
+                      <IoIosPeople />
+                    </div>
+                    <span>{displayInfo?.followers.length} followers</span>
+                  </article>
+
+                  <article className='side_opt'>
+                    <div className='icon_wrapper'>
+                      <BsPersonHearts />
+                    </div>
+                    <span>{displayInfo?.followings.length} followings</span>
+                  </article>
                 </div>
-                Joined on Feb 17, 1455
-              </article>
-            </div>
+              </aside>
 
-            <div className='socials'>
-              <a
-                href='https://github.com'
-                className='social_link'
-                target='_blank'
-              >
-                <AiFillGithub />
-              </a>
-
-              <a href='https://x.com' className='social_link' target='_blank'>
-                <AiOutlineTwitter />
-              </a>
-
-              <a href='https://fb.com' className='social_link' target='_blank'>
-                <AiFillFacebook />
-              </a>
-
-              <a
-                href='https://instagram.com'
-                className='social_link'
-                target='_blank'
-              >
-                <AiFillInstagram />
-              </a>
-
-              <a
-                href='https://behance.com'
-                className='social_link'
-                target='_blank'
-              >
-                <AiFillBehanceSquare />
-              </a>
+              <DisplayPosts posts={userPosts} />
             </div>
           </div>
-
-          <div className='bottom'>
-            <article className='bottom_opt'>
-              <div className='icon_wrapper'>
-                <FaScroll />
-              </div>
-              <span>{51} posts published</span>
-            </article>
-
-            <article className='bottom_opt'>
-              <div className='icon_wrapper'>
-                <IoIosPeople />
-              </div>
-              <span>{5} followers</span>
-            </article>
-
-            <article className='bottom_opt'>
-              <div className='icon_wrapper'>
-                <BsPersonHearts />
-              </div>
-              <span>10 followings</span>
-            </article>
-          </div>
-        </header>
-
-        <div className='user_posts'>
-          <aside>
-            <div className='side_opts'>
-              <article className='side_opt'>
-                <div className='icon_wrapper'>
-                  <FaScroll />
-                </div>
-                <span>{51} posts published</span>
-              </article>
-
-              <article className='side_opt'>
-                <div className='icon_wrapper'>
-                  <IoIosPeople />
-                </div>
-                <span>{5} followers</span>
-              </article>
-
-              <article className='side_opt'>
-                <div className='icon_wrapper'>
-                  <BsPersonHearts />
-                </div>
-                <span>10 followings</span>
-              </article>
-            </div>
-          </aside>
-
-          <DisplayPosts posts={userPosts} />
-        </div>
-      </div>
+        </>
+      )}
     </section>
   );
 };

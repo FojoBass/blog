@@ -52,4 +52,8 @@ export interface UserInfoInt extends FormDataInt {
     smallAviUrl: string;
   };
   createdAt: FieldValue | string;
+  followers: FollowsInt[];
+  followings: FollowsInt[];
+  userColor: string;
+  postCount: number;
 }

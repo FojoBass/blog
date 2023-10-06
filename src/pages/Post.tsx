@@ -190,7 +190,7 @@ const Post = () => {
 
           <div className='read_next_sect'>
             <h2>Read next</h2>
-            <Link to='/dummyUser/dummyPost' className='read_post'>
+            <Link to='/p/dummyUser/dummyPost' className='read_post'>
               <div className='img_wrapper'>
                 <img src={avatar} alt='' />
               </div>
@@ -202,7 +202,7 @@ const Post = () => {
               </div>
             </Link>
 
-            <Link to='/dummyUser/dummyPost' className='read_post'>
+            <Link to='/p/dummyUser/dummyPost' className='read_post'>
               <div className='img_wrapper'>
                 <img src={avatar} alt='' />
               </div>
@@ -214,7 +214,7 @@ const Post = () => {
               </div>
             </Link>
 
-            <Link to='/dummyUser/dummyPost' className='read_post'>
+            <Link to='/p/dummyUser/dummyPost' className='read_post'>
               <div className='img_wrapper'>
                 <img src={avatar} alt='' />
               </div>
@@ -226,7 +226,7 @@ const Post = () => {
               </div>
             </Link>
 
-            <Link to='/dummyUser/dummyPost' className='read_post'>
+            <Link to='/p/dummyUser/dummyPost' className='read_post'>
               <div className='img_wrapper'>
                 <img src={avatar} alt='' />
               </div>

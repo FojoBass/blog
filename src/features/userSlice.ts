@@ -54,6 +54,9 @@ export const userSlice = createSlice({
     setNoUserInfo(state, action) {
       state.noUserInfo = action.payload;
     },
+    // setUserInfoLoading(state, action) {
+    //   state.userInfoLoading = action.payload;
+    // },
   },
   extraReducers: (builder) => {
     // *Signup User
@@ -67,6 +70,7 @@ export const userSlice = createSlice({
       })
       .addCase(userSignUp.rejected, (state, error) => {
         state.isSignupLoading = false;
+        state.signInError = error.payload as string;
         console.log(error);
       });
     // *Get Userinfo

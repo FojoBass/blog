@@ -46,11 +46,15 @@ export const userSignUp = createAsyncThunk<void, UserSignUpPayloadInt>(
       });
     };
 
+    const { setNoUserInfo } = userSlice.actions;
+
     const { email, password, formData, bigAviFile, smallAviFile } = payload;
     const userId = uidLong.rnd();
     try {
-      await blogServices.emailReg(email, password);
-      await blogServices.logOut();
+      if (password) {
+        await blogServices.emailReg(email, password);
+        await blogServices.logOut();
+      }
       const bigAviUrl = await uploadImg(bigAviFile, true);
       const smallAviUrl = await uploadImg(smallAviFile, false);
       await blogServices.setUserInfo({
@@ -59,7 +63,12 @@ export const userSignUp = createAsyncThunk<void, UserSignUpPayloadInt>(
         aviUrls: { bigAviUrl, smallAviUrl },
         userId,
         createdAt: serverTimestamp(),
+        followers: [],
+        followings: [],
+        userColor: '#000000',
+        postCount: 0,
       });
+      if (!password) thunkApi.dispatch(setNoUserInfo(false));
     } catch (error) {
       return thunkApi.rejectWithValue(`Signup failed: ${error}`);
     }
@@ -115,8 +124,6 @@ export const getUserInfo = createAsyncThunk<void, { email: string }>(
   async (payload, thunkApi) => {
     const { email } = payload;
     let userInfo;
-
-    console.log('in getUserinfo');
 
     const { setUserInfo, setNoUserInfo } = userSlice.actions;
 

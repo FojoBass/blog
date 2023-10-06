@@ -48,7 +48,9 @@ const App = () => {
   const auth = getAuth();
   const theme = useBlogSelector((state) => state.theme);
   const tabStatus = useBlogSelector((state) => state.tab);
-  const { isUserLoggedIn, noUserInfo } = useBlogSelector((state) => state.user);
+  const { isUserLoggedIn, noUserInfo, userInfo } = useBlogSelector(
+    (state) => state.user
+  );
   const dispatch = useBlogDispatch();
   const [dummyFollows] = React.useState<FollowsInt[]>([
     { userName: 'Dummy name', id: 'asdf', avi },
@@ -76,7 +78,7 @@ const App = () => {
 
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path='/' element={<Root />} errorElement={<Error />}>
+      <Route path='/' element={<Root />} errorElement={<Error type='404' />}>
         <Route index element={<Home />} />
         <Route path='/know-us' element={<About />} />
         <Route path='/meet-us' element={<Contact />} />
@@ -101,7 +103,11 @@ const App = () => {
         <Route path='/new-post' element={<NewPost />} />
         <Route path='/notifications' element={<Notification />} />
         <Route path='/:username/:postId' element={<Post />} />
-        <Route path='/p/:username' element={<Profile />} />
+        <Route
+          path='/p/:username'
+          element={<Profile />}
+          errorElement={<Error type='profile' />}
+        />
         <Route path='/categories/:category' element={<CategoryPosts />} />
         <Route path='/search' element={<Search />} />
       </Route>
@@ -145,36 +151,34 @@ const App = () => {
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        const isUserInfo =
-          storageKeys &&
-          StorageFuncs.getStorage(
-            loginPersistence ? 'local' : 'session',
-            storageKeys.isUserInfo
-          );
+        // * User log in variable is false, and there is userInfo
         if (
           !isUserLoggedIn &&
           storageKeys &&
-          StorageFuncs.checkStorage('local', storageKeys.currUser)
+          StorageFuncs.checkStorage(
+            loginPersistence ? 'local' : 'session',
+            storageKeys.currUser
+          )
         ) {
           const userInfo = StorageFuncs.getStorage<UserInfoInt>(
-            'local',
+            loginPersistence ? 'local' : 'session',
             storageKeys.currUser
           );
-
           dispatch(setUserInfo(userInfo));
           dispatch(setIsUserLoggedIn(true));
         }
 
-        if (!isUserLoggedIn && !isUserInfo) {
-          dispatch(setNoUserInfo(true));
-        }
-
-        console.log('signed in: ', user);
+        console.log('signed in: ');
+        // console.log('signed in: ', user);
       } else {
         console.log('signed out');
       }
     });
   }, [storageKeys, loginPersistence]);
+
+  useEffect(() => {
+    console.log('user info: ', userInfo);
+  }, [userInfo]);
 
   useEffect(() => {
     document.documentElement.style.overflowY = noUserInfo ? 'hidden' : 'auto';

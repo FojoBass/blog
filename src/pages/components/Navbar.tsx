@@ -5,10 +5,9 @@ import { CiSearch } from 'react-icons/ci';
 import { IoNotificationsOutline } from 'react-icons/io5';
 import { FaLightbulb, FaRegLightbulb } from 'react-icons/fa';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import avatar from '../../assets/Me cropped.jpg';
+// import avatar from '../../assets/Me cropped.jpg';
 import { useBlogDispatch, useBlogSelector } from '../../app/store';
 import { toggleTheme } from '../../features/themeSlice';
-import { dropLinks } from '../../data';
 import { v4 } from 'uuid';
 import { blogSlice } from '../../features/blogSlice';
 import { useGlobalContext } from '../../context';
@@ -16,6 +15,7 @@ import SearchForm from './SearchForm';
 import { BlogServices } from '../../services/firebase/blogServices';
 import { userSlice } from '../../features/userSlice';
 import { StorageFuncs } from '../../services/storages';
+import { DropLinkType } from '../../data';
 
 const Navbar = () => {
   const theme = useBlogSelector((state) => state.theme);
@@ -24,6 +24,7 @@ const Navbar = () => {
   const { handleSideNav } = blogSlice.actions;
   const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   const profileOptsRef = useRef<HTMLButtonElement>(null);
+  const { userInfo } = useBlogSelector((state) => state.user);
 
   return (
     <nav id='nav_sect'>
@@ -87,7 +88,11 @@ const Navbar = () => {
                 ref={profileOptsRef}
               >
                 <div className='img_wrapper'>
-                  <img src={avatar} alt='avatar' className='avatar' />
+                  <img
+                    src={`${userInfo?.aviUrls.smallAviUrl}`}
+                    alt='user avatar'
+                    className='avatar'
+                  />
                 </div>{' '}
               </button>
             </>
@@ -117,6 +122,34 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
   const dispatch = useBlogDispatch();
   const navigate = useNavigate();
   const { loginPersistence, storageKeys } = useGlobalContext();
+  const { userInfo } = useBlogSelector((state) => state.user);
+
+  const dropLinks: DropLinkType[] = [
+    {
+      title: 'Username',
+      link: `/p/${userInfo?.userId}`,
+      param: true,
+      position: 'top',
+    },
+    {
+      title: 'Dashboard',
+      link: `/${userInfo?.userId}/dashboard`,
+      param: true,
+      position: 'mid',
+    },
+    {
+      title: 'Create Post',
+      link: '/new-post',
+      param: false,
+      position: 'mid',
+    },
+    {
+      title: 'Settings',
+      link: '/settings',
+      param: false,
+      position: 'mid',
+    },
+  ];
 
   const handleSignout = async () => {
     try {
@@ -160,9 +193,9 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
           .filter((link) => link.position === 'top')
           .map(({ title, link, param }) => {
             // TODO UPDATE MODLINK ONCE AUTH UIS UP AND RUNNING
-            const modLink = param ? link.replace('dum', 'dummies') : link;
+            // const modLink = param ? link.replace('dum', 'dummies') : link;
             return (
-              <Link className='drop_down_links' to={modLink} key={v4()}>
+              <Link className='drop_down_links' to={link} key={v4()}>
                 {title}
               </Link>
             );

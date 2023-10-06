@@ -36,7 +36,12 @@ interface ContextInt {
   setAviBigFile?: Dispatch<React.SetStateAction<File | null>>;
   aviSmallFile?: File | null;
   setAviSmallFile?: Dispatch<React.SetStateAction<File | null>>;
-  storageKeys?: { currUser: string; logPers: string; isUserInfo: string };
+  storageKeys?: {
+    currUser: string;
+    logPers: string;
+    isUserInfo: string;
+    userInfoData: string;
+  };
 }
 
 const BlogContext = createContext<ContextInt>({});
@@ -58,6 +63,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     currUser: 'devie_current_user',
     logPers: 'devie_login_persistence',
     isUserInfo: 'isUserInfo',
+    userInfoData: 'user_info_data',
   });
 
   const [loginPersistence, setLoginPersistence] = useState(
@@ -123,6 +129,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
       storageKeys.isUserInfo
     );
 
+    // * User log in variable is true, then save info in storage
     if (isUserLoggedIn) {
       StorageFuncs.setStorage<boolean>(
         loginPersistence ? 'local' : 'session',
@@ -131,6 +138,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
       );
     }
 
+    // * User log in variable is false, and isUserInfo in storage is false (not null)
     if (!isUserLoggedIn && !isUserInfo && typeof isUserInfo === 'boolean') {
       dispatch(setNoUserInfo(!isUserInfo));
     }

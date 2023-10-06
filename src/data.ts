@@ -81,33 +81,6 @@ export const team: TeamInt[] = [
   },
 ];
 
-export const dropLinks: DropLinkType[] = [
-  {
-    title: 'Username',
-    link: '/p/dum',
-    param: true,
-    position: 'top',
-  },
-  {
-    title: 'Dashboard',
-    link: '/dum/dashboard',
-    param: true,
-    position: 'mid',
-  },
-  {
-    title: 'Create Post',
-    link: '/new-post',
-    param: false,
-    position: 'mid',
-  },
-  {
-    title: 'Settings',
-    link: '/settings',
-    param: false,
-    position: 'mid',
-  },
-];
-
 export const sideNavLinks: SideNavLinkType[] = [
   { Icon: AiOutlineHome, title: 'Home', link: '/' },
   { Icon: AiOutlineQuestionCircle, title: 'FAQ', link: '/faqs' },

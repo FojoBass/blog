@@ -24,6 +24,7 @@ import { toast } from 'react-toastify';
 import { userSignUp } from '../features/userAsyncThunk';
 import { FormDataInt } from '../types';
 import InfoForm from './components/InfoForm';
+import { StorageFuncs } from '../services/storages';
 
 // TODO For input componenets, make the needed involve global variables
 
@@ -57,8 +58,15 @@ const Signup = () => {
       fb: '',
       url: '',
     });
-  const { gender, country, state, aviBigFile, aviSmallFile } =
-    useGlobalContext();
+  const {
+    gender,
+    country,
+    state,
+    aviBigFile,
+    aviSmallFile,
+    loginPersistence,
+    storageKeys,
+  } = useGlobalContext();
   const dispatch = useBlogDispatch();
   const navigate = useNavigate();
 
@@ -200,8 +208,20 @@ const Signup = () => {
   useEffect(() => {
     if (isSignedUp) {
       navigate('/enter');
+
+      if (storageKeys) {
+        StorageFuncs.clearStorage(
+          loginPersistence ? 'local' : 'session',
+          storageKeys.isUserInfo
+        );
+
+        StorageFuncs.clearStorage(
+          loginPersistence ? 'local' : 'session',
+          storageKeys.userInfoData
+        );
+      }
     }
-  }, [isSignedUp]);
+  }, [isSignedUp, storageKeys]);
 
   return (
     <section className='signup_sect'>
@@ -210,266 +230,6 @@ const Signup = () => {
       </Link>
 
       <InfoForm type={'signup'} loading={isSignupLoading} />
-
-      {/* <div className='center_sect'>
-        <div className='top'>
-          <h1>
-            <span className='before'></span>Sign up
-            <span className='after'></span>
-          </h1>
-
-          <form className='signup_form' onSubmit={handleSubmit}>
-            <article className='info_wrapper basics'>
-              <h3>Basic</h3>
-
-              <div className='form_opt_wrapper'>
-                <article className='form_opt'>
-                  <span className='form_opt_icon'>
-                    <BsFillPersonFill />
-                  </span>
-                  <input
-                    type='text'
-                    name='full_name'
-                    placeholder='Full name (25 chars max)'
-                    spellCheck='false'
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    maxLength={25}
-                    ref={formRefs.fullNameInputRef}
-                  />
-                </article>
-
-                <article className='form_opt'>
-                  <span className='form_opt_icon'>
-                    <MdMail />
-                  </span>
-                  <input
-                    type='email'
-                    name='email'
-                    placeholder='Email'
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    ref={formRefs.emailInputRef}
-                  />
-                </article>
-
-                <article className='form_opt'>
-                  <span className='form_opt_icon'>
-                    <BsFillLockFill />
-                  </span>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name='password'
-                    placeholder='Password'
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    ref={formRefs.passwordInputRef}
-                  />
-
-                  <button
-                    className='eye_icon_wrapper'
-                    type='button'
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {!showPassword ? <BsEyeSlash /> : <BsEye />}
-                  </button>
-                </article>
-
-                <article className='form_opt'>
-                  <span className='form_opt_icon'>
-                    <BsFillLockFill />
-                  </span>
-                  <input
-                    type={showConPassword ? 'text' : 'password'}
-                    name='con_password'
-                    placeholder='Confirm Password'
-                    value={conPassword}
-                    onChange={(e) => setConPassword(e.target.value)}
-                    ref={formRefs.conPasswordInputRef}
-                  />
-
-                  <button
-                    className='eye_icon_wrapper'
-                    type='button'
-                    onClick={() => setShowConPassword(!showConPassword)}
-                  >
-                    {!showConPassword ? <BsEyeSlash /> : <BsEye />}
-                  </button>
-                </article>
-
-                <article className='form_opt'>
-                  <span className='form_opt_icon'>
-                    <BsFillPersonFill />
-                  </span>
-                  <input
-                    type='text'
-                    name='user_name'
-                    placeholder='User name (25 chars max)'
-                    spellCheck='false'
-                    value={userName}
-                    maxLength={25}
-                    onChange={(e) => setUserName(e.target.value)}
-                    ref={formRefs.userNameInputRef}
-                  />
-                </article>
-              </div>
-            </article>
-
-            <article className='info_wrapper additionals'>
-              <h3>Additional</h3>
-
-              <div className='form_opt_wrapper'>
-                <LocationInput />
-
-                <article className='form_opt'>
-                  <label htmlFor='dob'>Birthday</label>
-                  <input
-                    type='date'
-                    name='dob'
-                    id='dob'
-                    value={dob}
-                    onChange={(e) => setDob(e.target.value)}
-                    style={{
-                      border: '2px solid var(--brd_clr)',
-                      padding: '5px 10px',
-                      borderRadius: '10px',
-                    }}
-                  />
-                </article>
-
-                <GenderInput />
-              </div>
-            </article>
-
-            <article className='info_wrapper'>
-              <h3>Bio</h3>
-
-              <textarea
-                name='bio'
-                cols={30}
-                rows={8}
-                placeholder='Give a brief description about yourself'
-                maxLength={300}
-                minLength={10}
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-              ></textarea>
-            </article>
-
-            <article className='info_wrapper'>
-              <h3>Socials</h3>
-
-              <div className='form_opt_wrapper'>
-                <article className='social_opt'>
-                  <span className='social_icon'>
-                    <AiFillGithub />
-                  </span>
-                  <input
-                    type='url'
-                    name='git_link'
-                    placeholder='Github'
-                    value={socials.git}
-                    onChange={(e) =>
-                      setSocials({ ...socials, git: e.target.value })
-                    }
-                  />
-                </article>
-
-                <article className='social_opt'>
-                  <span className='social_icon'>
-                    <AiOutlineTwitter />
-                  </span>
-                  <input
-                    type='url'
-                    name='twi_link'
-                    placeholder='Twitter'
-                    value={socials.X}
-                    onChange={(e) =>
-                      setSocials({ ...socials, X: e.target.value })
-                    }
-                  />
-                </article>
-
-                <article className='social_opt'>
-                  <span className='social_icon'>
-                    <AiFillFacebook />
-                  </span>
-                  <input
-                    type='url'
-                    name='fb_link'
-                    placeholder='Facebook'
-                    value={socials.fb}
-                    onChange={(e) =>
-                      setSocials({ ...socials, fb: e.target.value })
-                    }
-                  />
-                </article>
-
-                <article className='social_opt'>
-                  <span className='social_icon'>
-                    <AiFillInstagram />
-                  </span>
-                  <input
-                    type='url'
-                    name='ins_link'
-                    placeholder='Instagram'
-                    value={socials.ins}
-                    onChange={(e) =>
-                      setSocials({ ...socials, ins: e.target.value })
-                    }
-                  />
-                </article>
-
-                <article className='social_opt'>
-                  <span className='social_icon'>
-                    <AiFillBehanceSquare />
-                  </span>
-                  <input
-                    type='url'
-                    name='be_link'
-                    placeholder='Behance'
-                    value={socials.be}
-                    onChange={(e) =>
-                      setSocials({ ...socials, be: e.target.value })
-                    }
-                  />
-                </article>
-
-                <article className='social_opt'>
-                  <span className='social_icon'>
-                    <FaLink />
-                  </span>
-                  <input
-                    type='url'
-                    name='url_link'
-                    placeholder='Url (e.g portfolio link)'
-                    value={socials.url}
-                    onChange={(e) =>
-                      setSocials({ ...socials, url: e.target.value })
-                    }
-                  />
-                </article>
-              </div>
-            </article>
-
-            <article className='info_wrapper avi'>
-              <h3>Profile image</h3>
-
-              <ImageInputField />
-            </article>
-
-            <button
-              type='submit'
-              className={`reg_btn spc_btn ${isSignupLoading ? 'loading' : ''}`}
-            >
-              {isSignupLoading ? 'Registering...' : 'Register'}
-            </button>
-            <Link className='login_btn' to='/enter'>
-              Already have an account?
-            </Link>
-          </form>
-        </div>
-      </div> */}
     </section>
   );
 };

@@ -67,6 +67,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
     userName: Boolean(auth.currentUser?.providerId.includes('github')),
   });
   const [fetchedGit, setFetchedGit] = useState(false);
+  const [disableGit, setDisableGit] = useState(false);
 
   const {
     gender,
@@ -79,9 +80,12 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
   } = useGlobalContext();
   const dispatch = useBlogDispatch();
 
+  const { signInError } = useBlogSelector((state) => state.user);
+
   const navigate = useNavigate();
 
-  const { setIsUserLoggedIn, setNoUserInfo } = userSlice.actions;
+  const { setIsUserLoggedIn, setNoUserInfo, resetAuthError } =
+    userSlice.actions;
 
   const formRefs: FormRefsInt = {
     fullNameInputRef: useRef<HTMLInputElement>(null),
@@ -135,7 +139,41 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
 
   const handleGetInfoSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log('SUBMIT');
+    if (
+      validateFullName() &&
+      validateEmail() &&
+      validateUsername() &&
+      validateCountryState() &&
+      validateDob() &&
+      validateSocials() &&
+      validateAvi()
+    ) {
+      if (country && state && gender && aviBigFile && aviSmallFile) {
+        const formData: FormDataInt = {
+          fullName,
+          userName,
+          country,
+          state,
+          dob,
+          bio,
+          gender,
+          socials,
+        };
+        dispatch(
+          userSignUp({
+            email,
+            password,
+            formData,
+            bigAviFile: aviBigFile,
+            smallAviFile: aviSmallFile,
+          })
+        );
+
+        dispatch(setNoUserInfo(false));
+
+       
+      }
+    }
   };
 
   const handleSignout = async () => {
@@ -148,9 +186,15 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
       if (storageKeys) {
         !loginPersistence &&
           StorageFuncs.clearStorage('session', storageKeys.currUser);
+
         StorageFuncs.clearStorage(
           loginPersistence ? 'local' : 'session',
           storageKeys.isUserInfo
+        );
+
+        StorageFuncs.clearStorage(
+          loginPersistence ? 'local' : 'session',
+          storageKeys.userInfoData
         );
       }
     } catch (error) {
@@ -262,13 +306,12 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
   };
 
   useEffect(() => {
-    if (disableFields.name) setFullName(auth.currentUser?.displayName ?? '');
-    if (disableFields.email) setEmail(auth.currentUser?.email ?? '');
-    if (disableFields.userName) getGitUserName();
-  }, [disableFields]);
+    if (type === 'get_info' && auth.currentUser) {
+      setFullName(auth.currentUser?.displayName ?? '');
+      setEmail(auth.currentUser?.email ?? '');
+      if (auth.currentUser.providerData[0].providerId.includes('github'))
+        getGitUserName();
 
-  useEffect(() => {
-    if (auth.currentUser) {
       setDisableFields({
         name: Boolean(auth.currentUser.displayName),
         email: Boolean(auth.currentUser.email),
@@ -278,6 +321,78 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
       });
     }
   }, [auth.currentUser]);
+
+  useEffect(() => {
+    if (type === 'get_info') {
+      let isUserInfoData = { fullName, email, userName, git: socials.git };
+
+      if (
+        auth.currentUser &&
+        auth.currentUser.providerData[0].providerId.includes('github') &&
+        fetchedGit &&
+        storageKeys
+      ) {
+        isUserInfoData = { ...isUserInfoData, userName, git: socials.git };
+        StorageFuncs.setStorage(
+          loginPersistence ? 'local' : 'session',
+          storageKeys.userInfoData,
+          isUserInfoData
+        );
+      } else if (fullName && email && storageKeys) {
+        StorageFuncs.setStorage(
+          loginPersistence ? 'local' : 'session',
+          storageKeys.userInfoData,
+          isUserInfoData
+        );
+      }
+    }
+  }, [fetchedGit, fullName, email, userName, socials, storageKeys]);
+
+  useEffect(() => {
+    if (
+      type === 'get_info' &&
+      storageKeys &&
+      StorageFuncs.checkStorage(
+        loginPersistence ? 'local' : 'session',
+        storageKeys.userInfoData
+      )
+    ) {
+      const {
+        fullName: name,
+        email: mail,
+        userName: uName,
+        git,
+      } = StorageFuncs.getStorage<{
+        fullName: string;
+        email: string;
+        userName: string;
+        git: string;
+      }>(loginPersistence ? 'local' : 'session', storageKeys.userInfoData) ?? {
+        fullName: '',
+        email: '',
+        userName: '',
+        git: '',
+      };
+
+      setDisableFields({
+        name: Boolean(name),
+        email: Boolean(mail),
+        userName: Boolean(uName),
+      });
+
+      setFullName(name);
+      setEmail(mail);
+      setUserName(uName);
+      setSocials({ ...socials, git });
+      setDisableGit(true);
+    }
+  }, [storageKeys]);
+
+  useEffect(() => {
+    if (signInError.includes('email-already-in-use'))
+      toast.error('Email already in use');
+    dispatch(resetAuthError(''));
+  }, [signInError]);
 
   return (
     <div className='info_form_sect'>
@@ -456,7 +571,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
                   onChange={(e) =>
                     setSocials({ ...socials, git: e.target.value })
                   }
-                  disabled={fetchedGit}
+                  disabled={fetchedGit || disableGit}
                 />
               </article>
 
