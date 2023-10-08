@@ -8,6 +8,8 @@ import {
   GithubAuthProvider,
   signInWithPopup,
   GoogleAuthProvider,
+  sendEmailVerification,
+  User,
 } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
@@ -39,6 +41,10 @@ export class BlogServices {
 
   signInGoo(): Promise<UserCredential> {
     return signInWithPopup(auth, googleProvider);
+  }
+
+  verification(user: User) {
+    return sendEmailVerification(user);
   }
 
   // *Firestore methods

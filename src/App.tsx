@@ -43,6 +43,8 @@ import { userSlice } from './features/userSlice';
 import { StorageFuncs } from './services/storages';
 import { useGlobalContext } from './context';
 import GetUserInfo from './modals/GetUserInfo';
+import { auth } from './services/firebase/config';
+import Verification from './modals/Verification';
 
 const App = () => {
   const auth = getAuth();
@@ -199,6 +201,11 @@ const Root = () => {
       <Navbar />
       <Sidenav />
       {noUserInfo && <GetUserInfo />}
+      {!noUserInfo &&
+        !auth.currentUser?.emailVerified &&
+        typeof auth.currentUser?.emailVerified === 'boolean' && (
+          <Verification />
+        )}
       <Outlet />
       <ToastContainer
         theme={theme === 'light' ? 'light' : 'dark'}

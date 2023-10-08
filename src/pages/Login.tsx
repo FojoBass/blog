@@ -22,7 +22,7 @@ const Login = () => {
     useBlogSelector((state) => state.user);
   const dispatch = useBlogDispatch();
 
-  const { setLoginPersistence } = useGlobalContext();
+  const { setLoginPersistence, setIsVerifyOpen } = useGlobalContext();
 
   const [email, setEmail] = useState('');
   const [pword, setPword] = useState('');
@@ -33,15 +33,20 @@ const Login = () => {
     e.preventDefault();
 
     if (!email || !pword) toast.error('All fields are required');
-    else dispatch(userSignIn({ email, password: pword }));
+    else {
+      dispatch(userSignIn({ email, password: pword }));
+      setIsVerifyOpen && setIsVerifyOpen(true);
+    }
   };
 
   const handleGitSignIn = () => {
     dispatch(userGitSignIn());
+    setIsVerifyOpen && setIsVerifyOpen(true);
   };
 
   const handleGooSignIn = () => {
     dispatch(userGooSignIn());
+    setIsVerifyOpen && setIsVerifyOpen(true);
   };
 
   useEffect(() => {

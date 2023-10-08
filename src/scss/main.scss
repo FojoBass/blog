@@ -188,3 +188,77 @@
     }
   }
 }
+
+// *For Verification
+#verify_sect {
+  @include position(fixed, left, top, 0px, 0px);
+  min-height: 80vh;
+  height: 100vh;
+  width: 100%;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  display: flex;
+  padding: 10px;
+
+  .center_sect {
+    background-color: var(--bg_clr3);
+    margin: auto;
+    box-shadow: 0 0 6px 2px var(--shw_clr_shd);
+    overflow: hidden;
+    width: 500px;
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+
+    h2 {
+      margin-bottom: 5px;
+      font-family: $fnt_hdg1;
+      font-size: $txt_size3;
+    }
+
+    p {
+      font-size: $txt_size2;
+      margin-bottom: 2px;
+    }
+
+    .btn_wrapper {
+      @include flexDisplay(center, center);
+      margin-top: 20px;
+
+      button {
+        margin: 0 5px;
+        font-size: $txt_size2;
+        font-family: $fnt_spc1;
+        padding: 10px 25px;
+        border-radius: 5px;
+
+        &:active {
+          transform: scale(0.9);
+        }
+      }
+
+      .verify_btn {
+        position: relative;
+        overflow: hidden;
+
+        .counter {
+          @include position(absolute, left, top, 0px, 0px);
+          width: 100%;
+          height: 100%;
+          @include flexDisplay(center, center);
+          background-color: #000000b4;
+          font-family: $fnt_spc2;
+        }
+      }
+
+      .log_out_btn {
+        border: 2px solid var(--spc_clr);
+
+        &:hover {
+          color: #ff0000;
+          border-color: #ff0000;
+        }
+      }
+    }
+  }
+}

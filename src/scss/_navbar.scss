@@ -112,7 +112,7 @@ $acc_clr: var(--acc_clr);
       &:hover {
         text-decoration: underline;
         background-color: var(--acc_clr);
-        color: #fff;
+        color: $spc_txt_clr;
       }
     }
 

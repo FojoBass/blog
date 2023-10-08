@@ -22,6 +22,8 @@ interface ContextInt {
   setIsSearch?: Dispatch<React.SetStateAction<boolean>>;
   setLoginPersistence?: Dispatch<React.SetStateAction<boolean>>;
   loginPersistence?: boolean;
+  setIsVerifyOpen?: Dispatch<React.SetStateAction<boolean>>;
+  isVerifyOpen?: boolean;
   filters?: string;
   setFilters?: Dispatch<React.SetStateAction<string>>;
   orderBy?: string;
@@ -58,6 +60,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     [state, setState] = useState('');
   const [aviBigFile, setAviBigFile] = useState<File | null>(null),
     [aviSmallFile, setAviSmallFile] = useState<File | null>(null);
+  const [isVerifyOpen, setIsVerifyOpen] = useState(true);
 
   const [storageKeys] = useState({
     currUser: 'devie_current_user',
@@ -99,6 +102,8 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     storageKeys,
     setLoginPersistence,
     loginPersistence,
+    isVerifyOpen,
+    setIsVerifyOpen,
   };
 
   useEffect(() => {
