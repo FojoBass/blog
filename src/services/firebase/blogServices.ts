@@ -44,7 +44,9 @@ export class BlogServices {
   }
 
   verification(user: User) {
-    return sendEmailVerification(user);
+    return sendEmailVerification(user, {
+      url: `https://devie.netlify.app/?email=${auth.currentUser?.email}`,
+    });
   }
 
   // *Firestore methods
