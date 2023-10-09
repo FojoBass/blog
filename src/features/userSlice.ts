@@ -45,10 +45,10 @@ export const userSlice = createSlice({
     setUserInfo(state, action) {
       state.userInfo = action.payload as UserInfoInt;
     },
-    resetAuthError(state, action) {
+    resetAuthError(state) {
       state.signInError = '';
     },
-    resetIsJustLoggedIn(state, action) {
+    resetIsJustLoggedIn(state) {
       state.isJustLoggedIn = false;
     },
     setNoUserInfo(state, action) {
@@ -64,7 +64,7 @@ export const userSlice = createSlice({
       .addCase(userSignUp.pending, (state) => {
         state.isSignupLoading = true;
       })
-      .addCase(userSignUp.fulfilled, (state, action) => {
+      .addCase(userSignUp.fulfilled, (state) => {
         state.isSignupLoading = false;
         state.isSignedUp = true;
       })

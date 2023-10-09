@@ -14,6 +14,7 @@ import {
   browserSessionPersistence,
 } from 'firebase/auth';
 import { userSlice } from './features/userSlice';
+import { themeSlice } from './features/themeSlice';
 
 interface ContextInt {
   searchString?: string;
@@ -43,6 +44,7 @@ interface ContextInt {
     logPers: string;
     isUserInfo: string;
     userInfoData: string;
+    theme: string;
   };
 }
 
@@ -67,6 +69,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     logPers: 'devie_login_persistence',
     isUserInfo: 'isUserInfo',
     userInfoData: 'user_info_data',
+    theme: 'devie_theme',
   });
 
   const [loginPersistence, setLoginPersistence] = useState(
@@ -79,6 +82,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const dispatch = useBlogDispatch();
 
   const { setNoUserInfo } = userSlice.actions;
+  const { setTheme } = themeSlice.actions;
 
   const sharedProps: ContextInt = {
     searchString,
@@ -148,6 +152,16 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
       dispatch(setNoUserInfo(!isUserInfo));
     }
   }, [noUserInfo, loginPersistence, isUserLoggedIn]);
+
+  useEffect(() => {
+    if (StorageFuncs.checkStorage('local', storageKeys.theme))
+      dispatch(
+        setTheme(
+          StorageFuncs.getStorage<string>('local', storageKeys.theme) ?? ''
+        )
+      );
+    else StorageFuncs.setStorage('local', storageKeys.theme, 'light');
+  }, []);
 
   return (
     <BlogContext.Provider value={sharedProps}>{children}</BlogContext.Provider>

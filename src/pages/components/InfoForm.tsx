@@ -170,8 +170,6 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
         );
 
         dispatch(setNoUserInfo(false));
-
-       
       }
     }
   };
@@ -391,7 +389,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
   useEffect(() => {
     if (signInError.includes('email-already-in-use'))
       toast.error('Email already in use');
-    dispatch(resetAuthError(''));
+    dispatch(resetAuthError());
   }, [signInError]);
 
   return (

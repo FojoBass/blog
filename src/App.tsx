@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './scss/main.scss';
 import avi from './assets/Me cropped.jpg';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
   Outlet,
@@ -210,6 +210,10 @@ const Root = () => {
       <ToastContainer
         theme={theme === 'light' ? 'light' : 'dark'}
         position='top-center'
+        closeButton={false}
+        transition={Zoom}
+        autoClose={3000}
+        hideProgressBar={true}
       />
       <Footer />
     </>

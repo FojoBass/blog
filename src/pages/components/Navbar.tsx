@@ -25,6 +25,7 @@ const Navbar = () => {
   const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   const profileOptsRef = useRef<HTMLButtonElement>(null);
   const { userInfo } = useBlogSelector((state) => state.user);
+  const { storageKeys } = useGlobalContext();
 
   return (
     <nav id='nav_sect'>
@@ -52,7 +53,14 @@ const Navbar = () => {
 
           <button
             className='theme_btn light'
-            onClick={() => dispatch(toggleTheme())}
+            onClick={() => {
+              dispatch(toggleTheme());
+              StorageFuncs.setStorage(
+                'local',
+                storageKeys!.theme,
+                theme === 'light' ? 'dark' : 'light'
+              );
+            }}
           >
             {theme === 'light' ? (
               <FaLightbulb className='light' />

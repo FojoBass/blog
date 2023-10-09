@@ -1,5 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { BsEyeSlash, BsEye, BsGoogle } from 'react-icons/bs';
+import {
+  BsEyeSlash,
+  BsEye,
+  BsGoogle,
+  BsFillArrowLeftSquareFill,
+} from 'react-icons/bs';
 import { AiOutlineTwitter, AiFillGithub, AiOutlineHome } from 'react-icons/ai';
 import { Link, useNavigate } from 'react-router-dom';
 import { userSlice } from '../features/userSlice';
@@ -27,12 +32,15 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [pword, setPword] = useState('');
 
+  const [isForgot, setIsForgot] = useState(false);
+
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email || !pword) toast.error('All fields are required');
+    if (!email || !pword)
+      toast.error('All fields are required', { toastId: 'login_error' });
     else {
       dispatch(userSignIn({ email, password: pword }));
       setIsVerifyOpen && setIsVerifyOpen(true);
@@ -49,9 +57,14 @@ const Login = () => {
     setIsVerifyOpen && setIsVerifyOpen(true);
   };
 
+  const handleForgotClicked = () => {
+    console.log('Forgot password');
+  };
+
   useEffect(() => {
     if (inputRef.current.find((item) => item)) {
       const els = [...new Set(inputRef.current.filter((item) => item))];
+      console.log(inputRef, els);
 
       els.forEach((el) => {
         if (el) {
@@ -69,7 +82,7 @@ const Login = () => {
         }
       });
     }
-  }, [inputRef]);
+  }, [inputRef, isForgot]);
 
   useEffect(() => {
     if (isSignedUp) {
@@ -90,13 +103,13 @@ const Login = () => {
     if (signInError.includes('network-request-failed'))
       toast.error('Check network connection and try again');
 
-    dispatch(resetAuthError(''));
+    dispatch(resetAuthError());
   }, [signInError]);
 
   useEffect(() => {
     if (isJustLoggedIn) {
       navigate('/');
-      dispatch(resetIsJustLoggedIn(''));
+      dispatch(resetIsJustLoggedIn());
     }
   }, [isJustLoggedIn]);
 
@@ -110,89 +123,132 @@ const Login = () => {
         style={isLogInLoading ? { pointerEvents: 'none' } : {}}
       >
         <div className='top'>
-          <h1>Welcome back</h1>
+          {isForgot ? (
+            <>
+              <h1>
+                Forgot Password{' '}
+                <button className='back_btn' onClick={() => setIsForgot(false)}>
+                  <BsFillArrowLeftSquareFill />
+                </button>
+              </h1>
 
-          <form className='login_form' onSubmit={handleSubmit}>
-            <article className='form_opt'>
-              <input
-                type='email'
-                placeholder='Email'
-                ref={(el) => inputRef.current.push(el)}
-                spellCheck='false'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </article>
+              <form className='login_form' onSubmit={handleForgotClicked}>
+                <article className='form_opt'>
+                  <input
+                    type='email'
+                    placeholder='Email'
+                    ref={(el) => inputRef.current.push(el)}
+                    spellCheck='false'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </article>
 
-            <article className='form_opt'>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder='Password'
-                ref={(el) => inputRef.current.push(el)}
-                value={pword}
-                onChange={(e) => setPword(e.target.value)}
-              />
-              <button
-                className='eye_icon_wrapper'
-                type='button'
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <BsEyeSlash /> : <BsEye />}
-              </button>
-            </article>
-            <button
-              type='submit'
-              className={`login_btn ${isLogInLoading ? 'loading' : ''}`}
-            >
-              {isLogInLoading ? 'Logging in...' : 'Log in'}
-            </button>
+                <button
+                  type='submit'
+                  className={`login_btn ${isLogInLoading ? 'loading' : ''}`}
+                >
+                  {isLogInLoading ? 'Sending...' : 'Reset'}
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <h1>Welcome back</h1>
 
-            <div className='btns_wrapper'>
-              <button
-                className={`other_login_btn git_btn ${
-                  isLogInLoading ? 'loading' : ''
-                }`}
-                type='button'
-                onClick={handleGitSignIn}
-              >
-                <AiFillGithub />
-              </button>
-              <button
-                className={`other_login_btn tw_btn ${
-                  isLogInLoading ? 'loading' : ''
-                }`}
-                type='button'
-              >
-                <AiOutlineTwitter />
-              </button>
-              <button
-                className={`other_login_btn goo_btn ${
-                  isLogInLoading ? 'loading' : ''
-                }`}
-                type='button'
-                onClick={handleGooSignIn}
-              >
-                <BsGoogle />
-              </button>
-            </div>
+              <form className='login_form' onSubmit={handleSubmit}>
+                <article className='form_opt'>
+                  <input
+                    type='email'
+                    placeholder='Email'
+                    ref={(el) => inputRef.current.push(el)}
+                    spellCheck='false'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </article>
 
-            <footer>
-              <Link className='signup_btn' to='/join'>
-                Don't have an account?
-              </Link>
+                <article className='form_opt'>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder='Password'
+                    ref={(el) => inputRef.current.push(el)}
+                    value={pword}
+                    onChange={(e) => setPword(e.target.value)}
+                  />
+                  <button
+                    className='eye_icon_wrapper'
+                    type='button'
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <BsEyeSlash /> : <BsEye />}
+                  </button>
+                </article>
 
-              <div className='box_wrapper'>
-                <input
-                  type='checkbox'
-                  id='logged_in'
-                  onChange={(e) =>
-                    setLoginPersistence && setLoginPersistence(e.target.checked)
-                  }
-                />
-                <label htmlFor='logged_in'>Keep me logged in</label>
-              </div>
-            </footer>
-          </form>
+                <button
+                  type='button'
+                  className='forgot_btn'
+                  onClick={() => setIsForgot(true)}
+                >
+                  Forgot password?
+                </button>
+
+                <button
+                  type='submit'
+                  className={`login_btn ${isLogInLoading ? 'loading' : ''}`}
+                >
+                  {isLogInLoading ? 'Logging in...' : 'Log in'}
+                </button>
+
+                <div className='btns_wrapper'>
+                  <button
+                    className={`other_login_btn git_btn ${
+                      isLogInLoading ? 'loading' : ''
+                    }`}
+                    type='button'
+                    onClick={handleGitSignIn}
+                  >
+                    <AiFillGithub />
+                  </button>
+                  <button
+                    className={`other_login_btn tw_btn ${
+                      isLogInLoading ? 'loading' : ''
+                    }`}
+                    type='button'
+                  >
+                    <AiOutlineTwitter />
+                  </button>
+                  <button
+                    className={`other_login_btn goo_btn ${
+                      isLogInLoading ? 'loading' : ''
+                    }`}
+                    type='button'
+                    onClick={handleGooSignIn}
+                  >
+                    <BsGoogle />
+                  </button>
+                </div>
+
+                <footer>
+                  <Link className='signup_btn' to='/join'>
+                    Don't have an account?
+                  </Link>
+
+                  <div className='box_wrapper'>
+                    <input
+                      type='checkbox'
+                      id='logged_in'
+                      onChange={(e) =>
+                        setLoginPersistence &&
+                        setLoginPersistence(e.target.checked)
+                      }
+                    />
+                    <label htmlFor='logged_in'>Keep me logged in</label>
+                  </div>
+                </footer>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </section>

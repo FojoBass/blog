@@ -19,6 +19,40 @@
 @import 'settings';
 @import 'new_post';
 
+.Toastify__toast--error {
+  color: #e74c3c !important;
+}
+
+.Toastify__toast--success {
+  color: #07bc0c !important;
+}
+
+.Toastify__toast--info {
+  color: #3498db !important;
+}
+
+.Toastify__toast--warning {
+  color: #f1c40f !important;
+}
+
+.Toastify__toast-container {
+  font-size: $txt_size2 !important;
+  padding: 10px !important;
+  position: absolute !important;
+  transform: translateX(-50%) scale(0.9) !important;
+
+  @include mediaQueries(max, 480px) {
+    width: 70vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
+
+.Toastify__toast-body {
+  margin: 0 !important;
+  text-align: center !important;
+}
+
 .search_wrapper {
   position: relative;
 

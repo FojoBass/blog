@@ -56,6 +56,16 @@
         text-transform: capitalize;
         color: var(--shw_clr_txt);
         margin-bottom: 20px;
+        position: relative;
+
+        .back_btn {
+          @include position(absolute, right, top, 0px, 50%);
+          color: inherit;
+
+          &:hover {
+            color: var(--shw_clr_txt2);
+          }
+        }
       }
 
       .form_opt {
@@ -91,6 +101,20 @@
           @include position(absolute, right, top, 20px, 50%);
           font-size: $txt_size2;
           color: var(--shw_clr_txt2);
+        }
+      }
+
+      .forgot_btn {
+        display: block;
+        margin: 0 auto 10px;
+        width: fit-content;
+        text-decoration: underline;
+        font-size: 1.8rem;
+        font-family: $fnt_hdg2;
+        color: var(--shw_clr_txt);
+
+        &:hover {
+          color: var(--acc_clr);
         }
       }
 
