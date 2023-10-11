@@ -10,6 +10,7 @@ import {
   GoogleAuthProvider,
   sendEmailVerification,
   User,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
@@ -45,7 +46,13 @@ export class BlogServices {
 
   verification(user: User) {
     return sendEmailVerification(user, {
-      url: `https://devie.netlify.app/?email=${auth.currentUser?.email}`,
+      url: `https://devie.netlify.app/`,
+    });
+  }
+
+  forgotPword(email: string) {
+    return sendPasswordResetEmail(auth, email, {
+      url: `https://devie.netlify.app/`,
     });
   }
 

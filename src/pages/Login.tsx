@@ -11,6 +11,7 @@ import { userSlice } from '../features/userSlice';
 import { toast } from 'react-toastify';
 import { useBlogSelector, useBlogDispatch } from '../app/store';
 import {
+  forgotPword,
   userGitSignIn,
   userGooSignIn,
   userSignIn,
@@ -57,14 +58,16 @@ const Login = () => {
     setIsVerifyOpen && setIsVerifyOpen(true);
   };
 
-  const handleForgotClicked = () => {
-    console.log('Forgot password');
+  const handleForgotClicked = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (email) dispatch(forgotPword({ email }));
+    else toast.error('Enter email', { toastId: 'login_error' });
   };
 
   useEffect(() => {
     if (inputRef.current.find((item) => item)) {
       const els = [...new Set(inputRef.current.filter((item) => item))];
-      console.log(inputRef, els);
 
       els.forEach((el) => {
         if (el) {
@@ -102,16 +105,22 @@ const Login = () => {
       toast.error('Account does not exist');
     if (signInError.includes('network-request-failed'))
       toast.error('Check network connection and try again');
-
+    if (signInError && isForgot) toast.error('Failed! Please retry');
     dispatch(resetAuthError());
-  }, [signInError]);
+  }, [signInError, isForgot]);
 
   useEffect(() => {
-    if (isJustLoggedIn) {
+    if (isJustLoggedIn && !isForgot) {
       navigate('/');
       dispatch(resetIsJustLoggedIn());
+    } else if (isJustLoggedIn && isForgot) {
+      toast.success('Reset link sent to mail');
+      setIsForgot(false);
+      setEmail('');
+      setPword('');
+      dispatch(resetIsJustLoggedIn());
     }
-  }, [isJustLoggedIn]);
+  }, [isJustLoggedIn, isForgot]);
 
   return (
     <section className='login_sect'>
@@ -127,9 +136,14 @@ const Login = () => {
             <>
               <h1>
                 Forgot Password{' '}
-                <button className='back_btn' onClick={() => setIsForgot(false)}>
-                  <BsFillArrowLeftSquareFill />
-                </button>
+                {!isLogInLoading && (
+                  <button
+                    className='back_btn'
+                    onClick={() => setIsForgot(false)}
+                  >
+                    <BsFillArrowLeftSquareFill />
+                  </button>
+                )}
               </h1>
 
               <form className='login_form' onSubmit={handleForgotClicked}>

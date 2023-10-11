@@ -154,3 +154,15 @@ export const getUserInfo = createAsyncThunk<void, { email: string }>(
     }
   }
 );
+
+// *Forgot Password
+export const forgotPword = createAsyncThunk<void, { email: string }>(
+  'user/forgotPword',
+  async ({ email }, thunkApi) => {
+    try {
+      await blogServices.forgotPword(email);
+    } catch (error) {
+      return thunkApi.rejectWithValue(`Forgot password ${error}`);
+    }
+  }
+);

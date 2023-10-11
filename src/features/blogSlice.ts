@@ -13,7 +13,7 @@ export const blogSlice = createSlice({
       return { ...state, isOpenSideNav: !state.isOpenSideNav };
     },
 
-    // * This reducer pareses the post to html codes
+    // * This reducer parses the post to html codes
     handleParsePost: (state, action) => {
       const post = action.payload as string;
 

@@ -262,7 +262,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
       );
       return false;
     }
-    // ! ENSURE TO CHANGE BACK TO STRONG PASSWORD
+    // ! ENSURE TO CHANGE BACK TO STRONG PASSWORD AND FOR AUTH_HANDLERS
     if (regex.alphaNumberic.test(password)) return true;
 
     formRefsAction(

@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
+  forgotPword,
   getUserInfo,
   userGitSignIn,
   userGooSignIn,
@@ -72,6 +73,19 @@ export const userSlice = createSlice({
         state.isSignupLoading = false;
         state.signInError = error.payload as string;
         console.log(error);
+      });
+    // *Forgot Password
+    builder
+      .addCase(forgotPword.pending, (state) => {
+        state.isLogInLoading = true;
+      })
+      .addCase(forgotPword.fulfilled, (state) => {
+        state.isLogInLoading = false;
+        state.isJustLoggedIn = true;
+      })
+      .addCase(forgotPword.rejected, (state, error) => {
+        state.isLogInLoading = false;
+        state.signInError = error.payload as string;
       });
     // *Get Userinfo
     // builder
