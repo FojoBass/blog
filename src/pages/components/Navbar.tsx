@@ -153,7 +153,7 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
     },
     {
       title: 'Settings',
-      link: '/settings',
+      link: `/settings/${userInfo?.userId}`,
       param: false,
       position: 'mid',
     },

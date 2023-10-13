@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Country, State } from 'country-state-city';
 import { useGlobalContext } from '../../../context';
+import { useBlogSelector } from '../../../app/store';
 
 // TODO Add props to check for fetched location info for both sign up and settings form
 
@@ -8,6 +9,7 @@ const LocationInput = () => {
   const [countries] = useState(Country.getAllCountries()),
     [states, setStates] = useState<string[]>([]);
   const { state, setState, country, setCountry } = useGlobalContext();
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
 
   useEffect(() => {
     if (country && country.name)
@@ -30,9 +32,13 @@ const LocationInput = () => {
               name: e.target.value.split('/')[0],
             })
           }
-          defaultValue={'Select Country'}
+          defaultValue={
+            isUserLoggedIn
+              ? `${country?.name}/${country?.code}`
+              : 'Select Country'
+          }
         >
-          <option value='Select Country' disabled>
+          <option value='Select \ Country' disabled>
             Select Country
           </option>
           {countries.map((country) => (
@@ -51,7 +57,7 @@ const LocationInput = () => {
         <select
           name='states'
           id='states'
-          value={state}
+          defaultValue={state}
           onChange={(e) => setState && setState(e.target.value)}
         >
           <option value='' disabled>

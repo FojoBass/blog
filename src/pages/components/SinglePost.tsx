@@ -52,7 +52,7 @@ const SinglePost: React.FC<SinglePostProps> = ({
         </div>
 
         <div className='mid'>
-          <Link to='/p/dummyUser/dummyPost' className='title'>
+          <Link to='/dummyUser/dummyPost' className='title'>
             {title}
           </Link>
           <p className='detail'>{detail}</p>
@@ -75,7 +75,7 @@ const SinglePost: React.FC<SinglePostProps> = ({
           )}
         </div>
       </div>
-      <Link to='/p/dummyUser/dummyPost' className='img_wrapper'>
+      <Link to='/dummyUser/dummyPost' className='img_wrapper'>
         <img src={postImgUrl} alt='' />
       </Link>
     </article>

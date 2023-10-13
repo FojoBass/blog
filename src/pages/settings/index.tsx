@@ -6,22 +6,22 @@ import { useNavigate } from 'react-router-dom';
 import { useBlogSelector } from '../../app/store';
 
 const Settings = () => {
-  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
+  const { isUserLoggedIn, userInfo } = useBlogSelector((state) => state.user);
   const navigate = useNavigate();
   const [navItems] = useState([
     {
       title: 'Profile',
-      url: '/settings/profile',
+      url: `/settings/${userInfo?.userId}/profile`,
     },
     {
       title: 'Account',
-      url: '/settings/account',
+      url: `/settings/${userInfo?.userId}/account`,
     },
   ]);
 
   useEffect(() => {
     if (!isUserLoggedIn) navigate('/enter', { replace: true });
-    else navigate('/settings/profile', { replace: true });
+    else navigate(`/settings/${userInfo?.userId}/profile`, { replace: true });
   }, [isUserLoggedIn]);
 
   return (

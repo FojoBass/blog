@@ -12,9 +12,9 @@ import {
   User,
   sendPasswordResetEmail,
 } from 'firebase/auth';
-import { setDoc, doc } from 'firebase/firestore';
+import { setDoc, doc, updateDoc } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
-import { UserInfoInt } from '../../types';
+import { UpdateDataInt, UserInfoInt } from '../../types';
 
 const uidLong = new ShortUniqueId({ length: 10 });
 const uidShort = new ShortUniqueId({ length: 7 });
@@ -60,6 +60,11 @@ export class BlogServices {
   setUserInfo(data: UserInfoInt) {
     const docRef = doc(db, `users/${data.userId}`);
     return setDoc(docRef, data);
+  }
+
+  updateUserInfo(data: UpdateDataInt) {
+    const docRef = doc(db, `users/${data.userId}`);
+    return updateDoc(docRef, { ...data });
   }
 
   // * Storage methods

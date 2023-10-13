@@ -96,7 +96,7 @@ const Login = () => {
 
   useEffect(() => {
     if (
-      signInError.includes('user-not-found') ||
+      (signInError.includes('user-not-found') && !isForgot) ||
       signInError.includes('wrong-password') ||
       signInError.includes('invalid-login-credentials')
     )
@@ -105,7 +105,9 @@ const Login = () => {
       toast.error('Account does not exist');
     if (signInError.includes('network-request-failed'))
       toast.error('Check network connection and try again');
-    if (signInError && isForgot) toast.error('Failed! Please retry');
+    if (signInError.includes('user-not-found') && isForgot)
+      toast.error('User not found');
+    else if (signInError && isForgot) toast.error('Failed! Please retry');
     dispatch(resetAuthError());
   }, [signInError, isForgot]);
 

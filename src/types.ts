@@ -44,6 +44,30 @@ export interface FormDataInt {
   };
 }
 
+export interface UpdateDataInt {
+  userId: string;
+  fullName: string;
+  userName: string;
+  country: CountryInt;
+  state: string;
+  bio: string;
+  gender: string;
+  socials: {
+    git: string;
+    X: string;
+    fb: string;
+    ins: string;
+    be: string;
+    url: string;
+  };
+  userColor: string;
+  dispEmail: boolean;
+  aviUrls?: {
+    bigAviUrl: string;
+    smallAviUrl: string;
+  };
+}
+
 export interface UserInfoInt extends FormDataInt {
   email: string;
   userId: string;
@@ -56,4 +80,5 @@ export interface UserInfoInt extends FormDataInt {
   followings: FollowsInt[];
   userColor: string;
   postCount: number;
+  dispEmail: boolean;
 }

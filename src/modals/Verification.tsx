@@ -79,7 +79,6 @@ const Verification = () => {
       <div className='center_sect'>
         <h2>Email Verification</h2>
         <p>Verify Email to continue. This will not take long</p>
-        <p>Please reload after verification</p>
         <div className='btn_wrapper'>
           <button
             className='verify_btn spc_btn'

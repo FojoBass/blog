@@ -53,13 +53,20 @@ const BlogContext = createContext<ContextInt>({});
 export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const { userInfo, noUserInfo, isUserLoggedIn } = useBlogSelector(
+    (state) => state.user
+  );
+
   const [searchString, setSearchString] = useState(''),
     [isSearch, setIsSearch] = useState(false),
     [filters, setFilters] = useState('posts'),
     [orderBy, setOrderBy] = useState('newest');
   const [gender, setGender] = useState('male');
-  const [country, setCountry] = useState({ name: '', code: '' }),
-    [state, setState] = useState('');
+  const [country, setCountry] = useState<{ name: string; code: string }>({
+      name: '',
+      code: '',
+    }),
+    [state, setState] = useState<string>('');
   const [aviBigFile, setAviBigFile] = useState<File | null>(null),
     [aviSmallFile, setAviSmallFile] = useState<File | null>(null);
   const [isVerifyOpen, setIsVerifyOpen] = useState(true);
@@ -76,9 +83,6 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     StorageFuncs.getStorage<boolean>('local', storageKeys.logPers) ?? false
   );
 
-  const { userInfo, noUserInfo, isUserLoggedIn } = useBlogSelector(
-    (state) => state.user
-  );
   const dispatch = useBlogDispatch();
 
   const { setNoUserInfo } = userSlice.actions;
@@ -109,6 +113,14 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     isVerifyOpen,
     setIsVerifyOpen,
   };
+
+  useEffect(() => {
+    if (isUserLoggedIn && userInfo) {
+      setCountry(userInfo.country);
+      setState(userInfo.state);
+      setGender(userInfo.gender);
+    }
+  }, [isUserLoggedIn, userInfo]);
 
   useEffect(() => {
     StorageFuncs.setStorage(

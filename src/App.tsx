@@ -98,9 +98,9 @@ const App = () => {
         <Route path='/faqs' element={<FAQ />} />
         <Route path='/join' element={<Signup />} />
         <Route path='/enter' element={<Login />} />
-        <Route path='/settings' element={<Settings />}>
-          <Route path='profile' element={<ProfileSettings />} />
-          <Route path='account' element={<AccountSettings />} />
+        <Route path='/settings/:id' element={<Settings />}>
+          <Route path='profile/' element={<ProfileSettings />} />
+          <Route path='account/' element={<AccountSettings />} />
         </Route>
         <Route path='/new-post' element={<NewPost />} />
         <Route path='/notifications' element={<Notification />} />

@@ -5,10 +5,12 @@ import { resizeImg } from '../../../helpers/imgResize';
 import { useGlobalContext } from '../../../context';
 
 const ImageInputField = () => {
-  const [aviSrc, setAviSrc] = useState(''),
+  const { userInfo } = useBlogSelector((state) => state.user);
+  const [aviSrc, setAviSrc] = useState(
+      userInfo ? userInfo.aviUrls.smallAviUrl : ''
+    ),
     blogTheme = useBlogSelector((state) => state.theme);
-  const { aviBigFile, setAviBigFile, aviSmallFile, setAviSmallFile } =
-    useGlobalContext();
+  const { setAviBigFile, setAviSmallFile } = useGlobalContext();
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const imgFile = e.target.files?.[0];

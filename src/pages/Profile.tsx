@@ -17,7 +17,7 @@ import { PostsInt, UserInfoInt } from '../types';
 import { v4 } from 'uuid';
 import { useBlogSelector } from '../app/store';
 import { useGlobalContext } from '../context';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { userSlice } from '../features/userSlice';
 
 const Profile = () => {
@@ -69,7 +69,12 @@ const Profile = () => {
                 <div className='right_side'>
                   {isUserLoggedIn ? (
                     username === userInfo?.userId ? (
-                      <button className='spc_btn edit_btn'>Edit Profile</button>
+                      <Link
+                        to={`/settings/${userInfo?.userId}/profile`}
+                        className='spc_btn edit_btn'
+                      >
+                        Edit Profile
+                      </Link>
                     ) : (
                       <>
                         <button className='spc_btn follow_btn'>Follow</button>
@@ -103,14 +108,16 @@ const Profile = () => {
                     {displayInfo?.country.name}, {displayInfo?.state}
                   </article>
 
-                  <article className='more_info_opt'>
-                    <a href='mailto: fojo4god@gmail.com'>
-                      <div className='icon_wrapper'>
-                        <MdMail />
-                      </div>
-                      {displayInfo?.email}
-                    </a>
-                  </article>
+                  {userInfo?.dispEmail && (
+                    <article className='more_info_opt'>
+                      <a href='mailto: fojo4god@gmail.com'>
+                        <div className='icon_wrapper'>
+                          <MdMail />
+                        </div>
+                        {displayInfo?.email}
+                      </a>
+                    </article>
+                  )}
 
                   {displayInfo?.socials.url && (
                     <article className='more_info_opt'>

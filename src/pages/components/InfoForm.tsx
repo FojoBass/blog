@@ -28,7 +28,7 @@ import { BlogServices } from '../../services/firebase/blogServices';
 import { StorageFuncs } from '../../services/storages';
 import { userSlice } from '../../features/userSlice';
 
-interface FormRefsInt {
+export interface FormRefsInt {
   fullNameInputRef: React.RefObject<HTMLInputElement>;
   userNameInputRef: React.RefObject<HTMLInputElement>;
   emailInputRef: React.RefObject<HTMLInputElement>;

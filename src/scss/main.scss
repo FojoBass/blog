@@ -38,7 +38,7 @@
 .Toastify__toast-container {
   font-size: $txt_size2 !important;
   padding: 10px !important;
-  position: absolute !important;
+  position: fixed !important;
   transform: translateX(-50%) scale(0.9) !important;
 
   @include mediaQueries(max, 480px) {
