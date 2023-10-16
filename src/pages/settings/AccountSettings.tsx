@@ -1,116 +1,88 @@
-import React, { useState } from 'react';
+import React, { FormEvent, useState, useEffect } from 'react';
 import { BsEye, BsEyeSlash } from 'react-icons/bs';
+import { useBlogDispatch, useBlogSelector } from '../../app/store';
+import { forgotPword } from '../../features/userAsyncThunk';
+import { toast } from 'react-toastify';
+import { userSlice } from '../../features/userSlice';
+import { BlogServices } from '../../services/firebase/blogServices';
+import { useNavigate } from 'react-router-dom';
+import { useGlobalContext } from '../../context';
 
 const AccountSettings = () => {
-  const [currentPassword, setCurrentPassword] = useState({
-      show: false,
-      pword: '',
-    }),
-    [password, setPassword] = useState({ show: false, pword: '' }),
-    [confirmPassword, setConfirmPassword] = useState({
-      show: false,
-      pword: '',
-    }),
-    [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState('');
+  const { userInfo, isLogInLoading, isJustLoggedIn, signInError } =
+    useBlogSelector((state) => state.user);
+  const { resetIsJustLoggedIn, resetAuthError, setNoUserInfo } =
+    userSlice.actions;
+  const dispatch = useBlogDispatch();
+  const [click, setClick] = useState(false);
+  const [isDel, setIsDel] = useState(false);
+  const blogServices = new BlogServices();
+  const { logOut } = useGlobalContext();
+
+  const navigate = useNavigate();
+
+  const handleReset = (e: FormEvent) => {
+    e.preventDefault();
+    dispatch(forgotPword({ email: userInfo?.email! }));
+  };
+
+  const handleDel = async (e: FormEvent) => {
+    e.preventDefault();
+    if (userName === userInfo?.userName) {
+      if (!click) {
+        toast.warn(
+          'You are about to permanently delete your account. Click delete button again to confirm'
+        );
+        setClick(true);
+      }
+      if (click) {
+        setIsDel(true);
+
+        try {
+          await blogServices.delUserInfo(userInfo.userId);
+          await blogServices.delUser();
+          logOut && logOut();
+          navigate('/');
+          toast.success('Account deleted');
+        } catch (error) {
+          toast.error('Account deletion failed');
+          console.log(`Acccount delete error: ${error}`);
+        } finally {
+          setIsDel(false);
+        }
+      }
+    } else toast.info('Username incorrect');
+  };
+
+  useEffect(() => {
+    if (isJustLoggedIn) {
+      toast.success('Reset link sent to mail');
+      dispatch(resetIsJustLoggedIn());
+    }
+
+    if (signInError) {
+      toast.error('Failed! Please retry');
+      dispatch(resetAuthError());
+    }
+  }, [isJustLoggedIn, signInError]);
 
   return (
     <div className='acct_settings_wrapper'>
-      <form className='change_pword_form settings_form'>
+      <form className='change_pword_form settings_form' onSubmit={handleReset}>
         <fieldset className='form_segment'>
-          <legend>Change Password</legend>
+          <legend>Reset Password</legend>
 
-          <article className='form_opt'>
-            <label htmlFor='current_pword'>Current password</label>
-            <div className='input_wrapper'>
-              <input
-                type={currentPassword.show ? 'text' : 'password'}
-                id='current_pword'
-                value={currentPassword.pword}
-                onChange={(e) =>
-                  setCurrentPassword({
-                    ...currentPassword,
-                    pword: e.target.value,
-                  })
-                }
-              />
-              <button
-                className='eye_icon_wrapper'
-                type='button'
-                onClick={() =>
-                  setCurrentPassword({
-                    ...currentPassword,
-                    show: !currentPassword.show,
-                  })
-                }
-              >
-                {currentPassword.show ? <BsEyeSlash /> : <BsEye />}
-              </button>
-            </div>
-          </article>
-
-          <article className='form_opt'>
-            <label htmlFor='pword'>Password</label>
-            <div className='input_wrapper'>
-              <input
-                type={password.show ? 'text' : 'password'}
-                id='pword'
-                value={password.pword}
-                onChange={(e) =>
-                  setPassword({
-                    ...password,
-                    pword: e.target.value,
-                  })
-                }
-              />
-              <button
-                className='eye_icon_wrapper'
-                type='button'
-                onClick={() =>
-                  setPassword({
-                    ...password,
-                    show: !password.show,
-                  })
-                }
-              >
-                {password.show ? <BsEyeSlash /> : <BsEye />}
-              </button>
-            </div>
-          </article>
-
-          <article className='form_opt'>
-            <label htmlFor='confirm_pword'>Confirm password</label>
-            <div className='input_wrapper'>
-              <input
-                type={confirmPassword.show ? 'text' : 'password'}
-                id='confirm_pword'
-                value={confirmPassword.pword}
-                onChange={(e) =>
-                  setConfirmPassword({
-                    ...confirmPassword,
-                    pword: e.target.value,
-                  })
-                }
-              />
-              <button
-                type='button'
-                className='eye_icon_wrapper'
-                onClick={() =>
-                  setConfirmPassword({
-                    ...confirmPassword,
-                    show: !confirmPassword.show,
-                  })
-                }
-              >
-                {confirmPassword.show ? <BsEyeSlash /> : <BsEye />}
-              </button>
-            </div>
-          </article>
-
-          <button className='spc_btn'>Set New Password</button>
+          <button
+            className={`spc_btn ${isLogInLoading ? 'loading' : ''}`}
+            disabled={isLogInLoading}
+          >
+            {isLogInLoading ? 'Sending...' : 'Get reset link'}
+          </button>
         </fieldset>
       </form>
 
-      <form className='delete_acct settings_form'>
+      <form className='delete_acct settings_form' onSubmit={handleDel}>
         <fieldset className='form_segment'>
           <legend>Delete Account</legend>
 
@@ -127,13 +99,18 @@ const AccountSettings = () => {
           <div className='form_opt'>
             <input
               type='text'
-              placeholder='Enter Username'
+              placeholder={`Enter Username (${userInfo?.userName})`}
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
             />
 
-            <button className='delete_btn spc_btn' type='button'>
-              Delete Account
+            <button
+              className={`delete_btn spc_btn ${
+                userName !== userInfo?.userName || isDel ? 'disable' : ''
+              }`}
+              disabled={userName !== userInfo?.userName || isDel}
+            >
+              {isDel ? 'Deleting...' : 'Delete Account'}
             </button>
           </div>
         </fieldset>

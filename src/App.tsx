@@ -191,7 +191,7 @@ const App = () => {
 const Root = () => {
   const location = useLocation();
   const theme = useBlogSelector((state) => state.theme);
-  const { noUserInfo } = useBlogSelector((state) => state.user);
+  const { noUserInfo, isUserLoggedIn } = useBlogSelector((state) => state.user);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -200,7 +200,7 @@ const Root = () => {
     <>
       <Navbar />
       <Sidenav />
-      {noUserInfo && <GetUserInfo />}
+      {noUserInfo && isUserLoggedIn && <GetUserInfo />}
       {!noUserInfo &&
         !auth.currentUser?.emailVerified &&
         typeof auth.currentUser?.emailVerified === 'boolean' && (

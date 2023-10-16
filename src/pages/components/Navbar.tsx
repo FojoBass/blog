@@ -126,11 +126,13 @@ export interface DropType {
 
 const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
   const dropRef = useRef<HTMLDivElement>(null);
-  const { setIsUserLoggedIn } = userSlice.actions;
-  const dispatch = useBlogDispatch();
-  const navigate = useNavigate();
-  const { loginPersistence, storageKeys } = useGlobalContext();
+  const { logOut } = useGlobalContext();
   const { userInfo } = useBlogSelector((state) => state.user);
+
+  const { setNoUserInfo } = userSlice.actions;
+
+  const navigate = useNavigate();
+  const dispatch = useBlogDispatch();
 
   const dropLinks: DropLinkType[] = [
     {
@@ -161,19 +163,9 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
 
   const handleSignout = async () => {
     try {
-      await new BlogServices().logOut();
-      dispatch(setIsUserLoggedIn(false));
-      setDrop(false);
+      logOut && logOut();
+      dispatch(setNoUserInfo(false));
       navigate('/');
-
-      if (storageKeys) {
-        !loginPersistence &&
-          StorageFuncs.clearStorage('session', storageKeys.currUser);
-        StorageFuncs.clearStorage(
-          loginPersistence ? 'local' : 'session',
-          storageKeys.isUserInfo
-        );
-      }
     } catch (error) {
       console.log(`Log out failed: ${error}`);
     }

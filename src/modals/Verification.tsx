@@ -10,39 +10,23 @@ import { auth } from '../services/firebase/config';
 import { User } from 'firebase/auth';
 
 const Verification = () => {
-  const { setIsUserLoggedIn, setNoUserInfo } = userSlice.actions;
-  const { storageKeys, loginPersistence, isVerifyOpen, setIsVerifyOpen } =
-    useGlobalContext();
+  const { isVerifyOpen, setIsVerifyOpen, logOut } = useGlobalContext();
   const navigate = useNavigate();
   const dispatch = useBlogDispatch();
+
+  const { setNoUserInfo } = userSlice.actions;
 
   const [counter, setCounter] = useState(0);
   const [startCounter, setStartCounter] = useState(false);
 
   const handleSignout = async () => {
     try {
-      await new BlogServices().logOut();
-      dispatch(setIsUserLoggedIn(false));
+      logOut && logOut();
       dispatch(setNoUserInfo(false));
       navigate('/');
       setIsVerifyOpen && setIsVerifyOpen(false);
       setCounter(0);
       setStartCounter(false);
-
-      if (storageKeys) {
-        !loginPersistence &&
-          StorageFuncs.clearStorage('session', storageKeys.currUser);
-
-        StorageFuncs.clearStorage(
-          loginPersistence ? 'local' : 'session',
-          storageKeys.isUserInfo
-        );
-
-        StorageFuncs.clearStorage(
-          loginPersistence ? 'local' : 'session',
-          storageKeys.userInfoData
-        );
-      }
     } catch (error) {
       console.log(`Log out failed: ${error}`);
     }

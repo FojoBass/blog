@@ -15,6 +15,7 @@ import {
 } from 'firebase/auth';
 import { userSlice } from './features/userSlice';
 import { themeSlice } from './features/themeSlice';
+import { BlogServices } from './services/firebase/blogServices';
 
 interface ContextInt {
   searchString?: string;
@@ -46,6 +47,7 @@ interface ContextInt {
     userInfoData: string;
     theme: string;
   };
+  logOut?: () => void;
 }
 
 const BlogContext = createContext<ContextInt>({});
@@ -85,8 +87,28 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const dispatch = useBlogDispatch();
 
-  const { setNoUserInfo } = userSlice.actions;
+  const { setNoUserInfo, setIsUserLoggedIn } = userSlice.actions;
   const { setTheme } = themeSlice.actions;
+
+  const logOut = async () => {
+    await new BlogServices().logOut();
+    dispatch(setIsUserLoggedIn(false));
+
+    if (storageKeys) {
+      !loginPersistence &&
+        StorageFuncs.clearStorage('session', storageKeys.currUser);
+
+      StorageFuncs.clearStorage(
+        loginPersistence ? 'local' : 'session',
+        storageKeys.isUserInfo
+      );
+
+      StorageFuncs.clearStorage(
+        loginPersistence ? 'local' : 'session',
+        storageKeys.userInfoData
+      );
+    }
+  };
 
   const sharedProps: ContextInt = {
     searchString,
@@ -112,6 +134,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     loginPersistence,
     isVerifyOpen,
     setIsVerifyOpen,
+    logOut,
   };
 
   useEffect(() => {

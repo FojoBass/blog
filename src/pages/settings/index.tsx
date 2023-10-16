@@ -29,7 +29,7 @@ const Settings = () => {
       {isUserLoggedIn && (
         <BoardSearchLayout
           isPosts={{ status: false, items: [] }}
-          heading={`Settings for @dummyUser`}
+          heading={`Settings for ${userInfo?.userName}`}
           navItems={navItems}
           isSearch={false}
           isSettings={true}

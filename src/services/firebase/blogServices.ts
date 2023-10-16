@@ -11,8 +11,9 @@ import {
   sendEmailVerification,
   User,
   sendPasswordResetEmail,
+  deleteUser,
 } from 'firebase/auth';
-import { setDoc, doc, updateDoc } from 'firebase/firestore';
+import { setDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
 import { UpdateDataInt, UserInfoInt } from '../../types';
 
@@ -56,6 +57,10 @@ export class BlogServices {
     });
   }
 
+  delUser() {
+    return deleteUser(auth.currentUser!);
+  }
+
   // *Firestore methods
   setUserInfo(data: UserInfoInt) {
     const docRef = doc(db, `users/${data.userId}`);
@@ -65,6 +70,11 @@ export class BlogServices {
   updateUserInfo(data: UpdateDataInt) {
     const docRef = doc(db, `users/${data.userId}`);
     return updateDoc(docRef, { ...data });
+  }
+
+  delUserInfo(userId: string) {
+    const docRef = doc(db, `users/${userId}`);
+    return deleteDoc(docRef);
   }
 
   // * Storage methods

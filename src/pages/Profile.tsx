@@ -125,7 +125,7 @@ const Profile = () => {
                         <div className='icon_wrapper'>
                           <BsBoxArrowUpRight />
                         </div>
-                        displayInfo?.socials.url
+                        {displayInfo?.socials.url}
                       </a>
                     </article>
                   )}

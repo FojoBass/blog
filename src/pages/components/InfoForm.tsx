@@ -77,15 +77,13 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
     aviSmallFile,
     loginPersistence,
     storageKeys,
+    logOut,
   } = useGlobalContext();
   const dispatch = useBlogDispatch();
 
   const { signInError } = useBlogSelector((state) => state.user);
 
-  const navigate = useNavigate();
-
-  const { setIsUserLoggedIn, setNoUserInfo, resetAuthError } =
-    userSlice.actions;
+  const { setNoUserInfo, resetAuthError } = userSlice.actions;
 
   const formRefs: FormRefsInt = {
     fullNameInputRef: useRef<HTMLInputElement>(null),
@@ -94,6 +92,8 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
     passwordInputRef: useRef<HTMLInputElement>(null),
     conPasswordInputRef: useRef<HTMLInputElement>(null),
   };
+
+  const navigate = useNavigate();
 
   const formRefsAction = (ref: keyof FormRefsInt, msg: string) => {
     toast.warn(msg);
@@ -176,25 +176,9 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
 
   const handleSignout = async () => {
     try {
-      await new BlogServices().logOut();
-      dispatch(setIsUserLoggedIn(false));
+      logOut && logOut();
       dispatch(setNoUserInfo(false));
       navigate('/');
-
-      if (storageKeys) {
-        !loginPersistence &&
-          StorageFuncs.clearStorage('session', storageKeys.currUser);
-
-        StorageFuncs.clearStorage(
-          loginPersistence ? 'local' : 'session',
-          storageKeys.isUserInfo
-        );
-
-        StorageFuncs.clearStorage(
-          loginPersistence ? 'local' : 'session',
-          storageKeys.userInfoData
-        );
-      }
     } catch (error) {
       console.log(`Log out failed: ${error}`);
     }
