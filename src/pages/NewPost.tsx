@@ -17,6 +17,12 @@ import { v4 } from 'uuid';
 import { getDownloadURL } from 'firebase/storage';
 import { blogSlice } from '../features/blogSlice';
 import MainPost from './components/MainPost';
+import { handleParsePost } from '../helpers/handleParsePost';
+import ShortUniqueId from 'short-unique-id';
+
+// TODO SET UP THE ARTICLE DATA FOR SENDING
+// TODO ENSURE TO VALIDATE
+// TODO TAKE CARE FUTURE BRUFF
 
 interface EditorFuncInt {
   (
@@ -32,6 +38,11 @@ interface PostInt {
   postMain: string;
   bannerUrl: string;
   postTitle: string;
+}
+
+enum OpEnum {
+  pub = 'publish',
+  sav = 'save',
 }
 
 const NewPost = () => {
@@ -51,18 +62,19 @@ const NewPost = () => {
   const [postImgFile, setPostImgFile] = useState<null | File>(null);
   const [postImgUrl, setPostImgUrl] = useState('');
   const [post, setPost] = useState<PostInt>({ postMain, bannerUrl, postTitle });
+  const [parsedPost, setParsedPost] = useState('');
 
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const postMainRef = useRef<HTMLTextAreaElement>(null);
 
   const dummyUserId = useRef(v4());
-  const postId = useRef(v4());
+  const postId = useRef(new ShortUniqueId({ length: 10 }).rnd());
 
   const dispatch = useBlogDispatch();
-  const { parsedPost } = useBlogSelector((state) => state.blog);
+  const {} = useBlogSelector((state) => state.blog);
   const { isUserLoggedIn } = useBlogSelector((state) => state.user);
-  const { handleParsePost } = blogSlice.actions;
+  const {} = blogSlice.actions;
 
   const handleBannerFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const imgFile = e.target.files?.[0];
@@ -74,7 +86,6 @@ const NewPost = () => {
           setBannerImgFile(bannerImg.finalFile);
           setIsBannerReady(true);
         }
-        // todo Work on sending file to Fire storage
       } catch (err) {
         console.log(err);
       } finally {
@@ -305,6 +316,13 @@ const NewPost = () => {
     );
   };
 
+  const handlePost = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    op: OpEnum
+  ): void => {
+    console.log('Publish or Save: ', post);
+  };
+
   useEffect(() => {
     if (postImgFile) uploadImg(false, postImgFile);
   }, [postImgFile]);
@@ -345,8 +363,8 @@ const NewPost = () => {
   }, []);
 
   useEffect(() => {
-    if (route === 'preview') dispatch(handleParsePost(post.postMain));
-    if (route === 'edit') dispatch(handleParsePost(''));
+    if (route === 'preview') setParsedPost(handleParsePost(post.postMain));
+    if (route === 'edit') setParsedPost('');
   }, [route]);
 
   useEffect(() => {
@@ -563,8 +581,18 @@ const NewPost = () => {
 
           <footer className='editor_footer'>
             <div className='left_side'>
-              <button className='publish_btn spc_btn'>Publish</button>
-              <button className='save_btn'>Save</button>
+              <button
+                className='publish_btn spc_btn'
+                onClick={(e) => handlePost(e, OpEnum.pub)}
+              >
+                Publish
+              </button>
+              <button
+                className='save_btn'
+                onClick={(e) => handlePost(e, OpEnum.sav)}
+              >
+                Save
+              </button>
             </div>
 
             <button className='revert_btn'>Revert</button>

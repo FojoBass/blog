@@ -81,7 +81,11 @@ img {
   overflow: hidden;
 }
 
-.dark .img_wrapper:after {
+.dark
+  .img_wrapper:not(
+    #nav_sect .img_wrapper,
+    .profile_wrapper .img_wrapper
+  ):after {
   @include position(absolute, left, top, 0px, 0px);
   content: '';
   width: 100%;

@@ -22,6 +22,7 @@ import { userSlice } from '../features/userSlice';
 
 const Profile = () => {
   const { isUserLoggedIn, userInfo } = useBlogSelector((state) => state.user);
+  const theme = useBlogSelector((state) => state.theme);
   const { username } = useParams();
   const [userInfoLoading, setUserInfoLoading] = useState(true);
   const [displayInfo, setDisplayInfo] = useState<UserInfoInt | null>(null);
@@ -50,7 +51,10 @@ const Profile = () => {
         <>
           <div
             className='head_overlay'
-            style={{ backgroundColor: displayInfo?.userColor }}
+            style={{
+              backgroundColor:
+                theme === 'light' ? displayInfo?.userColor : '#000',
+            }}
           ></div>
 
           <div className='center_sect profile_wrapper'>
@@ -58,7 +62,10 @@ const Profile = () => {
               <div className='top'>
                 <div
                   className='img_wrapper'
-                  style={{ backgroundColor: displayInfo?.userColor }}
+                  style={{
+                    backgroundColor:
+                      theme === 'light' ? displayInfo?.userColor : '#000',
+                  }}
                 >
                   <img
                     src={`${displayInfo?.aviUrls.bigAviUrl}`}
