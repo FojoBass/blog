@@ -22,6 +22,7 @@ interface CommentInt {
   likes: number;
   isFirstLevel?: boolean;
 }
+// TODO ENSURE TO CHECK BOTH pubPosts and userPosts WHEN A USER NAVIGATES TO THIS PAGE
 
 const Post = () => {
   // todo comments will contain info about the replier

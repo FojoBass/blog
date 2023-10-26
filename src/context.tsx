@@ -8,7 +8,7 @@ import {
 import { CountryInt, UserInfoInt } from './types';
 import { useBlogDispatch, useBlogSelector } from './app/store';
 import { StorageFuncs } from './services/storages';
-import { auth } from './services/firebase/config';
+import { auth, db } from './services/firebase/config';
 import {
   browserLocalPersistence,
   browserSessionPersistence,
@@ -16,6 +16,8 @@ import {
 import { userSlice } from './features/userSlice';
 import { themeSlice } from './features/themeSlice';
 import { BlogServices } from './services/firebase/blogServices';
+import { blogSlice } from './features/blogSlice';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 
 interface ContextInt {
   searchString?: string;
@@ -58,6 +60,9 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const { userInfo, noUserInfo, isUserLoggedIn } = useBlogSelector(
     (state) => state.user
   );
+
+  const { categories } = useBlogSelector((state) => state.blog);
+  const { setCateg } = blogSlice.actions;
 
   const [searchString, setSearchString] = useState(''),
     [isSearch, setIsSearch] = useState(false),
@@ -136,6 +141,22 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsVerifyOpen,
     logOut,
   };
+
+  // * Fetches
+  useEffect(() => {
+    let categ: string[];
+
+    (async () => {
+      const snapQuery = query(collection(db, 'categories'));
+
+      onSnapshot(snapQuery, (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          categ = doc.data().categ as string[];
+        });
+        dispatch(setCateg(categ));
+      });
+    })();
+  }, []);
 
   useEffect(() => {
     if (isUserLoggedIn && userInfo) {

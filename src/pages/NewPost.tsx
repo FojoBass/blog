@@ -19,10 +19,10 @@ import { blogSlice } from '../features/blogSlice';
 import MainPost from './components/MainPost';
 import { handleParsePost } from '../helpers/handleParsePost';
 import ShortUniqueId from 'short-unique-id';
-
-// TODO SET UP THE ARTICLE DATA FOR SENDING
-// TODO ENSURE TO VALIDATE
-// TODO TAKE CARE FUTURE BRUFF
+import { toast } from 'react-toastify';
+import { serverTimestamp } from 'firebase/firestore';
+import { addPost } from '../features/blogAsyncThunk';
+import { PostInt } from '../types';
 
 interface EditorFuncInt {
   (
@@ -34,7 +34,7 @@ interface EditorFuncInt {
   ): void;
 }
 
-interface PostInt {
+interface NewPostInt {
   postMain: string;
   bannerUrl: string;
   postTitle: string;
@@ -61,20 +61,30 @@ const NewPost = () => {
   const [isUploadingImg, setIsUploadingImg] = useState(false);
   const [postImgFile, setPostImgFile] = useState<null | File>(null);
   const [postImgUrl, setPostImgUrl] = useState('');
-  const [post, setPost] = useState<PostInt>({ postMain, bannerUrl, postTitle });
+  const [post, setPost] = useState<NewPostInt>({
+    postMain,
+    bannerUrl,
+    postTitle,
+  });
   const [parsedPost, setParsedPost] = useState('');
+  const [isPubClicked, setIsPubClicked] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const postMainRef = useRef<HTMLTextAreaElement>(null);
 
-  const dummyUserId = useRef(v4());
   const postId = useRef(new ShortUniqueId({ length: 10 }).rnd());
 
   const dispatch = useBlogDispatch();
-  const {} = useBlogSelector((state) => state.blog);
-  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
-  const {} = blogSlice.actions;
+  const { uploading, uploadingFailed, uploadingSucceed, pubPosts, userPosts } =
+    useBlogSelector((state) => state.blog);
+  const { isUserLoggedIn, userInfo } = useBlogSelector((state) => state.user);
+  const { resetProp, setPosts } = blogSlice.actions;
+
+  const [selCategs, setSelCategs] = useState<string[]>([]);
+  const [desc, setDesc] = useState('');
+  const [dataPost, setDataPost] = useState<PostInt | null>(null);
 
   const handleBannerFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const imgFile = e.target.files?.[0];
@@ -281,7 +291,7 @@ const NewPost = () => {
     setIsUploadingImg(true);
 
     const uploadTask = new BlogServices().uploadBannerPostImg(
-      dummyUserId.current,
+      userInfo?.userId ?? '',
       postId.current,
       file,
       isBanner
@@ -316,11 +326,54 @@ const NewPost = () => {
     );
   };
 
-  const handlePost = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    op: OpEnum
-  ): void => {
-    console.log('Publish or Save: ', post);
+  const handlePost = (op: OpEnum): void => {
+    if (bannerUrl && postTitle && postMain) {
+      let postData: PostInt;
+      switch (op) {
+        case 'save':
+          postData = {
+            userId: userInfo!.userId,
+            isDummy: false,
+            postId: postId.current,
+            post: post.postMain,
+            bannerUrl: post.bannerUrl,
+            isPublished: false,
+            comments: [],
+            likes: [],
+            bookmarks: [],
+            commentsCount: 0,
+          };
+          break;
+
+        case 'publish':
+          postData = {
+            userId: userInfo!.userId,
+            isDummy: false,
+            postId: postId.current,
+            post: post.postMain,
+            bannerUrl: post.bannerUrl,
+            isPublished: true,
+            comments: [],
+            likes: [],
+            bookmarks: [],
+            commentsCount: 0,
+            publishedAt: serverTimestamp(),
+            selCategs,
+            desc,
+          };
+          break;
+
+        default:
+          return;
+      }
+
+      setDataPost(postData);
+      dispatch(addPost(postData));
+    } else {
+      if (!bannerUrl) toast.error('Upload banner image!');
+      else if (!postTitle) toast.error('Give post a descriptive titile!');
+      else toast.error('Post is empty!');
+    }
   };
 
   useEffect(() => {
@@ -339,6 +392,30 @@ const NewPost = () => {
       }
     }
   }, [isUploadingImg, postImgUrl]);
+
+  useEffect(() => {
+    if (uploadingFailed) {
+      toast.error('Uploading Failed!');
+      dispatch(resetProp('uploadingFailed'));
+      setIsPubClicked(false);
+      setDataPost(null);
+    }
+
+    if (uploadingSucceed && dataPost) {
+      isPubClicked &&
+        dispatch(setPosts({ type: 'pub', posts: [...pubPosts, dataPost] }));
+      dispatch(setPosts({ type: 'user', posts: [...userPosts, dataPost] }));
+
+      toast.success(`Post ${isPubClicked ? 'published' : 'saved'}`);
+
+      dispatch(resetProp('uploadingSucceed'));
+      navigate(`/${userInfo?.userId}/${dataPost.postId}`);
+      setIsPubClicked(false);
+      setDataPost(null);
+    }
+  }, [uploadingFailed, uploadingSucceed, dataPost, isPubClicked]);
+
+  // TODO TEST POST UPLOAD, AND FIX BUGS
 
   useEffect(() => {
     if (isPostImgReady && postMainRef.current) {
@@ -580,23 +657,47 @@ const NewPost = () => {
           </div>
 
           <footer className='editor_footer'>
-            <div className='left_side'>
-              <button
-                className='publish_btn spc_btn'
-                onClick={(e) => handlePost(e, OpEnum.pub)}
-              >
-                Publish
+            {uploading ? (
+              <button className='publish_btn spc_btn loading' disabled>
+                {isPubClicked ? 'Publishing' : 'Saving'}
               </button>
-              <button
-                className='save_btn'
-                onClick={(e) => handlePost(e, OpEnum.sav)}
-              >
-                Save
-              </button>
-            </div>
+            ) : (
+              <>
+                <div className='left_side'>
+                  <button
+                    className='publish_btn spc_btn'
+                    onClick={() => {
+                      setIsPubClicked(true);
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    Publish
+                  </button>
+                  <button
+                    className='save_btn'
+                    onClick={() => {
+                      setIsPubClicked(false);
+                      handlePost(OpEnum.sav);
+                    }}
+                  >
+                    Save
+                  </button>
+                </div>
 
-            <button className='revert_btn'>Revert</button>
+                <button className='revert_btn'>Revert</button>
+              </>
+            )}
           </footer>
+
+          <PubModal
+            desc={desc}
+            setDesc={setDesc}
+            selCategs={selCategs}
+            setSelCategs={setSelCategs}
+            isModalOpen={isModalOpen}
+            setIsModalOpen={setIsModalOpen}
+            handlePost={handlePost}
+          />
         </>
       )}
     </section>
@@ -612,3 +713,89 @@ const ToolTip: FC<ToolTipInt> = ({ info }) => (
 );
 
 export default NewPost;
+
+interface PubModalInt {
+  desc: string;
+  setDesc: React.Dispatch<React.SetStateAction<string>>;
+  selCategs: string[];
+  setSelCategs: React.Dispatch<React.SetStateAction<string[]>>;
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handlePost: (op: OpEnum) => void;
+}
+
+const PubModal: React.FC<PubModalInt> = ({
+  desc,
+  setDesc,
+  selCategs,
+  setSelCategs,
+  isModalOpen,
+  setIsModalOpen,
+  handlePost,
+}) => {
+  const { categories } = useBlogSelector((state) => state.blog);
+  const descRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) setSelCategs([...selCategs, e.target.value]);
+    else setSelCategs(selCategs.filter((cat) => cat !== e.target.value));
+  };
+
+  const handleContinue = () => {
+    if (!selCategs.length) toast.info('Select relevant categories');
+    else if (!desc.trim()) toast.info('Enter a concise description');
+    else {
+      handlePost(OpEnum.pub);
+      setIsModalOpen(false);
+    }
+  };
+
+  const handleDesc = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (descRef.current) {
+      descRef.current.style.height = 'auto';
+      descRef.current.style.height = descRef.current.scrollHeight + 'px';
+    }
+
+    desc.trim().length < 300
+      ? setDesc(e.target.value)
+      : toast.error('Description too long', { toastId: 'desc' });
+  };
+
+  return (
+    <section className={`pub_modal ${!isModalOpen ? 'hide' : ''}`}>
+      <div className='opts_wrapper'>
+        <div className='opt_wrapper'>
+          <h3>Select Category</h3>
+
+          <div className='check_wrapper'>
+            {categories.map((categ, index) => (
+              <div className='check_opt' key={index}>
+                <input
+                  type='checkbox'
+                  onChange={handleCheck}
+                  id={`categ_check${index}`}
+                  value={categ}
+                />
+                <label htmlFor={`categ_check${index}`}>{categ}</label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className='opt_wrapper'>
+          <h3>Description</h3>
+          <textarea
+            placeholder='Enter brief description about post'
+            ref={descRef}
+            value={desc}
+            onChange={handleDesc}
+          ></textarea>
+        </div>
+
+        <button className='cont_btn spc_btn' onClick={handleContinue}>
+          Continue
+        </button>
+      </div>
+    </section>
+  );
+};

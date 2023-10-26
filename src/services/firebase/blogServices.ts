@@ -15,7 +15,7 @@ import {
 } from 'firebase/auth';
 import { setDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
-import { UpdateDataInt, UserInfoInt } from '../../types';
+import { PostInt, UpdateDataInt, UserInfoInt } from '../../types';
 
 const uidLong = new ShortUniqueId({ length: 10 });
 const uidShort = new ShortUniqueId({ length: 7 });
@@ -77,6 +77,11 @@ export class BlogServices {
     return deleteDoc(docRef);
   }
 
+  addPost(data: PostInt) {
+    const docRef = doc(db, `posts/${data.postId}`);
+    return setDoc(docRef, data);
+  }
+
   // * Storage methods
   uploadBannerPostImg(
     userId: string,
@@ -85,8 +90,8 @@ export class BlogServices {
     isBanner: boolean
   ): UploadTask {
     const imgRef = isBanner
-      ? ref(storage, `${userId}/banners/${postId}_banner`)
-      : ref(storage, `${userId}/posts/${postId}_post_${uidShort.rnd()}`);
+      ? ref(storage, `${userId}/posts/${postId}/banner`)
+      : ref(storage, `${userId}/posts/${postId}/imgs/${uidShort.rnd()}`);
     return uploadBytesResumable(imgRef, imgFile);
   }
 

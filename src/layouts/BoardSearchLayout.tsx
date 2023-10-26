@@ -88,7 +88,7 @@ const BoardSearchLayout: FC<BSLInt> = ({
     <section id='bsl_sect' className={className ? className : ''}>
       <div className={`center_sect ${modClass ? modClass : ''}`}>
         <header className='bsl_header'>
-          <h1>{heading}</h1>
+          <h1 style={{ textTransform: 'capitalize' }}>{heading}</h1>
 
           {filterItems ? (
             <div className='sort_by_opts'>

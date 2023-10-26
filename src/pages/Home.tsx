@@ -5,7 +5,7 @@ import dummyImg from '../assets/Me cropped.jpg';
 import { SkeletonLoad, SinglePost, DisplayPosts } from './components';
 import { useGlobalContext } from '../context';
 import { v4 } from 'uuid';
-import { PostsInt } from '../types';
+import { DummyPostsInt } from '../types';
 import { useBlogSelector } from '../app/store';
 
 export interface HandleStickInt {
@@ -19,7 +19,7 @@ const Home = () => {
   const { setSearchString } = useGlobalContext();
   const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   // TODO Placeholder for loading purposes
-  const homePosts: PostsInt[] = [
+  const homePosts: DummyPostsInt[] = [
     { isDummy: true, id: v4() },
     { isDummy: true, id: v4() },
     { isDummy: true, id: v4() },

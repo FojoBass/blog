@@ -10,16 +10,29 @@ import BoardSearchLayout, {
 import { useBlogSelector } from '../../app/store';
 
 const Dashboard = () => {
-  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
+  const { isUserLoggedIn, userInfo } = useBlogSelector((state) => state.user);
   const { pathname } = useLocation();
   const [isPosts, setisPosts] = useState<PostInt>({
     status: pathname.split('/').length === 3 ? true : false,
     items: [],
   });
   const [navItems] = useState<NavInt[]>([
-    { title: 'Posts', count: 3, url: '/dummies/dashboard/posts' },
-    { title: 'Followers', count: 5, url: '/dummies/dashboard/followers' },
-    { title: 'Followings', count: 6, url: '/dummies/dashboard/followings' },
+    { title: 'Posts', count: 3, url: `/${userInfo?.userId}/dashboard/posts` },
+    {
+      title: 'Followers',
+      count: 5,
+      url: `/${userInfo?.userId}/dashboard/followers`,
+    },
+    {
+      title: 'Followings',
+      count: 6,
+      url: `/${userInfo?.userId}/dashboard/followings`,
+    },
+    {
+      title: 'Bookmarks',
+      count: 2,
+      url: `/${userInfo?.userId}/dashboard/bookmarks`,
+    },
   ]);
   const navigate = useNavigate();
 
@@ -43,7 +56,7 @@ const Dashboard = () => {
       {isUserLoggedIn && (
         <BoardSearchLayout
           isPosts={isPosts}
-          heading={'Dashboard'}
+          heading={`Dashboard >> ${pathname.split('/')[3]}`}
           navItems={navItems}
           modClass='dashboard'
           isSearch={false}

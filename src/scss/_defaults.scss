@@ -119,7 +119,8 @@ button.loading {
   position: relative;
   overflow: hidden;
 
-  &[type='submit']::after {
+  // &[type='submit']::after {
+  &:not(.other_login_btn.loading):after {
     content: '';
     width: 100%;
     height: 100%;

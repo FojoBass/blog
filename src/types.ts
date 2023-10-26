@@ -1,8 +1,40 @@
 import { FieldValue } from 'firebase/firestore';
 
-export interface PostsInt {
+export interface DummyPostsInt {
   isDummy: boolean;
   id: string;
+}
+
+export interface PostInt {
+  userId: string;
+  isDummy: boolean;
+  postId: string;
+  post: string;
+  bannerUrl: string;
+  isPublished: boolean;
+  comments: CommentInt[];
+  likes: string[];
+  bookmarks: string[];
+  commentsCount: number;
+  publishedAt?: FieldValue | string;
+  selCategs?: string[];
+  desc?: string;
+}
+
+// export enum CategoryEnum {
+//   cyb = 'cyber security',
+//   web = 'web development',
+//   data = 'data science',
+//   gen = 'general',
+// }
+
+export interface CommentInt {
+  aviUrl: string;
+  name: string;
+  createdAt: FieldValue | string;
+  comment: string;
+  likes: number;
+  comments: CommentInt[];
 }
 
 export interface CountryInt {

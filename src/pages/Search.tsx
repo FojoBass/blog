@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGlobalContext } from '../context';
 import { useSearchParams } from 'react-router-dom';
 import BoardSearchLayout from '../layouts/BoardSearchLayout';
-import { FollowsInt, PostsInt } from '../types';
+import { FollowsInt, DummyPostsInt } from '../types';
 import { v4 } from 'uuid';
 import { DisplayPosts, DisplayUsers } from './components';
 import avi from '../assets/Me cropped.jpg';
@@ -20,7 +20,7 @@ const Search = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   // TODO Placeholder for loading purposes
-  const searchPosts: PostsInt[] = [
+  const searchPosts: DummyPostsInt[] = [
     { isDummy: true, id: v4() },
     { isDummy: true, id: v4() },
     { isDummy: true, id: v4() },

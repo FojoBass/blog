@@ -45,6 +45,7 @@ import { useGlobalContext } from './context';
 import GetUserInfo from './modals/GetUserInfo';
 import { auth } from './services/firebase/config';
 import Verification from './modals/Verification';
+import Bookmarks from './pages/dashboard/Bookmarks';
 
 const App = () => {
   const auth = getAuth();
@@ -53,6 +54,7 @@ const App = () => {
   const { isUserLoggedIn, noUserInfo, userInfo } = useBlogSelector(
     (state) => state.user
   );
+  const { userPosts, pubPosts } = useBlogSelector((state) => state.blog);
   const dispatch = useBlogDispatch();
   const [dummyFollows] = React.useState<FollowsInt[]>([
     { userName: 'Dummy name', id: 'asdf', avi },
@@ -85,15 +87,16 @@ const App = () => {
         <Route path='/know-us' element={<About />} />
         <Route path='/meet-us' element={<Contact />} />
         <Route path='/:username/dashboard' element={<Dashboard />}>
-          <Route path='/:username/dashboard/posts' element={<Posts />} />
+          <Route path='posts' element={<Posts />} />
           <Route
-            path='/:username/dashboard/followers'
+            path='followers'
             element={<DisplayUsers users={dummyFollows} />}
           />
           <Route
-            path='/:username/dashboard/followings'
+            path='followings'
             element={<DisplayUsers users={dummyFollows.slice(0, 3)} />}
           />
+          <Route path='bookmarks' element={<Bookmarks />} />
         </Route>
         <Route path='/faqs' element={<FAQ />} />
         <Route path='/join' element={<Signup />} />
@@ -115,10 +118,10 @@ const App = () => {
       </Route>
     )
   );
-  // todo When user logs in through other providers
-  // todo if user has no record, show a modal for registering record
-  // todo modal should be same as sign up page, with little differences(make signup page a re-usable component)
-  // todo If user is not verified, get them to verify by force
+  useEffect(() => {
+    console.log('User Posts: ', userPosts);
+    console.log('Pub Posts: ', pubPosts);
+  }, [userPosts, pubPosts]);
 
   useEffect(() => {
     if (document.documentElement.classList.contains('light')) {

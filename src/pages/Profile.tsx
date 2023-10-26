@@ -13,7 +13,7 @@ import {
   AiFillBehanceSquare,
 } from 'react-icons/ai';
 import { DisplayPosts, Loading } from './components';
-import { PostsInt, UserInfoInt } from '../types';
+import { DummyPostsInt, UserInfoInt } from '../types';
 import { v4 } from 'uuid';
 import { useBlogSelector } from '../app/store';
 import { useGlobalContext } from '../context';
@@ -28,7 +28,7 @@ const Profile = () => {
   const [displayInfo, setDisplayInfo] = useState<UserInfoInt | null>(null);
 
   // todo Dummy Posts to be replaced
-  const userPosts: PostsInt[] = [
+  const userPosts: DummyPostsInt[] = [
     { isDummy: true, id: v4() },
     { isDummy: true, id: v4() },
     { isDummy: true, id: v4() },

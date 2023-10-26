@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { SkeletonLoad, SinglePost } from './index';
 import dummyImg from '../../assets/Me cropped.jpg';
-import { PostsInt } from '../../types';
+import { DummyPostsInt } from '../../types';
 
 interface PropInt {
-  posts: PostsInt[];
+  posts: DummyPostsInt[];
 }
 
 const DisplayPosts: React.FC<PropInt> = ({ posts }) => {
