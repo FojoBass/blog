@@ -264,7 +264,7 @@ $maxWidth: 820px;
             &:after {
               width: 1rem;
               height: 1rem;
-              box-shadow: 0 0 3px var(--shw_clr_shd);
+              box-shadow: 0 0 3px var(--txt_clr1);
               border-radius: 0.3rem;
               @include position(absolute, left, top, -10px, 50%);
             }
@@ -273,7 +273,7 @@ $maxWidth: 820px;
               @include position(absolute, left, top, -9px, 50%);
               width: 0.8rem;
               height: 0.8rem;
-              background-color: var(--shw_clr_shd);
+              background-color: var(--acc_clr);
               border-radius: 50%;
               opacity: 0;
             }
@@ -282,8 +282,8 @@ $maxWidth: 820px;
           input {
             visibility: hidden;
 
-            &:checked + label:after {
-              border-color: var(--acc_clr);
+            &:checked + label {
+              color: var(--acc_clr);
             }
 
             &:checked + label:before {
@@ -299,6 +299,7 @@ $maxWidth: 820px;
         width: 100%;
         border-radius: 5px;
         padding: 10px;
+        color: var(--txt_clr3);
       }
     }
   }
