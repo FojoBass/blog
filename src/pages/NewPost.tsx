@@ -23,6 +23,7 @@ import { toast } from 'react-toastify';
 import { serverTimestamp } from 'firebase/firestore';
 import { addPost } from '../features/blogAsyncThunk';
 import { PostInt } from '../types';
+import { auth } from '../services/firebase/config';
 
 interface EditorFuncInt {
   (
@@ -115,7 +116,6 @@ const NewPost = () => {
           if (typeof postImg !== 'string') {
             setPostImgFile(postImg.finalFile);
           }
-          // todo Work on sending file to Fire storage
         } catch (err) {
           console.log(err);
         }
@@ -291,7 +291,7 @@ const NewPost = () => {
     setIsUploadingImg(true);
 
     const uploadTask = new BlogServices().uploadBannerPostImg(
-      userInfo?.userId ?? '',
+      auth.currentUser?.uid ?? '',
       postId.current,
       file,
       isBanner

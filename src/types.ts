@@ -77,7 +77,6 @@ export interface FormDataInt {
 }
 
 export interface UpdateDataInt {
-  userId: string;
   fullName: string;
   userName: string;
   country: CountryInt;
@@ -103,6 +102,7 @@ export interface UpdateDataInt {
 export interface UserInfoInt extends FormDataInt {
   email: string;
   userId: string;
+  uid: string;
   aviUrls: {
     bigAviUrl: string;
     smallAviUrl: string;

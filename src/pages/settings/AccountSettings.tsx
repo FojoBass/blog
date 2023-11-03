@@ -7,6 +7,7 @@ import { userSlice } from '../../features/userSlice';
 import { BlogServices } from '../../services/firebase/blogServices';
 import { useNavigate } from 'react-router-dom';
 import { useGlobalContext } from '../../context';
+import { auth } from '../../services/firebase/config';
 
 const AccountSettings = () => {
   const [userName, setUserName] = useState('');
@@ -16,9 +17,8 @@ const AccountSettings = () => {
     userSlice.actions;
   const dispatch = useBlogDispatch();
   const [click, setClick] = useState(false);
-  const [isDel, setIsDel] = useState(false);
   const blogServices = new BlogServices();
-  const { logOut } = useGlobalContext();
+  const { logOut, setDelAcc, delAcc } = useGlobalContext();
 
   const navigate = useNavigate();
 
@@ -37,10 +37,10 @@ const AccountSettings = () => {
         setClick(true);
       }
       if (click) {
-        setIsDel(true);
+        setDelAcc && setDelAcc(true);
 
         try {
-          await blogServices.delUserInfo(userInfo.userId);
+          await blogServices.delUserInfo(auth.currentUser?.uid ?? '');
           await blogServices.delUser();
           logOut && logOut();
           navigate('/');
@@ -49,7 +49,7 @@ const AccountSettings = () => {
           toast.error('Account deletion failed');
           console.log(`Acccount delete error: ${error}`);
         } finally {
-          setIsDel(false);
+          setDelAcc && setDelAcc(false);
         }
       }
     } else toast.info('Username incorrect');
@@ -106,11 +106,11 @@ const AccountSettings = () => {
 
             <button
               className={`delete_btn spc_btn ${
-                userName !== userInfo?.userName || isDel ? 'disable' : ''
+                userName !== userInfo?.userName || delAcc ? 'disable' : ''
               }`}
-              disabled={userName !== userInfo?.userName || isDel}
+              disabled={userName !== userInfo?.userName || delAcc}
             >
-              {isDel ? 'Deleting...' : 'Delete Account'}
+              {delAcc ? 'Deleting...' : 'Delete Account'}
             </button>
           </div>
         </fieldset>

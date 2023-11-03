@@ -1,5 +1,10 @@
 import { storage, db, auth } from './config';
-import { ref, uploadBytesResumable, UploadTask } from 'firebase/storage';
+import {
+  deleteObject,
+  ref,
+  uploadBytesResumable,
+  UploadTask,
+} from 'firebase/storage';
 import {
   createUserWithEmailAndPassword,
   UserCredential,
@@ -13,7 +18,14 @@ import {
   sendPasswordResetEmail,
   deleteUser,
 } from 'firebase/auth';
-import { setDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import {
+  setDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
+  getDoc,
+} from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
 import { PostInt, UpdateDataInt, UserInfoInt } from '../../types';
 
@@ -63,23 +75,33 @@ export class BlogServices {
 
   // *Firestore methods
   setUserInfo(data: UserInfoInt) {
-    const docRef = doc(db, `users/${data.userId}`);
+    const docRef = doc(db, `users/${data.uid}`);
     return setDoc(docRef, data);
   }
 
   updateUserInfo(data: UpdateDataInt) {
-    const docRef = doc(db, `users/${data.userId}`);
+    const docRef = doc(db, `users/${auth.currentUser?.uid}`);
     return updateDoc(docRef, { ...data });
   }
 
-  delUserInfo(userId: string) {
-    const docRef = doc(db, `users/${userId}`);
+  delUserInfo(uid: string) {
+    const docRef = doc(db, `users/${uid}`);
     return deleteDoc(docRef);
   }
 
   addPost(data: PostInt) {
     const docRef = doc(db, `posts/${data.postId}`);
     return setDoc(docRef, data);
+  }
+
+  setTime() {
+    const docRef = doc(db, 'currTime/currTime');
+    return setDoc(docRef, { time: serverTimestamp() });
+  }
+
+  getTime() {
+    const docRef = doc(db, 'currTime/currTime');
+    return getDoc(docRef);
   }
 
   // * Storage methods

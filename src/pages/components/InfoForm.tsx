@@ -78,6 +78,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
     loginPersistence,
     storageKeys,
     logOut,
+    currYear,
   } = useGlobalContext();
   const dispatch = useBlogDispatch();
 
@@ -168,8 +169,6 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
             smallAviFile: aviSmallFile,
           })
         );
-
-        dispatch(setNoUserInfo(false));
       }
     }
   };
@@ -515,6 +514,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
                     padding: '5px 10px',
                     borderRadius: '10px',
                   }}
+                  max={`${Number(currYear) - 18}-12-31`}
                 />
               </article>
 

@@ -18,6 +18,10 @@ const LocationInput = () => {
       );
   }, [country]);
 
+  // TODO THERES ARE BIG ISSUE WITH GOOGLE SIGIN.
+  // TODO TEST THOROUGHLY AND FIX
+  // TODO FOR STARTERS, THERE'S NO LOADING WHEN THE USER SUBMITS INFO
+
   return (
     <>
       <article className='form_opt'>
@@ -34,11 +38,13 @@ const LocationInput = () => {
           }
           defaultValue={
             isUserLoggedIn
-              ? `${country?.name}/${country?.code}`
-              : 'Select Country'
+              ? country?.name
+                ? `${country?.name}/${country?.code}`
+                : ''
+              : ''
           }
         >
-          <option value='Select \ Country' disabled>
+          <option value='' disabled>
             Select Country
           </option>
           {countries.map((country) => (

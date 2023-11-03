@@ -14,6 +14,7 @@ import { BlogServices } from '../../services/firebase/blogServices';
 import { getDownloadURL } from 'firebase/storage';
 import { regex } from '../../data';
 import { FormRefsInt } from '../components/InfoForm';
+import { auth } from '../../services/firebase/config';
 
 const ProfileSettings = () => {
   const { userInfo } = useBlogSelector((state) => state.user);
@@ -109,12 +110,7 @@ const ProfileSettings = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (
-      validateFullName() &&
-      validateEmail() &&
-      validateUsername() &&
-      validateSocials()
-    ) {
+    if (validateFullName() && validateUsername() && validateSocials()) {
       try {
         setIsSavingInfo(true);
         if (country && state && gender) {
@@ -125,7 +121,7 @@ const ProfileSettings = () => {
             const uploadImg = (file: File, isBig: boolean): Promise<string> => {
               return new Promise<string>((resolve, reject) => {
                 const uploadTask = new BlogServices().uplaodAviImg(
-                  userInfo!.userId,
+                  auth.currentUser?.uid ?? '',
                   isBig,
                   file
                 );
@@ -151,7 +147,6 @@ const ProfileSettings = () => {
           const data: UpdateDataInt =
             bigAviUrl && smallAviUrl
               ? {
-                  userId: userInfo!.userId,
                   fullName,
                   userName,
                   country,
@@ -167,7 +162,6 @@ const ProfileSettings = () => {
                   dispEmail,
                 }
               : {
-                  userId: userInfo!.userId,
                   fullName,
                   userName,
                   country,
@@ -223,7 +217,7 @@ const ProfileSettings = () => {
         </article>
 
         <article className='form_opt'>
-          <div className='top_field'>
+          {/* <div className='top_field'>
             <label htmlFor='email'>Email</label>
             <input
               type='email'
@@ -233,7 +227,7 @@ const ProfileSettings = () => {
               id='email'
               ref={formRefs.emailInputRef}
             />
-          </div>
+          </div> */}
 
           <div className='bottom_field'>
             <input

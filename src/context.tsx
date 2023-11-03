@@ -36,6 +36,8 @@ interface ContextInt {
   setGender?: Dispatch<React.SetStateAction<string>>;
   state?: string;
   setState?: Dispatch<React.SetStateAction<string>>;
+  currYear?: string;
+  setCurrYear?: Dispatch<React.SetStateAction<string>>;
   country?: CountryInt;
   setCountry?: Dispatch<React.SetStateAction<CountryInt>>;
   aviBigFile?: File | null;
@@ -50,6 +52,8 @@ interface ContextInt {
     theme: string;
   };
   logOut?: () => void;
+  setDelAcc?: Dispatch<React.SetStateAction<boolean>>;
+  delAcc?: boolean;
 }
 
 const BlogContext = createContext<ContextInt>({});
@@ -85,6 +89,9 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     userInfoData: 'user_info_data',
     theme: 'devie_theme',
   });
+
+  const [delAcc, setDelAcc] = useState(false);
+  const [currYear, setCurrYear] = useState('');
 
   const [loginPersistence, setLoginPersistence] = useState(
     StorageFuncs.getStorage<boolean>('local', storageKeys.logPers) ?? false
@@ -140,6 +147,10 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     isVerifyOpen,
     setIsVerifyOpen,
     logOut,
+    delAcc,
+    setDelAcc,
+    currYear,
+    setCurrYear,
   };
 
   // * Fetches
@@ -187,6 +198,19 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
       );
     }
   }, [userInfo, loginPersistence]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await new BlogServices().setTime();
+        const res = await new BlogServices().getTime();
+        const time = res.data() as any;
+        setCurrYear(time.time.toDate().toString().split(' ')[3]);
+      } catch (err) {
+        console.error(`Time fetch ${err}`);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     const isUserInfo = StorageFuncs.getStorage<boolean>(

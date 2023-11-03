@@ -11,7 +11,7 @@ import {
   serverTimestamp,
   where,
 } from 'firebase/firestore';
-import { db } from '../services/firebase/config';
+import { auth, db } from '../services/firebase/config';
 import { userSlice } from './userSlice';
 
 interface UserSignUpPayloadInt {
@@ -31,7 +31,7 @@ export const userSignUp = createAsyncThunk<void, UserSignUpPayloadInt>(
   async (payload, thunkApi) => {
     const uploadImg = (file: File, isBig: boolean): Promise<string> => {
       return new Promise<string>((resolve, reject) => {
-        const uploadTask = new BlogServices().uplaodAviImg(userId, isBig, file);
+        const uploadTask = new BlogServices().uplaodAviImg(uid, isBig, file);
         uploadTask.on(
           'state_changed',
           (snapshot) => {},
@@ -50,9 +50,11 @@ export const userSignUp = createAsyncThunk<void, UserSignUpPayloadInt>(
 
     const { email, password, formData, bigAviFile, smallAviFile } = payload;
     const userId = uidLong.rnd();
+    let uid = '';
     try {
       if (password) {
         await blogServices.emailReg(email, password);
+        uid = auth.currentUser?.uid ?? '';
         await blogServices.logOut();
       }
       const bigAviUrl = await uploadImg(bigAviFile, true);
@@ -62,6 +64,7 @@ export const userSignUp = createAsyncThunk<void, UserSignUpPayloadInt>(
         email: payload.email,
         aviUrls: { bigAviUrl, smallAviUrl },
         userId,
+        uid: uid ? uid : auth.currentUser!.uid,
         createdAt: serverTimestamp(),
         followers: [],
         followings: [],
