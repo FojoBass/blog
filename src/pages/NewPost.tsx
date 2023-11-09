@@ -21,7 +21,7 @@ import { handleParsePost } from '../helpers/handleParsePost';
 import ShortUniqueId from 'short-unique-id';
 import { toast } from 'react-toastify';
 import { serverTimestamp } from 'firebase/firestore';
-import { addPost } from '../features/blogAsyncThunk';
+import { addPosts } from '../features/blogAsyncThunk';
 import { PostInt } from '../types';
 import { auth } from '../services/firebase/config';
 
@@ -78,7 +78,7 @@ const NewPost = () => {
   const postId = useRef(new ShortUniqueId({ length: 10 }).rnd());
 
   const dispatch = useBlogDispatch();
-  const { uploading, uploadingFailed, uploadingSucceed, pubPosts, userPosts } =
+  const { uploading, uploadingFailed, uploadingSucceed, userPosts } =
     useBlogSelector((state) => state.blog);
   const { isUserLoggedIn, userInfo } = useBlogSelector((state) => state.user);
   const { resetProp, setPosts } = blogSlice.actions;
@@ -333,6 +333,7 @@ const NewPost = () => {
         case 'save':
           postData = {
             userId: userInfo!.userId,
+            uid: auth.currentUser?.uid ?? '',
             isDummy: false,
             postId: postId.current,
             post: post.postMain,
@@ -342,12 +343,20 @@ const NewPost = () => {
             likes: [],
             bookmarks: [],
             commentsCount: 0,
+            createdAt: serverTimestamp(),
+            author: userInfo?.userName ?? '',
+            aviUrl: userInfo?.aviUrls.smallAviUrl ?? '',
+            title: post.postTitle,
+            followers: userInfo?.followers ?? [],
+            bio: userInfo?.bio ?? '',
           };
+          dispatch(addPosts({ data: postData, type: 'save' }));
           break;
 
         case 'publish':
           postData = {
             userId: userInfo!.userId,
+            uid: auth.currentUser?.uid ?? '',
             isDummy: false,
             postId: postId.current,
             post: post.postMain,
@@ -360,7 +369,13 @@ const NewPost = () => {
             publishedAt: serverTimestamp(),
             selCategs,
             desc,
+            author: userInfo?.userName ?? '',
+            aviUrl: userInfo?.aviUrls.smallAviUrl ?? '',
+            title: post.postTitle,
+            followers: userInfo?.followers ?? [],
+            bio: userInfo?.bio ?? '',
           };
+          dispatch(addPosts({ data: postData, type: 'pub' }));
           break;
 
         default:
@@ -368,7 +383,6 @@ const NewPost = () => {
       }
 
       setDataPost(postData);
-      dispatch(addPost(postData));
     } else {
       if (!bannerUrl) toast.error('Upload banner image!');
       else if (!postTitle) toast.error('Give post a descriptive titile!');
@@ -402,9 +416,27 @@ const NewPost = () => {
     }
 
     if (uploadingSucceed && dataPost) {
-      isPubClicked &&
-        dispatch(setPosts({ type: 'pub', posts: [...pubPosts, dataPost] }));
-      dispatch(setPosts({ type: 'user', posts: [...userPosts, dataPost] }));
+      // ! No need for manual additoin of posts to pubPosts, since a listener will be set, and homePost will be updated
+      // isPubClicked &&
+      //   dispatch(
+      //     setPosts({
+      //       type: 'pub',
+      //       posts: [
+      //         ...pubPosts,
+      //         { ...dataPost, publishedAt: new Date().toString() },
+      //       ],
+      //     })
+      //   );
+      dispatch(
+        setPosts([
+          ...userPosts,
+          {
+            ...dataPost,
+            createdAt: !dataPost.isPublished ? new Date().toString() : '',
+            publishedAt: dataPost.isPublished ? new Date().toString() : '',
+          },
+        ])
+      );
 
       toast.success(`Post ${isPubClicked ? 'published' : 'saved'}`);
 

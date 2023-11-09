@@ -21,11 +21,11 @@ const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   // TODO Placeholder for loading purposes
   const searchPosts: DummyPostsInt[] = [
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
+    { isDummy: true, postId: v4() },
+    { isDummy: true, postId: v4() },
+    { isDummy: true, postId: v4() },
+    { isDummy: true, postId: v4() },
+    { isDummy: true, postId: v4() },
   ];
 
   const [dummyFollows] = React.useState<FollowsInt[]>([
@@ -64,11 +64,11 @@ const Search = () => {
       isSettings={false}
     >
       {filters === 'posts' ? (
-        <DisplayPosts posts={searchPosts} />
+        <DisplayPosts posts={searchPosts} target={'search'} />
       ) : filters === 'users' ? (
         <DisplayUsers users={dummyFollows} />
       ) : filters === 'my posts only' ? (
-        <DisplayPosts posts={searchPosts} />
+        <DisplayPosts posts={searchPosts} target={'search'} />
       ) : (
         ''
       )}

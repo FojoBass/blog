@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthorInfo from './AuthorInfo';
 import { CiBookmarkPlus } from 'react-icons/ci';
+import { FollowsInt } from '../../types';
 
 export interface SinglePostProps {
   posterName: string;
@@ -11,10 +12,10 @@ export interface SinglePostProps {
   title: string;
   detail: string;
   date: string;
-  category: string;
+  category: string[];
   postImgUrl: string;
   id: string;
-  followersCount: number;
+  followersCount: FollowsInt[];
   aboutPoster: string;
 }
 
@@ -31,6 +32,11 @@ const SinglePost: React.FC<SinglePostProps> = ({
   aboutPoster,
 }) => {
   const [isUser, setIsUser] = useState(false);
+  const [modDate] = useState({
+    day: date.split(' ')[2],
+    month: date.split(' ')[1],
+    year: date.split(' ')[3],
+  });
   return (
     <article className='single_post'>
       <div className='post_wrapper'>
@@ -60,10 +66,14 @@ const SinglePost: React.FC<SinglePostProps> = ({
 
         <div className='bottom'>
           <div className='bottom_left'>
-            <span className='created_at'>{date}</span>
-            <Link className='category' to='/categories/dummy'>
-              {category}
-            </Link>
+            <span className='created_at'>
+              {modDate.day} {modDate.month}, {modDate.year}
+            </span>
+            {category.map((categ, index) => (
+              <Link className='category' to='/categories/dummy' key={index}>
+                {categ}
+              </Link>
+            ))}
           </div>
 
           {isUser || (

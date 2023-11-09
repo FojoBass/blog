@@ -5,7 +5,7 @@ import dummyImg from '../assets/Me cropped.jpg';
 import { SkeletonLoad, SinglePost, DisplayPosts } from './components';
 import { useGlobalContext } from '../context';
 import { v4 } from 'uuid';
-import { DummyPostsInt } from '../types';
+import { DummyPostsInt, PostInt } from '../types';
 import { useBlogSelector } from '../app/store';
 
 export interface HandleStickInt {
@@ -16,21 +16,36 @@ export interface HandleStickInt {
 
 const Home = () => {
   const asideRef = useRef<HTMLDivElement>(null);
-  const { setSearchString } = useGlobalContext();
+  const { setSearchString, homePosts } = useGlobalContext();
   const { isUserLoggedIn } = useBlogSelector((state) => state.user);
-  // TODO Placeholder for loading purposes
-  const homePosts: DummyPostsInt[] = [
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
-  ];
+  const [modHomePost, setModHomePost] = useState<PostInt[] | DummyPostsInt[]>(
+    []
+  );
 
   useEffect(() => {
     if (setSearchString) setSearchString('');
   }, []);
 
+  useEffect(() => {
+    let uniqueIds = new Set<string>();
+    let modPosts: PostInt[] | DummyPostsInt[] = [];
+
+    if (
+      homePosts &&
+      homePosts.length &&
+      homePosts[homePosts.length - 1].isDummy
+    )
+      modPosts = homePosts;
+    else {
+      homePosts?.forEach((post) => {
+        if (!uniqueIds.has(post.postId)) {
+          modPosts.push(post as PostInt);
+          uniqueIds.add(post.postId);
+        }
+      });
+    }
+    setModHomePost(modPosts);
+  }, [homePosts]);
   return (
     <section id='home_sect'>
       <div className='center_sect home_wrapper'>
@@ -62,7 +77,7 @@ const Home = () => {
           <SidenavPart />
         </aside>
 
-        <DisplayPosts posts={homePosts} />
+        {homePosts && <DisplayPosts posts={modHomePost} target={'home'} />}
       </div>
     </section>
   );

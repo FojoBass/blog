@@ -78,6 +78,7 @@
 
       .category {
         @include category;
+        margin-right: 5px;
       }
 
       .bkmark_btn {

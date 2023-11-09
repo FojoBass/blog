@@ -13,7 +13,7 @@ import {
   AiFillBehanceSquare,
 } from 'react-icons/ai';
 import { DisplayPosts, Loading } from './components';
-import { DummyPostsInt, UserInfoInt } from '../types';
+import { DummyPostsInt, PostInt, UserInfoInt } from '../types';
 import { v4 } from 'uuid';
 import { useBlogSelector } from '../app/store';
 import { useGlobalContext } from '../context';
@@ -28,20 +28,30 @@ const Profile = () => {
   const [displayInfo, setDisplayInfo] = useState<UserInfoInt | null>(null);
 
   // todo Dummy Posts to be replaced
-  const userPosts: DummyPostsInt[] = [
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
-    { isDummy: true, id: v4() },
+  const userPosts: DummyPostsInt[] | PostInt[] = [
+    { isDummy: true, postId: v4() },
+    { isDummy: true, postId: v4() },
+    { isDummy: true, postId: v4() },
+    { isDummy: true, postId: v4() },
+    { isDummy: true, postId: v4() },
   ];
 
   useEffect(() => {
     if (username === userInfo?.userId) {
       setUserInfoLoading(false);
       setDisplayInfo(userInfo);
+    } else {
+      // TODO FETCH USER INFO
+      // TODO CREATE SKELETON LOAD
+      // TODO ONCE USERINFO IS FETCHED, FETHC POSTS
     }
   }, [username, userInfo]);
+
+  useEffect(() => {
+    if (!userInfoLoading) {
+      // TODO REPLICATE SAME LOGIC FOR HOMEPOSTS
+    }
+  }, [userInfoLoading]);
 
   return (
     <section id='profile_sect'>
@@ -250,7 +260,7 @@ const Profile = () => {
                 </div>
               </aside>
 
-              <DisplayPosts posts={userPosts} />
+              <DisplayPosts posts={userPosts} target={'profile'} />
             </div>
           </div>
         </>

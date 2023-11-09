@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { PostInt } from '../types';
-import { addPost } from './blogAsyncThunk';
+import { addPosts } from './blogAsyncThunk';
 
 interface InitialStateInt {
-  pubPosts: PostInt[];
+  // pubPosts: PostInt[];
   userPosts: PostInt[];
   isOpenSideNav: boolean;
   uploading: boolean;
@@ -13,7 +13,7 @@ interface InitialStateInt {
 }
 
 const initialState: InitialStateInt = {
-  pubPosts: [],
+  // pubPosts: [],
   userPosts: [],
   isOpenSideNav: false,
   uploading: false,
@@ -34,16 +34,7 @@ export const blogSlice = createSlice({
       return { ...state, [key]: false };
     },
     setPosts(state, action) {
-      switch (action.payload.type) {
-        case 'pub':
-          state.pubPosts = action.payload.posts;
-          break;
-        case 'user':
-          state.userPosts = action.payload.posts;
-          break;
-        default:
-          return state;
-      }
+      state.userPosts = action.payload;
     },
     setCateg(state, action) {
       state.categories = action.payload;
@@ -52,15 +43,15 @@ export const blogSlice = createSlice({
   extraReducers: (builder) => {
     // *Add Post
     builder
-      .addCase(addPost.pending, (state) => {
+      .addCase(addPosts.pending, (state) => {
         state.uploading = true;
       })
-      .addCase(addPost.fulfilled, (state) => ({
+      .addCase(addPosts.fulfilled, (state) => ({
         ...state,
         uploading: false,
         uploadingSucceed: true,
       }))
-      .addCase(addPost.rejected, (state, error) => {
+      .addCase(addPosts.rejected, (state, error) => {
         console.log(error);
         return { ...state, uploading: false, uploadingFailed: true };
       });

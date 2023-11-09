@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FollowsInt } from '../../types';
 
 export interface AuthorInfoType {
   imgUrl: string;
   name: string;
   about: string;
-  followersCount: number;
+  followersCount: FollowsInt[];
 }
 
 const AuthorInfo: React.FC<AuthorInfoType> = ({
@@ -29,7 +30,7 @@ const AuthorInfo: React.FC<AuthorInfoType> = ({
       </div>
 
       <div className='author_info_bottom'>
-        <span className='left_side'>{followersCount} Followers </span>
+        <span className='left_side'>{followersCount.length} Followers </span>
 
         <button className='right_side follow_btn'>Follow</button>
       </div>

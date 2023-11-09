@@ -25,6 +25,13 @@ import {
   deleteDoc,
   serverTimestamp,
   getDoc,
+  Timestamp,
+  query,
+  collection,
+  orderBy,
+  limit,
+  startAfter,
+  getDocs,
 } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
 import { PostInt, UpdateDataInt, UserInfoInt } from '../../types';
@@ -89,9 +96,36 @@ export class BlogServices {
     return deleteDoc(docRef);
   }
 
-  addPost(data: PostInt) {
+  addPubPosts(data: PostInt) {
     const docRef = doc(db, `posts/${data.postId}`);
     return setDoc(docRef, data);
+  }
+
+  addUserPosts(data: PostInt) {
+    const docRef = doc(db, `users/${data.uid}/posts/${data.postId}`);
+    console.log('data: ', data);
+
+    return setDoc(docRef, data);
+  }
+
+  getPosts(isMore: boolean, lastDocTime: Timestamp | null) {
+    const q = isMore
+      ? query(
+          collection(db, 'posts'),
+          orderBy('publishedAt', 'desc'),
+          startAfter(lastDocTime),
+          limit(10)
+        )
+      : query(
+          collection(db, 'posts'),
+          orderBy('publishedAt', 'desc'),
+          limit(10)
+        );
+    return getDocs(q);
+  }
+
+  getUserPosts(isMore: boolean, lastDocTime: Timestamp | null, userId: string) {
+    // const q = isMore ? query(collection(db, `users/${userId}/drafts`), orderBy(''))
   }
 
   setTime() {

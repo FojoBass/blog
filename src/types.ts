@@ -2,11 +2,12 @@ import { FieldValue } from 'firebase/firestore';
 
 export interface DummyPostsInt {
   isDummy: boolean;
-  id: string;
+  postId: string;
 }
 
 export interface PostInt {
   userId: string;
+  uid: string;
   isDummy: boolean;
   postId: string;
   post: string;
@@ -17,16 +18,15 @@ export interface PostInt {
   bookmarks: string[];
   commentsCount: number;
   publishedAt?: FieldValue | string;
+  createdAt?: FieldValue | string;
   selCategs?: string[];
   desc?: string;
+  author: string;
+  aviUrl: string;
+  title: string;
+  followers: FollowsInt[];
+  bio: string;
 }
-
-// export enum CategoryEnum {
-//   cyb = 'cyber security',
-//   web = 'web development',
-//   data = 'data science',
-//   gen = 'general',
-// }
 
 export interface CommentInt {
   aviUrl: string;

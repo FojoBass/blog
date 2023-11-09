@@ -54,7 +54,7 @@ const App = () => {
   const { isUserLoggedIn, noUserInfo, userInfo } = useBlogSelector(
     (state) => state.user
   );
-  const { userPosts, pubPosts } = useBlogSelector((state) => state.blog);
+  const { userPosts } = useBlogSelector((state) => state.blog);
   const dispatch = useBlogDispatch();
   const [dummyFollows] = React.useState<FollowsInt[]>([
     { userName: 'Dummy name', id: 'asdf', avi },
@@ -118,10 +118,11 @@ const App = () => {
       </Route>
     )
   );
+
   useEffect(() => {
     console.log('User Posts: ', userPosts);
-    console.log('Pub Posts: ', pubPosts);
-  }, [userPosts, pubPosts]);
+    // console.log('Pub Posts: ', pubPosts);
+  }, [userPosts]);
 
   useEffect(() => {
     if (document.documentElement.classList.contains('light')) {

@@ -4,8 +4,9 @@ import {
   useState,
   createContext,
   useEffect,
+  useRef,
 } from 'react';
-import { CountryInt, UserInfoInt } from './types';
+import { CountryInt, DummyPostsInt, PostInt, UserInfoInt } from './types';
 import { useBlogDispatch, useBlogSelector } from './app/store';
 import { StorageFuncs } from './services/storages';
 import { auth, db } from './services/firebase/config';
@@ -17,7 +18,10 @@ import { userSlice } from './features/userSlice';
 import { themeSlice } from './features/themeSlice';
 import { BlogServices } from './services/firebase/blogServices';
 import { blogSlice } from './features/blogSlice';
-import { collection, onSnapshot, query } from 'firebase/firestore';
+import { Timestamp, collection, onSnapshot, query } from 'firebase/firestore';
+import { CategoryPosts } from './pages';
+import ShortUniqueId from 'short-unique-id';
+// import { getPosts } from './features/blogAsyncThunk';
 
 interface ContextInt {
   searchString?: string;
@@ -54,6 +58,14 @@ interface ContextInt {
   logOut?: () => void;
   setDelAcc?: Dispatch<React.SetStateAction<boolean>>;
   delAcc?: boolean;
+  skeletonPosts?: DummyPostsInt[];
+  homePosts?: DummyPostsInt[] | PostInt[];
+  setHomePosts?: Dispatch<React.SetStateAction<DummyPostsInt[] | PostInt[]>>;
+  homeLoading?: boolean;
+  setHomeLoading?: Dispatch<React.SetStateAction<boolean>>;
+  setHomeLastDocTime?: Dispatch<React.SetStateAction<Timestamp | null>>;
+  homeLastDocTime?: Timestamp | null;
+  fetchMoreHomePosts?: () => Promise<void>;
 }
 
 const BlogContext = createContext<ContextInt>({});
@@ -64,9 +76,13 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const { userInfo, noUserInfo, isUserLoggedIn } = useBlogSelector(
     (state) => state.user
   );
+  const [homeLastDocTime, setHomeLastDocTime] = useState<Timestamp | null>(
+    null
+  );
 
   const { categories } = useBlogSelector((state) => state.blog);
   const { setCateg } = blogSlice.actions;
+  const randId = new ShortUniqueId({ length: 10 });
 
   const [searchString, setSearchString] = useState(''),
     [isSearch, setIsSearch] = useState(false),
@@ -81,6 +97,8 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [aviBigFile, setAviBigFile] = useState<File | null>(null),
     [aviSmallFile, setAviSmallFile] = useState<File | null>(null);
   const [isVerifyOpen, setIsVerifyOpen] = useState(true);
+  const [homeLoading, setHomeLoading] = useState(true);
+  const delayListner = useRef(true);
 
   const [storageKeys] = useState({
     currUser: 'devie_current_user',
@@ -92,6 +110,16 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const [delAcc, setDelAcc] = useState(false);
   const [currYear, setCurrYear] = useState('');
+  const [skeletonPosts] = useState<DummyPostsInt[]>([
+    { isDummy: true, postId: randId.rnd() },
+    { isDummy: true, postId: randId.rnd() },
+    { isDummy: true, postId: randId.rnd() },
+    { isDummy: true, postId: randId.rnd() },
+    { isDummy: true, postId: randId.rnd() },
+  ]);
+  const [homePosts, setHomePosts] = useState<DummyPostsInt[] | PostInt[]>([
+    ...skeletonPosts,
+  ]);
 
   const [loginPersistence, setLoginPersistence] = useState(
     StorageFuncs.getStorage<boolean>('local', storageKeys.logPers) ?? false
@@ -102,8 +130,10 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const { setNoUserInfo, setIsUserLoggedIn } = userSlice.actions;
   const { setTheme } = themeSlice.actions;
 
+  const blogServices = new BlogServices();
+
   const logOut = async () => {
-    await new BlogServices().logOut();
+    await blogServices.logOut();
     dispatch(setIsUserLoggedIn(false));
 
     if (storageKeys) {
@@ -119,6 +149,39 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         loginPersistence ? 'local' : 'session',
         storageKeys.userInfoData
       );
+    }
+  };
+
+  const fetchMoreHomePosts = async () => {
+    try {
+      setHomeLoading(true);
+      const res = await blogServices.getPosts(true, homeLastDocTime);
+      let posts: any[] = [];
+
+      res.forEach((doc) => {
+        const post = doc.data();
+        posts.push({
+          ...post,
+          publishedAt: post.publishedAt
+            ? post.publishedAt.toDate().toString()
+            : '',
+        });
+      });
+
+      const lastDocTime = res.docs[res.docs.length - 1]
+        ? res.docs[res.docs.length - 1].data().publishedAt
+        : null;
+      lastDocTime && setHomeLastDocTime(lastDocTime as Timestamp);
+
+      setHomePosts((prev) => [
+        ...prev.filter((p) => !p.isDummy),
+        ...(posts as PostInt[]),
+      ]);
+    } catch (err) {
+      console.log('Home Post More fetch failed: ', err);
+      setHomePosts((prev) => [...prev.filter((p) => !p.isDummy)]);
+    } finally {
+      setHomeLoading(false);
     }
   };
 
@@ -151,12 +214,20 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     setDelAcc,
     currYear,
     setCurrYear,
+    skeletonPosts,
+    homePosts,
+    setHomePosts,
+    homeLoading,
+    setHomeLoading,
+    setHomeLastDocTime,
+    homeLastDocTime,
+    fetchMoreHomePosts,
   };
 
   // * Fetches
   useEffect(() => {
+    // *Fetches Categories
     let categ: string[];
-
     (async () => {
       const snapQuery = query(collection(db, 'categories'));
 
@@ -167,7 +238,86 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(setCateg(categ));
       });
     })();
+
+    // *Listens to any addition or removal from posts
+    const postsRef = collection(db, 'posts');
+    onSnapshot(
+      postsRef,
+      (querySnapshot) => {
+        querySnapshot.docChanges().forEach((change) => {
+          if (!delayListner.current) {
+            if (change.type === 'added') {
+              const post = change.doc.data();
+              const modPost = {
+                ...post,
+                publishedAt: post.publishedAt
+                  ? post.publishedAt.toDate().toString()
+                  : '',
+              } as PostInt;
+              setHomePosts((prev) => [modPost, ...prev]);
+            }
+            if (change.type === 'modified') {
+              const post = change.doc.data();
+              const modPost = {
+                ...post,
+                publishedAt: post.publishedAt
+                  ? post.publishedAt.toDate().toString()
+                  : '',
+              } as PostInt;
+              setHomePosts((prev) =>
+                prev.map((p) =>
+                  p.postId === modPost.postId ? { ...modPost } : p
+                )
+              );
+            }
+            if (change.type === 'removed') {
+              const post = change.doc.data();
+              setHomePosts((prev) =>
+                prev.filter((p) => !p.postId === post.postId)
+              );
+            }
+          }
+        });
+      },
+      (error) => {
+        console.log(`Home posts listener error: ${error}`);
+      }
+    );
+
+    // *Fetches initial first batch of posts
+    (async () => {
+      try {
+        const res = await blogServices.getPosts(false, null);
+        let posts: any[] = [];
+
+        res.forEach((doc) => {
+          const post = doc.data();
+          posts.push({
+            ...post,
+            publishedAt: post.publishedAt
+              ? post.publishedAt.toDate().toString()
+              : '',
+          });
+        });
+
+        const lastDocTime = res.docs[res.docs.length - 1]
+          ? res.docs[res.docs.length - 1].data().publishedAt
+          : null;
+        lastDocTime && setHomeLastDocTime(lastDocTime as Timestamp);
+
+        setHomePosts(posts as PostInt[]);
+      } catch (err) {
+        console.log('Home post inital fetch failed: ', err);
+      } finally {
+        setHomeLoading(false);
+        delayListner.current = false;
+      }
+    })();
   }, []);
+
+  useEffect(() => {
+    console.log('homePosts: ', homePosts);
+  }, [homePosts]);
 
   useEffect(() => {
     if (isUserLoggedIn && userInfo) {
@@ -202,8 +352,8 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     (async () => {
       try {
-        await new BlogServices().setTime();
-        const res = await new BlogServices().getTime();
+        await blogServices.setTime();
+        const res = await blogServices.getTime();
         const time = res.data() as any;
         setCurrYear(time.time.toDate().toString().split(' ')[3]);
       } catch (err) {
