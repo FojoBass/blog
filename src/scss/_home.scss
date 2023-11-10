@@ -54,3 +54,12 @@
     background-color: var(--bg_clr1);
   }
 }
+
+@keyframes bgAnim2 {
+  0% {
+    background-color: var(--bg_clr3);
+  }
+  50% {
+    background-color: var(--bg_clr1);
+  }
+}

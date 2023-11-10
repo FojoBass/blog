@@ -7,6 +7,7 @@ export interface AuthorInfoType {
   name: string;
   about: string;
   followersCount: FollowsInt[];
+  uid: string;
 }
 
 const AuthorInfo: React.FC<AuthorInfoType> = ({
@@ -14,11 +15,12 @@ const AuthorInfo: React.FC<AuthorInfoType> = ({
   name,
   about,
   followersCount,
+  uid,
 }) => {
   return (
     <div className='author_info_wrapper'>
       <div className='author_info_top'>
-        <Link to='/p/dummyUser' className='heading'>
+        <Link to={`/p/${uid}`} className='heading'>
           <div className='img_wrapper'>
             <img src={imgUrl} alt='' />
           </div>

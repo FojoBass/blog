@@ -61,11 +61,22 @@ interface ContextInt {
   skeletonPosts?: DummyPostsInt[];
   homePosts?: DummyPostsInt[] | PostInt[];
   setHomePosts?: Dispatch<React.SetStateAction<DummyPostsInt[] | PostInt[]>>;
+  userPosts?: DummyPostsInt[] | PostInt[];
+  setUserPosts?: Dispatch<React.SetStateAction<DummyPostsInt[] | PostInt[]>>;
   homeLoading?: boolean;
   setHomeLoading?: Dispatch<React.SetStateAction<boolean>>;
   setHomeLastDocTime?: Dispatch<React.SetStateAction<Timestamp | null>>;
+  userLastDocTime?: Timestamp | null;
+  userPostsLoading?: boolean;
+  setUserPostsLoading?: Dispatch<React.SetStateAction<boolean>>;
+  setUserLastDocTime?: Dispatch<React.SetStateAction<Timestamp | null>>;
   homeLastDocTime?: Timestamp | null;
   fetchMoreHomePosts?: () => Promise<void>;
+  fetchMoreUserPosts?: () => Promise<void>;
+  targetUserId?: string;
+  setTargetUserId?: Dispatch<React.SetStateAction<string>>;
+  authLoading?: boolean;
+  setAuthLoading?: Dispatch<React.SetStateAction<boolean>>;
 }
 
 const BlogContext = createContext<ContextInt>({});
@@ -79,10 +90,14 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [homeLastDocTime, setHomeLastDocTime] = useState<Timestamp | null>(
     null
   );
+  const [userLastDocTime, setUserLastDocTime] = useState<Timestamp | null>(
+    null
+  );
 
   const { categories } = useBlogSelector((state) => state.blog);
   const { setCateg } = blogSlice.actions;
   const randId = new ShortUniqueId({ length: 10 });
+  const [targetUserId, setTargetUserId] = useState('');
 
   const [searchString, setSearchString] = useState(''),
     [isSearch, setIsSearch] = useState(false),
@@ -98,7 +113,8 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     [aviSmallFile, setAviSmallFile] = useState<File | null>(null);
   const [isVerifyOpen, setIsVerifyOpen] = useState(true);
   const [homeLoading, setHomeLoading] = useState(true);
-  const delayListner = useRef(true);
+  const [userPostsLoading, setUserPostsLoading] = useState(true);
+  const delayListener = useRef(true);
 
   const [storageKeys] = useState({
     currUser: 'devie_current_user',
@@ -120,6 +136,9 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [homePosts, setHomePosts] = useState<DummyPostsInt[] | PostInt[]>([
     ...skeletonPosts,
   ]);
+  const [userPosts, setUserPosts] = useState<DummyPostsInt[] | PostInt[]>([
+    ...skeletonPosts,
+  ]);
 
   const [loginPersistence, setLoginPersistence] = useState(
     StorageFuncs.getStorage<boolean>('local', storageKeys.logPers) ?? false
@@ -131,6 +150,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const { setTheme } = themeSlice.actions;
 
   const blogServices = new BlogServices();
+  const [authLoading, setAuthLoading] = useState(true);
 
   const logOut = async () => {
     await blogServices.logOut();
@@ -185,6 +205,45 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const fetchMoreUserPosts = async () => {
+    try {
+      setUserPostsLoading(true);
+      const res = await blogServices.getUserPosts(
+        true,
+        userLastDocTime,
+        targetUserId,
+        true
+      );
+      let posts: any[] = [];
+
+      res.forEach((doc) => {
+        const post = doc.data();
+        posts.push({
+          ...post,
+          publishedAt: post.publishedAt
+            ? post.publishedAt.toDate().toString()
+            : '',
+          createdAt: post.createdAt ? post.createdAt.toDate().toString() : '',
+        });
+      });
+
+      const lastDocTime = res.docs[res.docs.length - 1]
+        ? res.docs[res.docs.length - 1].data().publishedAt
+        : null;
+      lastDocTime && setUserLastDocTime(lastDocTime as Timestamp);
+
+      setUserPosts((prev) => [
+        ...prev.filter((p) => !p.isDummy),
+        ...(posts as PostInt[]),
+      ]);
+    } catch (err) {
+      console.log('User Post More fetch failed: ', err);
+      setUserPosts((prev) => [...prev.filter((p) => !p.isDummy)]);
+    } finally {
+      setUserPostsLoading(false);
+    }
+  };
+
   const sharedProps: ContextInt = {
     searchString,
     setSearchString,
@@ -222,6 +281,17 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     setHomeLastDocTime,
     homeLastDocTime,
     fetchMoreHomePosts,
+    userPostsLoading,
+    setUserPostsLoading,
+    setUserLastDocTime,
+    userLastDocTime,
+    fetchMoreUserPosts,
+    targetUserId,
+    setTargetUserId,
+    userPosts,
+    setUserPosts,
+    authLoading,
+    setAuthLoading,
   };
 
   // * Fetches
@@ -245,7 +315,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
       postsRef,
       (querySnapshot) => {
         querySnapshot.docChanges().forEach((change) => {
-          if (!delayListner.current) {
+          if (!delayListener.current) {
             if (change.type === 'added') {
               const post = change.doc.data();
               const modPost = {
@@ -297,6 +367,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
             publishedAt: post.publishedAt
               ? post.publishedAt.toDate().toString()
               : '',
+            createdAt: post.createdAt ? post.createdAt.toDate().toString() : '',
           });
         });
 
@@ -310,14 +381,14 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log('Home post inital fetch failed: ', err);
       } finally {
         setHomeLoading(false);
-        delayListner.current = false;
+        delayListener.current = false;
       }
     })();
   }, []);
 
-  useEffect(() => {
-    console.log('homePosts: ', homePosts);
-  }, [homePosts]);
+  // useEffect(() => {
+  //   console.log('homePosts: ', homePosts);
+  // }, [homePosts]);
 
   useEffect(() => {
     if (isUserLoggedIn && userInfo) {

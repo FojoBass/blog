@@ -5,7 +5,7 @@ const Contact = () => {
   const [mail, setMail] = useState('');
   const [msg, setMsg] = useState('');
   return (
-    <section id='contact_sect'>
+    <section id='contact_sect' className='gen_sect'>
       <div className='center_sect'>
         <h2 className='contact_heading'>Contact Us</h2>
 

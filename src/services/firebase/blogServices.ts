@@ -32,6 +32,7 @@ import {
   limit,
   startAfter,
   getDocs,
+  where,
 } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
 import { PostInt, UpdateDataInt, UserInfoInt } from '../../types';
@@ -91,6 +92,11 @@ export class BlogServices {
     return updateDoc(docRef, { ...data });
   }
 
+  getUserInfo(userId: string) {
+    const docRef = doc(db, `users/${userId}`);
+    return getDoc(docRef);
+  }
+
   delUserInfo(uid: string) {
     const docRef = doc(db, `users/${uid}`);
     return deleteDoc(docRef);
@@ -124,8 +130,40 @@ export class BlogServices {
     return getDocs(q);
   }
 
-  getUserPosts(isMore: boolean, lastDocTime: Timestamp | null, userId: string) {
-    // const q = isMore ? query(collection(db, `users/${userId}/drafts`), orderBy(''))
+  getUserPosts(
+    isMore: boolean,
+    lastDocTime: Timestamp | null,
+    userId: string,
+    isPubOnly: boolean
+  ) {
+    const q = isPubOnly
+      ? isMore
+        ? query(
+            collection(db, `posts`),
+            where('uid', '==', userId),
+            orderBy('publishedAt', 'desc'),
+            startAfter(lastDocTime),
+            limit(3)
+          )
+        : query(
+            collection(db, `posts`),
+            where('uid', '==', userId),
+            orderBy('publishedAt', 'desc'),
+            limit(3)
+          )
+      : isMore
+      ? query(
+          collection(db, `users/${userId}/posts`),
+          orderBy('createdAt', 'desc'),
+          startAfter(lastDocTime),
+          limit(3)
+        )
+      : query(
+          collection(db, `users/${userId}/posts`),
+          orderBy('createdAt', 'desc'),
+          limit(3)
+        );
+    return getDocs(q);
   }
 
   setTime() {

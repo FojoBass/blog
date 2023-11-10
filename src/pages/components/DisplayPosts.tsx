@@ -10,8 +10,15 @@ interface PropInt {
 }
 
 const DisplayPosts: React.FC<PropInt> = ({ posts, target }) => {
-  const { homeLoading, setHomePosts, skeletonPosts, fetchMoreHomePosts } =
-    useGlobalContext();
+  const {
+    homeLoading,
+    setHomePosts,
+    setUserPosts,
+    skeletonPosts,
+    fetchMoreHomePosts,
+    userPostsLoading,
+    fetchMoreUserPosts,
+  } = useGlobalContext();
 
   const handleLoadMore = () => {
     switch (target) {
@@ -22,7 +29,10 @@ const DisplayPosts: React.FC<PropInt> = ({ posts, target }) => {
         fetchMoreHomePosts && fetchMoreHomePosts();
         break;
       case 'profile':
-        console.log('Handle More for profile');
+        skeletonPosts &&
+          setUserPosts &&
+          setUserPosts((prev) => [...prev, ...skeletonPosts]);
+        fetchMoreUserPosts && fetchMoreUserPosts();
         break;
       case 'search':
         console.log('Handle More for search');
@@ -52,16 +62,33 @@ const DisplayPosts: React.FC<PropInt> = ({ posts, target }) => {
             id={post.postId}
             followersCount={(post as PostInt).followers}
             aboutPoster={(post as PostInt).bio}
+            uid={(post as PostInt).uid}
           />
         )
       )}
 
       <button
-        className={`load_more_btn ${homeLoading ? 'disable' : ''}`}
-        disabled={homeLoading}
+        className={`load_more_btn ${
+          target === 'home' && homeLoading
+            ? 'disable'
+            : target === 'profile' && userPostsLoading
+            ? 'disable'
+            : ''
+        }`}
+        disabled={
+          target === 'home' && homeLoading
+            ? true
+            : target === 'profile' && userPostsLoading
+            ? true
+            : false
+        }
         onClick={handleLoadMore}
       >
-        {homeLoading ? 'Loading...' : 'Load more'}
+        {target === 'home' && homeLoading
+          ? 'Loading...'
+          : target === 'profile' && userPostsLoading
+          ? 'Loading...'
+          : 'Load more'}
       </button>
     </main>
   ) : (

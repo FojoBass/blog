@@ -82,7 +82,7 @@ const Post = () => {
     },
   ];
   return (
-    <section id='single_post_sect'>
+    <section id='single_post_sect' className='gen_sect'>
       <div className='center_sect'>
         <aside className='left_side'>
           <Interactions type='like' count={5} />

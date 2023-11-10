@@ -66,7 +66,7 @@ const App = () => {
   ]);
 
   const { setUserInfo, setIsUserLoggedIn, setNoUserInfo } = userSlice.actions;
-  const { storageKeys, loginPersistence } = useGlobalContext();
+  const { storageKeys, loginPersistence, setAuthLoading } = useGlobalContext();
 
   const handleTabAdd = (e: KeyboardEvent) => {
     if (e.key === 'Tab' && !tabStatus) {
@@ -86,7 +86,7 @@ const App = () => {
         <Route index element={<Home />} />
         <Route path='/know-us' element={<About />} />
         <Route path='/meet-us' element={<Contact />} />
-        <Route path='/:username/dashboard' element={<Dashboard />}>
+        <Route path='/:uid/dashboard' element={<Dashboard />}>
           <Route path='posts' element={<Posts />} />
           <Route
             path='followers'
@@ -107,9 +107,9 @@ const App = () => {
         </Route>
         <Route path='/new-post' element={<NewPost />} />
         <Route path='/notifications' element={<Notification />} />
-        <Route path='/:username/:postId' element={<Post />} />
+        <Route path='/:uid/:postId' element={<Post />} />
         <Route
-          path='/p/:username'
+          path='/p/:uid'
           element={<Profile />}
           errorElement={<Error type='profile' />}
         />
@@ -118,11 +118,6 @@ const App = () => {
       </Route>
     )
   );
-
-  useEffect(() => {
-    console.log('User Posts: ', userPosts);
-    // console.log('Pub Posts: ', pubPosts);
-  }, [userPosts]);
 
   useEffect(() => {
     if (document.documentElement.classList.contains('light')) {
@@ -157,8 +152,7 @@ const App = () => {
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log(user.uid);
-
+        // console.log(user.uid);
         // * User log in variable is false, and there is userInfo
         if (
           !isUserLoggedIn &&
@@ -181,6 +175,7 @@ const App = () => {
       } else {
         console.log('signed out');
       }
+      setAuthLoading && setAuthLoading(false);
     });
   }, [storageKeys, loginPersistence]);
 

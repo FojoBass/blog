@@ -9,7 +9,7 @@ const Notification = () => {
   useEffect(() => {
     if (!isUserLoggedIn) navigate('/enter', { replace: true });
   }, [isUserLoggedIn]);
-  return <>{isUserLoggedIn && <div>Notification</div>}</>;
+  return <>{isUserLoggedIn && <div className='gen_sect'>Notification</div>}</>;
 };
 
 export default Notification;

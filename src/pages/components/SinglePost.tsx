@@ -17,6 +17,7 @@ export interface SinglePostProps {
   id: string;
   followersCount: FollowsInt[];
   aboutPoster: string;
+  uid: string;
 }
 
 const SinglePost: React.FC<SinglePostProps> = ({
@@ -30,6 +31,7 @@ const SinglePost: React.FC<SinglePostProps> = ({
   id,
   followersCount,
   aboutPoster,
+  uid,
 }) => {
   const [isUser, setIsUser] = useState(false);
   const [modDate] = useState({
@@ -42,10 +44,10 @@ const SinglePost: React.FC<SinglePostProps> = ({
       <div className='post_wrapper'>
         <div className='top'>
           <div className='top_child'>
-            <Link className='img_wrapper' to='/p/dummyUser'>
+            <Link className='img_wrapper' to={`/p/${uid}`}>
               <img src={avi} alt='' />
             </Link>
-            <Link to='/p/dummyUser' className='author_name'>
+            <Link to={`/p/${uid}`} className='author_name'>
               {posterName}
             </Link>
             <AuthorInfo
@@ -53,12 +55,13 @@ const SinglePost: React.FC<SinglePostProps> = ({
               name={posterName}
               about={aboutPoster}
               followersCount={followersCount}
+              uid={uid}
             />
           </div>
         </div>
 
         <div className='mid'>
-          <Link to='/dummyUser/dummyPost' className='title'>
+          <Link to={`/${uid}/${id}`} className='title'>
             {title}
           </Link>
           <p className='detail'>{detail}</p>
@@ -85,7 +88,7 @@ const SinglePost: React.FC<SinglePostProps> = ({
           )}
         </div>
       </div>
-      <Link to='/dummyUser/dummyPost' className='img_wrapper'>
+      <Link to={`/${uid}/${id}`} className='img_wrapper'>
         <img src={postImgUrl} alt='' />
       </Link>
     </article>

@@ -5,7 +5,7 @@ import { team } from '../data';
 
 const About = () => {
   return (
-    <section id='about_sect'>
+    <section id='about_sect' className='gen_sect'>
       <div className='center_sect'>
         <h2 className='about_heading'>About us</h2>
 

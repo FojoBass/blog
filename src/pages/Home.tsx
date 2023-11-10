@@ -47,7 +47,7 @@ const Home = () => {
     setModHomePost(modPosts);
   }, [homePosts]);
   return (
-    <section id='home_sect'>
+    <section id='home_sect' className='gen_sect'>
       <div className='center_sect home_wrapper'>
         <aside className='left_side' ref={asideRef}>
           {!isUserLoggedIn ? (

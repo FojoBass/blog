@@ -18,7 +18,7 @@ export interface PostInt {
   bookmarks: string[];
   commentsCount: number;
   publishedAt?: FieldValue | string;
-  createdAt?: FieldValue | string;
+  createdAt: FieldValue | string;
   selCategs?: string[];
   desc?: string;
   author: string;

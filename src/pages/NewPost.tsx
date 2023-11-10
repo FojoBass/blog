@@ -367,6 +367,7 @@ const NewPost = () => {
             bookmarks: [],
             commentsCount: 0,
             publishedAt: serverTimestamp(),
+            createdAt: serverTimestamp(),
             selCategs,
             desc,
             author: userInfo?.userName ?? '',

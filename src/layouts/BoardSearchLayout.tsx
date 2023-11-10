@@ -85,7 +85,7 @@ const BoardSearchLayout: FC<BSLInt> = ({
   }, [searchParams, isSettings]);
 
   return (
-    <section id='bsl_sect' className={className ? className : ''}>
+    <section id='bsl_sect' className={`gen_sect ${className ? className : ''}`}>
       <div className={`center_sect ${modClass ? modClass : ''}`}>
         <header className='bsl_header'>
           <h1 style={{ textTransform: 'capitalize' }}>{heading}</h1>
