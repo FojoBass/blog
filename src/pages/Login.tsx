@@ -22,8 +22,7 @@ import { BlogServices } from '../services/firebase/blogServices';
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const inputRef = useRef<Array<HTMLInputElement | null>>([]);
-  const { setIsSignedUp, resetAuthError, resetIsJustLoggedIn } =
-    userSlice.actions;
+  const { setIsSignedUp, setAuthError, setIsJustLoggedIn } = userSlice.actions;
   const { isSignedUp, isLogInLoading, isJustLoggedIn, signInError } =
     useBlogSelector((state) => state.user);
   const dispatch = useBlogDispatch();
@@ -108,19 +107,19 @@ const Login = () => {
     if (signInError.includes('user-not-found') && isForgot)
       toast.error('User not found');
     else if (signInError && isForgot) toast.error('Failed! Please retry');
-    dispatch(resetAuthError());
+    dispatch(setAuthError(''));
   }, [signInError, isForgot]);
 
   useEffect(() => {
     if (isJustLoggedIn && !isForgot) {
       navigate('/');
-      dispatch(resetIsJustLoggedIn());
+      dispatch(setIsJustLoggedIn(false));
     } else if (isJustLoggedIn && isForgot) {
       toast.success('Reset link sent to mail');
       setIsForgot(false);
       setEmail('');
       setPword('');
-      dispatch(resetIsJustLoggedIn());
+      dispatch(setIsJustLoggedIn(false));
     }
   }, [isJustLoggedIn, isForgot]);
 

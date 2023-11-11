@@ -6,7 +6,9 @@ import { SkeletonLoad, SinglePost, DisplayPosts } from './components';
 import { useGlobalContext } from '../context';
 import { v4 } from 'uuid';
 import { DummyPostsInt, PostInt } from '../types';
-import { useBlogSelector } from '../app/store';
+import { useBlogDispatch, useBlogSelector } from '../app/store';
+import { userSlice } from '../features/userSlice';
+import { toast } from 'react-toastify';
 
 export interface HandleStickInt {
   (el: HTMLDivElement, stick: boolean, posValue?: number): void;
@@ -17,10 +19,13 @@ export interface HandleStickInt {
 const Home = () => {
   const asideRef = useRef<HTMLDivElement>(null);
   const { setSearchString, homePosts } = useGlobalContext();
-  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
+  const { isUserLoggedIn, isSignedUp } = useBlogSelector((state) => state.user);
+  const { setIsSignedUp } = userSlice.actions;
   const [modHomePost, setModHomePost] = useState<PostInt[] | DummyPostsInt[]>(
     []
   );
+
+  const dispatch = useBlogDispatch();
 
   useEffect(() => {
     if (setSearchString) setSearchString('');
@@ -46,6 +51,14 @@ const Home = () => {
     }
     setModHomePost(modPosts);
   }, [homePosts]);
+
+  useEffect(() => {
+    if (isSignedUp) {
+      toast.success('Signup successful', { toastId: 'signup_success' });
+      dispatch(setIsSignedUp(false));
+    }
+  }, [isSignedUp]);
+
   return (
     <section id='home_sect' className='gen_sect'>
       <div className='center_sect home_wrapper'>

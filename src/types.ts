@@ -28,6 +28,20 @@ export interface PostInt {
   bio: string;
 }
 
+export interface UpdatePostInt {
+  post?: string;
+  bannerUrl?: string;
+  isPublished?: boolean;
+  comments?: CommentInt[];
+  likes?: string[];
+  bookmarks?: string[];
+  commentsCount?: number;
+  selCategs?: string[];
+  desc?: string;
+  aviUrl?: string;
+  title?: string;
+}
+
 export interface CommentInt {
   aviUrl: string;
   name: string;
@@ -77,13 +91,13 @@ export interface FormDataInt {
 }
 
 export interface UpdateDataInt {
-  fullName: string;
-  userName: string;
-  country: CountryInt;
-  state: string;
-  bio: string;
-  gender: string;
-  socials: {
+  fullName?: string;
+  userName?: string;
+  country?: CountryInt;
+  state?: string;
+  bio?: string;
+  gender?: string;
+  socials?: {
     git: string;
     X: string;
     fb: string;
@@ -91,12 +105,13 @@ export interface UpdateDataInt {
     be: string;
     url: string;
   };
-  userColor: string;
-  dispEmail: boolean;
+  userColor?: string;
+  dispEmail?: boolean;
   aviUrls?: {
     bigAviUrl: string;
     smallAviUrl: string;
   };
+  postCount?: number;
 }
 
 export interface UserInfoInt extends FormDataInt {

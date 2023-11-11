@@ -108,11 +108,7 @@ const App = () => {
         <Route path='/new-post' element={<NewPost />} />
         <Route path='/notifications' element={<Notification />} />
         <Route path='/:uid/:postId' element={<Post />} />
-        <Route
-          path='/p/:uid'
-          element={<Profile />}
-          errorElement={<Error type='profile' />}
-        />
+        <Route path='/p/:uid' element={<Profile />} />
         <Route path='/categories/:category' element={<CategoryPosts />} />
         <Route path='/search' element={<Search />} />
       </Route>
@@ -170,10 +166,10 @@ const App = () => {
           dispatch(setIsUserLoggedIn(true));
         }
 
-        console.log('signed in: ');
+        // console.log('signed in: ');
         // console.log('signed in: ', user);
       } else {
-        console.log('signed out');
+        // console.log('signed out');
       }
       setAuthLoading && setAuthLoading(false);
     });
@@ -198,6 +194,7 @@ const Root = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
   return (
     <>
       <Navbar />

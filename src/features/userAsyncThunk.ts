@@ -31,7 +31,11 @@ export const userSignUp = createAsyncThunk<void, UserSignUpPayloadInt>(
   async (payload, thunkApi) => {
     const uploadImg = (file: File, isBig: boolean): Promise<string> => {
       return new Promise<string>((resolve, reject) => {
-        const uploadTask = new BlogServices().uplaodAviImg(uid, isBig, file);
+        const uploadTask = new BlogServices().uplaodAviImg(
+          uid ? uid : auth.currentUser!.uid,
+          isBig,
+          file
+        );
         uploadTask.on(
           'state_changed',
           (snapshot) => {},
@@ -88,7 +92,7 @@ export const userSignIn = createAsyncThunk<
   const { email, password } = payload;
   try {
     await blogServices.signIn(email, password);
-    thunkApi.dispatch(getUserInfo({ email }));
+    // thunkApi.dispatch(getUserInfo({ email }));
   } catch (error) {
     return thunkApi.rejectWithValue(`Signin failed: ${error}`);
   }
@@ -102,7 +106,7 @@ export const userGitSignIn = createAsyncThunk<void, void>(
       console.log('Start git auth');
       const res = await blogServices.signInGit();
       console.log('End git auth');
-      thunkApi.dispatch(getUserInfo({ email: res.user.email ?? '' }));
+      // thunkApi.dispatch(getUserInfo({ email: res.user.email ?? '' }));
     } catch (error) {
       return thunkApi.rejectWithValue(`Signin failed: ${error}`);
     }
@@ -115,7 +119,7 @@ export const userGooSignIn = createAsyncThunk<void, void>(
   async (payload, thunkApi) => {
     try {
       const res = await blogServices.signInGoo();
-      thunkApi.dispatch(getUserInfo({ email: res.user.email ?? '' }));
+      // thunkApi.dispatch(getUserInfo({ email: res.user.email ?? '' }));
     } catch (error) {
       return thunkApi.rejectWithValue(`Signin failed: ${error}`);
     }
@@ -123,41 +127,43 @@ export const userGooSignIn = createAsyncThunk<void, void>(
 );
 
 // * Get User info
-export const getUserInfo = createAsyncThunk<void, { email: string }>(
-  'user/getUserInfo',
-  async (payload, thunkApi) => {
-    const { email } = payload;
-    let userInfo;
+// export const getUserInfo = createAsyncThunk<void, { email: string }>(
+//   'user/getUserInfo',
+//   async (payload, thunkApi) => {
+//     const { email } = payload;
+//     let userInfo;
 
-    const { setUserInfo, setNoUserInfo } = userSlice.actions;
+//     const { setUserInfo, setNoUserInfo } = userSlice.actions;
 
-    try {
-      const snapQuery = query(
-        collection(db, 'users'),
-        where('email', '==', email)
-      );
+//     try {
+//       const snapQuery = query(
+//         collection(db, 'users'),
+//         where('email', '==', email)
+//       );
 
-      onSnapshot(snapQuery, (querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          userInfo = doc.data() ?? null;
+//       onSnapshot(snapQuery, (querySnapshot) => {
+//         console.log('USERINFO SNAP FIRED');
 
-          thunkApi.dispatch(
-            setUserInfo({
-              ...userInfo,
-              createdAt: userInfo.createdAt
-                ? userInfo.createdAt.toDate().toString()
-                : '',
-            })
-          );
-        });
+//         querySnapshot.forEach((doc) => {
+//           userInfo = doc.data() ?? null;
 
-        !querySnapshot.size && thunkApi.dispatch(setNoUserInfo(true));
-      });
-    } catch (error) {
-      return thunkApi.rejectWithValue(`Get user info ${error}`);
-    }
-  }
-);
+//           thunkApi.dispatch(
+//             setUserInfo({
+//               ...userInfo,
+//               createdAt: userInfo.createdAt
+//                 ? userInfo.createdAt.toDate().toString()
+//                 : '',
+//             })
+//           );
+//         });
+
+//         !querySnapshot.size && thunkApi.dispatch(setNoUserInfo(true));
+//       });
+//     } catch (error) {
+//       return thunkApi.rejectWithValue(`Get user info ${error}`);
+//     }
+//   }
+// );
 
 // *Forgot Password
 export const forgotPword = createAsyncThunk<void, { email: string }>(

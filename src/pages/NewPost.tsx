@@ -288,7 +288,7 @@ const NewPost = () => {
 
   const uploadImg = (isBanner: boolean, file: File) => {
     if (!isPostImgReady) setIsUploadingBannerImg(true);
-    setIsUploadingImg(true);
+    else setIsUploadingImg(true);
 
     const uploadTask = new BlogServices().uploadBannerPostImg(
       auth.currentUser?.uid ?? '',
@@ -417,17 +417,6 @@ const NewPost = () => {
     }
 
     if (uploadingSucceed && dataPost) {
-      // ! No need for manual additoin of posts to pubPosts, since a listener will be set, and homePost will be updated
-      // isPubClicked &&
-      //   dispatch(
-      //     setPosts({
-      //       type: 'pub',
-      //       posts: [
-      //         ...pubPosts,
-      //         { ...dataPost, publishedAt: new Date().toString() },
-      //       ],
-      //     })
-      //   );
       dispatch(
         setPosts([
           ...userPosts,
@@ -698,20 +687,26 @@ const NewPost = () => {
               <>
                 <div className='left_side'>
                   <button
-                    className='publish_btn spc_btn'
+                    className={`publish_btn spc_btn ${
+                      isUploadingBannerImg || isUploadingImg ? 'disable' : ''
+                    }`}
                     onClick={() => {
                       setIsPubClicked(true);
                       setIsModalOpen(true);
                     }}
+                    disabled={isUploadingBannerImg || isUploadingImg}
                   >
                     Publish
                   </button>
                   <button
-                    className='save_btn'
+                    className={`save_btn ${
+                      isUploadingBannerImg || isUploadingImg ? 'disable' : ''
+                    }`}
                     onClick={() => {
                       setIsPubClicked(false);
                       handlePost(OpEnum.sav);
                     }}
+                    disabled={isUploadingBannerImg || isUploadingImg}
                   >
                     Save
                   </button>
@@ -798,7 +793,12 @@ const PubModal: React.FC<PubModalInt> = ({
     <section className={`pub_modal ${!isModalOpen ? 'hide' : ''}`}>
       <div className='opts_wrapper'>
         <div className='opt_wrapper'>
-          <h3>Select Category</h3>
+          <h3>
+            Select Category{' '}
+            <button className='close_btn' onClick={() => setIsModalOpen(false)}>
+              <FaTimes />
+            </button>
+          </h3>
 
           <div className='check_wrapper'>
             {categories.map((categ, index) => (

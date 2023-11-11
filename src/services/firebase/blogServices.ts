@@ -35,7 +35,12 @@ import {
   where,
 } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
-import { PostInt, UpdateDataInt, UserInfoInt } from '../../types';
+import {
+  PostInt,
+  UpdateDataInt,
+  UpdatePostInt,
+  UserInfoInt,
+} from '../../types';
 
 const uidLong = new ShortUniqueId({ length: 10 });
 const uidShort = new ShortUniqueId({ length: 7 });
@@ -89,6 +94,8 @@ export class BlogServices {
 
   updateUserInfo(data: UpdateDataInt) {
     const docRef = doc(db, `users/${auth.currentUser?.uid}`);
+    console.log('Update called: ', data);
+
     return updateDoc(docRef, { ...data });
   }
 
@@ -109,7 +116,7 @@ export class BlogServices {
 
   addUserPosts(data: PostInt) {
     const docRef = doc(db, `users/${data.uid}/posts/${data.postId}`);
-    console.log('data: ', data);
+    // console.log('data: ', data);
 
     return setDoc(docRef, data);
   }
@@ -164,6 +171,13 @@ export class BlogServices {
           limit(3)
         );
     return getDocs(q);
+  }
+
+  updatePost(data: UpdatePostInt, postId: string, isPub: boolean, uid: string) {
+    const docRef = isPub
+      ? doc(db, `posts/${postId}`)
+      : doc(db, `users/${uid}/posts/${postId}`);
+    return updateDoc(docRef, { ...data });
   }
 
   setTime() {

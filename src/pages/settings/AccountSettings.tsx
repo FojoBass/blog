@@ -13,8 +13,7 @@ const AccountSettings = () => {
   const [userName, setUserName] = useState('');
   const { userInfo, isLogInLoading, isJustLoggedIn, signInError } =
     useBlogSelector((state) => state.user);
-  const { resetIsJustLoggedIn, resetAuthError, setNoUserInfo } =
-    userSlice.actions;
+  const { setIsJustLoggedIn, setAuthError, setNoUserInfo } = userSlice.actions;
   const dispatch = useBlogDispatch();
   const [click, setClick] = useState(false);
   const blogServices = new BlogServices();
@@ -58,12 +57,12 @@ const AccountSettings = () => {
   useEffect(() => {
     if (isJustLoggedIn) {
       toast.success('Reset link sent to mail');
-      dispatch(resetIsJustLoggedIn());
+      dispatch(setIsJustLoggedIn(false));
     }
 
     if (signInError) {
       toast.error('Failed! Please retry');
-      dispatch(resetAuthError());
+      dispatch(setAuthError(''));
     }
   }, [isJustLoggedIn, signInError]);
 

@@ -1,8 +1,23 @@
 $padding: 10px;
 
+.empty_info {
+  @include position(absolute, left, top, 50%, 50%);
+  text-align: center;
+
+  span {
+    font-size: 5rem;
+    color: $dlt_clr;
+  }
+
+  h3 {
+    font-size: 3rem;
+    font-family: $fnt_spc1;
+    color: var(--txt_clr1);
+  }
+}
+
 .head_overlay {
   height: 120px;
-  // z-index: -1;
 }
 
 .profile_wrapper {

@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
   forgotPword,
-  getUserInfo,
   userGitSignIn,
   userGooSignIn,
   userSignIn,
@@ -19,6 +18,7 @@ interface InitialStateInt {
   isLogInLoading: boolean;
   signInError: string;
   noUserInfo: boolean;
+  isSuccessLogin: boolean;
 }
 
 const initialState: InitialStateInt = {
@@ -31,6 +31,7 @@ const initialState: InitialStateInt = {
   isLogInLoading: false,
   signInError: '',
   noUserInfo: false,
+  isSuccessLogin: false,
 };
 
 export const userSlice = createSlice({
@@ -46,14 +47,20 @@ export const userSlice = createSlice({
     setUserInfo(state, action) {
       state.userInfo = action.payload as UserInfoInt;
     },
-    resetAuthError(state) {
-      state.signInError = '';
+    setAuthError(state, action) {
+      state.signInError = action.payload;
     },
-    resetIsJustLoggedIn(state) {
-      state.isJustLoggedIn = false;
+    setIsJustLoggedIn(state, action) {
+      state.isJustLoggedIn = action.payload;
     },
     setNoUserInfo(state, action) {
       state.noUserInfo = action.payload;
+    },
+    resetIsSuccessLogin(state) {
+      state.isSuccessLogin = false;
+    },
+    resetIsLogInLoading(state) {
+      state.isLogInLoading = false;
     },
     // setUserInfoLoading(state, action) {
     //   state.userInfoLoading = action.payload;
@@ -87,54 +94,47 @@ export const userSlice = createSlice({
         state.isLogInLoading = false;
         state.signInError = error.payload as string;
       });
-    // *Get Userinfo
-    // builder
-    //   .addCase(getUserInfo.pending, (state) => {
-    //     state.userInfoLoading = true;
-    //   })
-    //   .addCase(getUserInfo.fulfilled, (state, action) => {
-    //     state.isUserLoggedIn = true;
-    //     state.userInfoLoading = false;
-    //   })
-    //   .addCase(getUserInfo.rejected, (state, error) => {
-    //     state.userInfoLoading = false;
-    //     console.log(error);
-    //   });
+
     // *Sign in
+    // ?Email
     builder
       .addCase(userSignIn.pending, (state) => {
         state.isLogInLoading = true;
       })
       .addCase(userSignIn.fulfilled, (state, action) => {
-        state.isLogInLoading = false;
-        state.isUserLoggedIn = true;
-        state.isJustLoggedIn = true;
+        state.isSuccessLogin = true;
       })
       .addCase(userSignIn.rejected, (state, error) => {
         state.isLogInLoading = false;
         state.signInError = error.payload as string;
       });
+
+    // ?Git
     builder
       .addCase(userGitSignIn.pending, (state) => {
         state.isLogInLoading = true;
       })
       .addCase(userGitSignIn.fulfilled, (state, action) => {
-        state.isLogInLoading = false;
-        state.isUserLoggedIn = true;
-        state.isJustLoggedIn = true;
+        state.isSuccessLogin = true;
+        // state.isLogInLoading = false;
+        // state.isUserLoggedIn = true;
+        // state.isJustLoggedIn = true;
       })
       .addCase(userGitSignIn.rejected, (state, error) => {
         state.isLogInLoading = false;
         state.signInError = error.payload as string;
       });
+
+    // ?Gooogle
     builder
       .addCase(userGooSignIn.pending, (state) => {
         state.isLogInLoading = true;
       })
       .addCase(userGooSignIn.fulfilled, (state, action) => {
-        state.isLogInLoading = false;
-        state.isUserLoggedIn = true;
-        state.isJustLoggedIn = true;
+        state.isSuccessLogin = true;
+        // state.isLogInLoading = false;
+        // state.isUserLoggedIn = true;
+        // state.isJustLoggedIn = true;
       })
       .addCase(userGooSignIn.rejected, (state, error) => {
         state.isLogInLoading = false;

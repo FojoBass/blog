@@ -231,6 +231,18 @@ $maxWidth: 820px;
         font-family: $fnt_hdg1;
         font-size: $txt_size2;
         color: var(--txt_clr1);
+        position: relative;
+
+        .close_btn {
+          @include navBtnsGen;
+          font-size: 2.1rem;
+          margin-right: 0;
+          @include position(absolute, right, top, 0px, 50%);
+
+          &:hover {
+            @include navHover;
+          }
+        }
       }
 
       .check_wrapper {

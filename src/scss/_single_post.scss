@@ -111,6 +111,7 @@
     img {
       object-fit: cover;
       transition: all ease-out $fmid_trans;
+      border-radius: 5px;
     }
   }
 }

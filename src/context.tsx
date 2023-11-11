@@ -18,7 +18,13 @@ import { userSlice } from './features/userSlice';
 import { themeSlice } from './features/themeSlice';
 import { BlogServices } from './services/firebase/blogServices';
 import { blogSlice } from './features/blogSlice';
-import { Timestamp, collection, onSnapshot, query } from 'firebase/firestore';
+import {
+  Timestamp,
+  collection,
+  onSnapshot,
+  query,
+  where,
+} from 'firebase/firestore';
 import { CategoryPosts } from './pages';
 import ShortUniqueId from 'short-unique-id';
 // import { getPosts } from './features/blogAsyncThunk';
@@ -84,9 +90,8 @@ const BlogContext = createContext<ContextInt>({});
 export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { userInfo, noUserInfo, isUserLoggedIn } = useBlogSelector(
-    (state) => state.user
-  );
+  const { userInfo, noUserInfo, isUserLoggedIn, isSuccessLogin } =
+    useBlogSelector((state) => state.user);
   const [homeLastDocTime, setHomeLastDocTime] = useState<Timestamp | null>(
     null
   );
@@ -115,6 +120,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [homeLoading, setHomeLoading] = useState(true);
   const [userPostsLoading, setUserPostsLoading] = useState(true);
   const delayListener = useRef(true);
+  const isInitial = useRef(true);
 
   const [storageKeys] = useState({
     currUser: 'devie_current_user',
@@ -146,7 +152,15 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const dispatch = useBlogDispatch();
 
-  const { setNoUserInfo, setIsUserLoggedIn } = userSlice.actions;
+  const {
+    setNoUserInfo,
+    setIsUserLoggedIn,
+    resetIsSuccessLogin,
+    setIsJustLoggedIn,
+    resetIsLogInLoading,
+    setAuthError,
+    setUserInfo,
+  } = userSlice.actions;
   const { setTheme } = themeSlice.actions;
 
   const blogServices = new BlogServices();
@@ -155,6 +169,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const logOut = async () => {
     await blogServices.logOut();
     dispatch(setIsUserLoggedIn(false));
+    isInitial.current = true;
 
     if (storageKeys) {
       !loginPersistence &&
@@ -386,9 +401,55 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     })();
   }, []);
 
-  // useEffect(() => {
-  //   console.log('homePosts: ', homePosts);
-  // }, [homePosts]);
+  useEffect(() => {
+    // *Get UserInfo on login
+
+    if (isSuccessLogin) {
+      const email = auth.currentUser?.email ?? '';
+      let userInfo;
+
+      (async () => {
+        try {
+          const snapQuery = query(
+            collection(db, 'users'),
+            where('email', '==', email)
+          );
+
+          onSnapshot(snapQuery, (querySnapshot) => {
+            console.log('USERINFO SNAP FIRED');
+
+            querySnapshot.forEach((doc) => {
+              userInfo = doc.data() ?? null;
+
+              dispatch(
+                setUserInfo({
+                  ...userInfo,
+                  createdAt: userInfo.createdAt
+                    ? userInfo.createdAt.toDate().toString()
+                    : '',
+                })
+              );
+            });
+
+            if (isInitial.current) {
+              dispatch(setIsUserLoggedIn(true));
+              dispatch(setIsJustLoggedIn(true));
+              isInitial.current = false;
+            }
+
+            !querySnapshot.size && dispatch(setNoUserInfo(true));
+          });
+        } catch (error) {
+          await blogServices.logOut();
+          setAuthError(error);
+          console.log(`Get user info ${error}`);
+        } finally {
+          dispatch(resetIsLogInLoading());
+          dispatch(resetIsSuccessLogin());
+        }
+      })();
+    }
+  }, [isSuccessLogin, auth.currentUser]);
 
   useEffect(() => {
     if (isUserLoggedIn && userInfo) {

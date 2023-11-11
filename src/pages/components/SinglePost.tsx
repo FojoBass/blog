@@ -1,10 +1,13 @@
 // todo Check profile to enable/disable bookmarks
 // todo Functionality to ensure bookmark icons change based on bookmarked status
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AuthorInfo from './AuthorInfo';
-import { CiBookmarkPlus } from 'react-icons/ci';
+import { BsBookmarkPlus, BsBookmarkDashFill } from 'react-icons/bs';
 import { FollowsInt } from '../../types';
+import { useBlogSelector } from '../../app/store';
+import { BlogServices } from '../../services/firebase/blogServices';
+import { toast } from 'react-toastify';
 
 export interface SinglePostProps {
   posterName: string;
@@ -18,6 +21,7 @@ export interface SinglePostProps {
   followersCount: FollowsInt[];
   aboutPoster: string;
   uid: string;
+  bookmarks: string[];
 }
 
 const SinglePost: React.FC<SinglePostProps> = ({
@@ -32,6 +36,7 @@ const SinglePost: React.FC<SinglePostProps> = ({
   followersCount,
   aboutPoster,
   uid,
+  bookmarks,
 }) => {
   const [isUser, setIsUser] = useState(false);
   const [modDate] = useState({
@@ -39,6 +44,42 @@ const SinglePost: React.FC<SinglePostProps> = ({
     month: date.split(' ')[1],
     year: date.split(' ')[3],
   });
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isBkmLoading, setIsBkmLoading] = useState(false);
+
+  const { userInfo } = useBlogSelector((state) => state.user);
+  const blogServices = new BlogServices();
+
+  const handleAddBk = async () => {
+    const bkmList = [...bookmarks];
+    if (!bkmList.find((bm) => bm === userInfo?.uid)) {
+      bkmList.push(userInfo?.uid ?? '');
+      try {
+        setIsBkmLoading(true);
+        await blogServices.updatePost({ bookmarks: bkmList }, id, true, uid);
+        await blogServices.updatePost({ bookmarks: bkmList }, id, false, uid);
+      } catch (error) {
+        toast.error('Bookmarking failed');
+        console.log('Bookmark add error: ', error);
+      } finally {
+        setIsBkmLoading(false);
+      }
+    }
+  };
+
+  const handleRemoveBk = () => {
+    console.log('Remove Bookmark');
+    // TODO THIS NEEDS ITS CODES
+    // TODO FOR SOME REASONS, BOOKMARKS ALSO GET LOCALLY UPDATED. CHECK homePosts PRE AND POST BOOKMARK TO ENUSRE IT IS CONSISTENT.
+    // TODO ALSO, FIX UP FOLLOWERS IN POST DATA. COME UP WITH THE MOST EFFICIENT WAY OF ACCESSING FOLLOWERS IN USERINFO FROM POST
+    // TODO BE GOOD FUTURE ME 🤗🤗
+  };
+
+  useEffect(() => {
+    if (uid === userInfo?.uid) setIsUser(true);
+    if (bookmarks.find((bm) => bm === userInfo?.uid)) setIsBookmarked(true);
+  }, [uid, userInfo, bookmarks]);
+
   return (
     <article className='single_post'>
       <div className='post_wrapper'>
@@ -81,9 +122,25 @@ const SinglePost: React.FC<SinglePostProps> = ({
 
           {isUser || (
             <div className='bottom_right'>
-              <button className='bkmark_btn'>
-                <CiBookmarkPlus />
-              </button>
+              {isBookmarked ? (
+                <button
+                  className={`bkmark_btn ${isBkmLoading ? 'disable' : ''}`}
+                  disabled={isBkmLoading}
+                  onClick={handleRemoveBk}
+                  title='Remove bookmark'
+                >
+                  <BsBookmarkDashFill />
+                </button>
+              ) : (
+                <button
+                  className={`bkmark_btn ${isBkmLoading ? 'disable' : ''}`}
+                  disabled={isBkmLoading}
+                  onClick={handleAddBk}
+                  title='Add bookmark'
+                >
+                  <BsBookmarkPlus />
+                </button>
+              )}
             </div>
           )}
         </div>

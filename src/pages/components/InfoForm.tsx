@@ -84,7 +84,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
 
   const { signInError } = useBlogSelector((state) => state.user);
 
-  const { setNoUserInfo, resetAuthError } = userSlice.actions;
+  const { setNoUserInfo, setAuthError } = userSlice.actions;
 
   const formRefs: FormRefsInt = {
     fullNameInputRef: useRef<HTMLInputElement>(null),
@@ -372,7 +372,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
   useEffect(() => {
     if (signInError.includes('email-already-in-use'))
       toast.error('Email already in use');
-    dispatch(resetAuthError());
+    dispatch(setAuthError(''));
   }, [signInError]);
 
   return (

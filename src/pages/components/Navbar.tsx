@@ -137,13 +137,13 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
   const dropLinks: DropLinkType[] = [
     {
       title: 'Username',
-      link: `/p/${userInfo?.userId}`,
+      link: `/p/${userInfo?.uid}`,
       param: true,
       position: 'top',
     },
     {
       title: 'Dashboard',
-      link: `/${userInfo?.userId}/dashboard`,
+      link: `/${userInfo?.uid}/dashboard`,
       param: true,
       position: 'mid',
     },
@@ -155,7 +155,7 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
     },
     {
       title: 'Settings',
-      link: `/settings/${userInfo?.userId}`,
+      link: `/settings/${userInfo?.uid}`,
       param: false,
       position: 'mid',
     },
