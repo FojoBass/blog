@@ -83,6 +83,10 @@ interface ContextInt {
   setTargetUserId?: Dispatch<React.SetStateAction<string>>;
   authLoading?: boolean;
   setAuthLoading?: Dispatch<React.SetStateAction<boolean>>;
+  displayUserInfo?: UserInfoInt | null;
+  displayPostContent?: PostInt | null;
+  setDisplayUserInfo?: Dispatch<React.SetStateAction<UserInfoInt | null>>;
+  setDisplayPostContent?: Dispatch<React.SetStateAction<PostInt | null>>;
 }
 
 const BlogContext = createContext<ContextInt>({});
@@ -103,6 +107,12 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const { setCateg } = blogSlice.actions;
   const randId = new ShortUniqueId({ length: 10 });
   const [targetUserId, setTargetUserId] = useState('');
+  const [displayUserInfo, setDisplayUserInfo] = useState<UserInfoInt | null>(
+    null
+  );
+  const [displayPostContent, setDisplayPostContent] = useState<PostInt | null>(
+    null
+  );
 
   const [searchString, setSearchString] = useState(''),
     [isSearch, setIsSearch] = useState(false),
@@ -307,6 +317,10 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     setUserPosts,
     authLoading,
     setAuthLoading,
+    displayPostContent,
+    displayUserInfo,
+    setDisplayPostContent,
+    setDisplayUserInfo,
   };
 
   // * Fetches
@@ -416,8 +430,6 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
           );
 
           onSnapshot(snapQuery, (querySnapshot) => {
-            console.log('USERINFO SNAP FIRED');
-
             querySnapshot.forEach((doc) => {
               userInfo = doc.data() ?? null;
 

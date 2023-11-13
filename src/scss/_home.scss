@@ -63,3 +63,12 @@
     background-color: var(--bg_clr1);
   }
 }
+
+@keyframes bgAnim3 {
+  0% {
+    background-color: var(--bg_clr2);
+  }
+  50% {
+    background-color: var(--bg_clr1);
+  }
+}

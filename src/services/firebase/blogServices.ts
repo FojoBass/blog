@@ -36,6 +36,7 @@ import {
 } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
 import {
+  FollowsInt,
   PostInt,
   UpdateDataInt,
   UpdatePostInt,
@@ -94,8 +95,14 @@ export class BlogServices {
 
   updateUserInfo(data: UpdateDataInt) {
     const docRef = doc(db, `users/${auth.currentUser?.uid}`);
-    console.log('Update called: ', data);
+    return updateDoc(docRef, { ...data });
+  }
 
+  updateUserFollows(
+    data: { followings?: FollowsInt[]; followers?: FollowsInt[] },
+    uid: string
+  ) {
+    const docRef = doc(db, `users/${uid}`);
     return updateDoc(docRef, { ...data });
   }
 
@@ -135,6 +142,13 @@ export class BlogServices {
           limit(10)
         );
     return getDocs(q);
+  }
+
+  getPost(authorId: string, postId: string, isPub: boolean) {
+    const docRef = isPub
+      ? doc(db, `posts/${postId}`)
+      : doc(db, `users/${authorId}/post/${postId}`);
+    return getDoc(docRef);
   }
 
   getUserPosts(

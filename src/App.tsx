@@ -195,6 +195,8 @@ const Root = () => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
+  // TODO Utilize useHistory to detect change of route from profile to another, and use that to reset displayInfo
+
   return (
     <>
       <Navbar />

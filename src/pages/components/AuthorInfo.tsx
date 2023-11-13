@@ -6,16 +6,22 @@ export interface AuthorInfoType {
   imgUrl: string;
   name: string;
   about: string;
-  followersCount: FollowsInt[];
+  isFollow: boolean;
   uid: string;
+  handleFollow: () => void;
+  followLoading: boolean;
+  isUser: boolean;
 }
 
 const AuthorInfo: React.FC<AuthorInfoType> = ({
   imgUrl,
   name,
   about,
-  followersCount,
+  isFollow,
   uid,
+  handleFollow,
+  followLoading,
+  isUser,
 }) => {
   return (
     <div className='author_info_wrapper'>
@@ -32,9 +38,21 @@ const AuthorInfo: React.FC<AuthorInfoType> = ({
       </div>
 
       <div className='author_info_bottom'>
-        <span className='left_side'>{followersCount.length} Followers </span>
+        <span className='left_side'>
+          {/* {followersCount.length} Followers  */}
+        </span>
 
-        <button className='right_side follow_btn'>Follow</button>
+        {isUser || (
+          <button
+            className={`right_side follow_btn ${
+              followLoading ? 'loading' : ''
+            }`}
+            onClick={handleFollow}
+            disabled={followLoading}
+          >
+            {isFollow ? 'Unfollow' : 'Follow'}
+          </button>
+        )}
       </div>
     </div>
   );

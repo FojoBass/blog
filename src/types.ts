@@ -44,10 +44,12 @@ export interface UpdatePostInt {
 
 export interface CommentInt {
   aviUrl: string;
-  name: string;
+  replierName: string;
   createdAt: FieldValue | string;
   comment: string;
-  likes: number;
+  likes: string[];
+  id: string;
+  isFirstLevel: boolean;
   comments: CommentInt[];
 }
 

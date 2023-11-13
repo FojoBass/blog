@@ -65,8 +65,15 @@
     }
 
     .bottom {
-      @include flexDisplay(center, space-between);
       padding: 10px 0 0;
+
+      &_top {
+        @include flexDisplay(center, space-between);
+      }
+
+      &_bottom {
+        margin-top: 10px;
+      }
 
       .created_at {
         margin-right: 20px;

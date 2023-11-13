@@ -3,6 +3,7 @@ $padding: 10px;
 .empty_info {
   @include position(absolute, left, top, 50%, 50%);
   text-align: center;
+  width: 100%;
 
   span {
     font-size: 5rem;
