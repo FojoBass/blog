@@ -144,11 +144,14 @@ export class BlogServices {
     return getDocs(q);
   }
 
-  getPost(authorId: string, postId: string, isPub: boolean) {
-    const docRef = isPub
-      ? doc(db, `posts/${postId}`)
-      : doc(db, `users/${authorId}/post/${postId}`);
-    return getDoc(docRef);
+  getRelatedPosts(categs: string[], postId: string) {
+    const q = query(
+      collection(db, 'posts'),
+      where('postId', '!=', postId),
+      where('selCategs', 'array-contains-any', categs),
+      limit(4)
+    );
+    return getDocs(q);
   }
 
   getUserPosts(

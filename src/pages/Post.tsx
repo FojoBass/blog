@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { BiComment } from 'react-icons/bi';
 import {
@@ -7,10 +7,7 @@ import {
   BsBookmarkPlus,
   BsDot,
 } from 'react-icons/bs';
-import subImg1 from '../assets/cockpit.jpg';
-import subImg2 from '../assets/salute.jpg';
-import avatar from '../assets/Me cropped.jpg';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CommentInt, PostInt } from '../types';
 import { useGlobalContext } from '../context';
 import PostLoading from './components/PostLoading';
@@ -19,61 +16,155 @@ import { BlogServices } from '../services/firebase/blogServices';
 import { useBlogSelector } from '../app/store';
 import { handleParsePost } from '../helpers/handleParsePost';
 import DOMPurify from 'dompurify';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db } from '../services/firebase/config';
+import { ImSpinner } from 'react-icons/im';
+import { toast } from 'react-toastify';
 
 const Post = () => {
   const { uid: authorId, postId } = useParams();
-  const { displayPostContent, setDisplayPostContent, homePosts, userPosts } =
-    useGlobalContext();
+  const { displayPostContent, setDisplayPostContent } = useGlobalContext();
   const [fetchingPost, setFetchingPost] = useState(true);
-  const blogServices = new BlogServices();
   const [modDate, setModDate] = useState({ day: '', month: '', year: '' });
-  const { userInfo } = useBlogSelector((state) => state.user);
+  const { userInfo, isUserLoggedIn } = useBlogSelector((state) => state.user);
   const [mainPost, setMainPost] = useState('');
+  const [fetch2, setFetch2] = useState(false);
+  const navigate = useNavigate();
+  const [morePosts, setMorePosts] = useState<PostInt[]>([]);
+  const [nextPosts, setNextPosts] = useState<PostInt[]>([]);
+  const [isNextPostsLoading, setIsNextPostsLoading] = useState(true);
+  const [isBkm, setIsBkm] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const commentRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const handleFollow = () => {
+    if (!isUserLoggedIn) navigate('/enter');
+    else {
+      console.log('Follow');
+    }
+  };
+
+  const fetchNextPosts = async () => {
+    const categs = displayPostContent?.selCategs ?? [];
+    let nextPosts: PostInt[] = [];
+
+    try {
+      const res = await new BlogServices().getRelatedPosts(
+        categs,
+        postId ?? ''
+      );
+      res.forEach((doc) => {
+        const postInfo = doc.data();
+        nextPosts.push({
+          ...(postInfo as PostInt),
+          createdAt: postInfo.createdAt.toDate().toString(),
+          publishedAt: postInfo.publishedAt.toDate().toString(),
+        });
+      });
+
+      setNextPosts(nextPosts);
+    } catch (error) {
+      console.log('Next Posts fetching failed: ', error);
+    } finally {
+      setIsNextPostsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // TODO Use onSnapshot so you can get realtime updates
-    // TODO For bookmarks, get a global variable that stores all newly added ones, so that it can be maintained across home signle posts and post page
+    if (displayPostContent) {
+      setIsBkm(
+        Boolean(
+          displayPostContent.bookmarks.find((bId) => bId === userInfo?.uid)
+        )
+      );
+
+      setIsLiked(
+        Boolean(displayPostContent.likes.find((lId) => lId === userInfo?.uid))
+      );
+    }
+  }, [displayPostContent]);
+
+  useEffect(() => {
     // TODO Fit in every variable where needed
-    // TODO YOU'VE GOT THIS FUTURE ME 😊😊😊
+
+    let unsub: () => void;
+    let unsubMore: () => void;
 
     if (authorId && postId) {
-      if (homePosts && homePosts.find((post) => post.postId === postId)) {
-        const targetPost = homePosts.find(
-          (post) => post.postId === postId
-        ) as PostInt;
-        setDisplayPostContent && setDisplayPostContent(targetPost);
-        setFetchingPost(false);
-      } else if (
-        userPosts &&
-        userPosts.find((post) => post.postId === postId)
-      ) {
-        const targetPost = userPosts.find(
-          (post) => post.postId === postId
-        ) as PostInt;
-        setDisplayPostContent && setDisplayPostContent(targetPost);
-        setFetchingPost(false);
-      } else
-        (async () => {
-          let content: any;
-          try {
-            let res = await blogServices.getPost(authorId, postId, true);
-            if (!res.data())
-              res = await blogServices.getPost(authorId, postId, false);
-            content = res.data();
-            setDisplayPostContent &&
-              setDisplayPostContent({
-                ...(content as PostInt),
-                createdAt: content.createdAt.toDate().toString(),
-                publishedAt: content.publishedAt.toDate().toString(),
-              });
-          } catch (error) {
-            console.log('Post fetching faile: ', error);
-          } finally {
-            setFetchingPost(false);
-          }
-        })();
+      setFetchingPost(true);
+      let postInfo: any;
+      const q = query(collection(db, 'posts'), where('postId', '==', postId));
+      const qm = query(
+        collection(db, 'posts'),
+        where('postId', '!=', postId),
+        where('uid', '==', authorId)
+      );
+      unsub = onSnapshot(q, (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          postInfo = doc.data();
+        });
+
+        if (!postInfo?.postId) {
+          setFetch2(true);
+          unsub();
+        } else {
+          postInfo &&
+            setDisplayPostContent?.({
+              ...(postInfo as PostInt),
+              createdAt: postInfo.createdAt.toDate().toString(),
+              publishedAt: postInfo.publishedAt.toDate().toString(),
+            });
+          setFetchingPost(false);
+        }
+      });
+
+      unsubMore = onSnapshot(qm, (querySnapshot) => {
+        let morePosts: PostInt[] = [];
+
+        querySnapshot.forEach((doc) => {
+          const postInfo = doc.data();
+          morePosts.push({
+            ...(postInfo as PostInt),
+            createdAt: postInfo.createdAt.toDate().toString(),
+            publishedAt: postInfo.publishedAt.toDate().toString(),
+          });
+        });
+
+        setMorePosts(morePosts);
+      });
     }
-  }, [homePosts, userPosts]);
+    return () => {
+      unsub?.();
+      unsubMore?.();
+    };
+  }, [postId]);
+
+  useEffect(() => {
+    let unsub2: () => void;
+
+    if (fetch2) {
+      let postInfo: any;
+      const q2 = query(
+        collection(db, `users/${authorId}/posts`),
+        where('postId', '==', postId)
+      );
+      unsub2 = onSnapshot(q2, (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          postInfo = doc.data();
+        });
+
+        postInfo &&
+          setDisplayPostContent?.({
+            ...(postInfo as PostInt),
+            createdAt: postInfo.createdAt.toDate().toString(),
+            publishedAt: postInfo?.publishedAt.toDate().toString(),
+          });
+
+        setFetchingPost(false);
+      });
+    }
+    return () => unsub2?.();
+  }, [fetch2]);
 
   useEffect(() => {
     if (displayPostContent) {
@@ -92,6 +183,8 @@ const Post = () => {
       setModDate({ day, month, year });
 
       setMainPost(handleParsePost(displayPostContent.post));
+
+      displayPostContent.isPublished && fetchNextPosts();
     }
   }, [displayPostContent]);
 
@@ -109,14 +202,22 @@ const Post = () => {
       ) : (
         <div className='center_sect'>
           <aside className='left_side'>
-            <Interactions type='like' count={displayPostContent.likes.length} />
+            <Interactions
+              type='like'
+              count={displayPostContent.likes.length}
+              post={displayPostContent}
+              isInt={isLiked}
+            />
             <Interactions
               type='comment'
               count={displayPostContent.commentsCount}
+              commentEl={commentRef.current}
             />
             <Interactions
               type='bookmark'
               count={displayPostContent.bookmarks.length}
+              isInt={isBkm}
+              post={displayPostContent}
             />
             <button className='share_opts_btn'>
               <BsThreeDots />
@@ -131,11 +232,16 @@ const Post = () => {
                 </div>
 
                 <div className='poster'>
-                  <Link to='/p/dummyUser' className='img_wrapper poster_avi'>
+                  <Link
+                    to={`/p/${displayPostContent.uid}`}
+                    className='img_wrapper poster_avi'
+                  >
                     <img src={displayPostContent.aviUrl} alt='author avi' />
                   </Link>
                   <div className='info'>
-                    <Link to='/p/dummyUser'>{displayPostContent.author}</Link>
+                    <Link to={`/p/${displayPostContent.uid}`}>
+                      {displayPostContent.author}
+                    </Link>
                     <p>
                       {displayPostContent.isPublished ? 'Posted' : 'Created'} on{' '}
                       {modDate.day} {modDate.month}, {modDate.year}
@@ -165,24 +271,28 @@ const Post = () => {
 
               <div className='comments_super_wrapper'>
                 <h3>Comments ({displayPostContent.commentsCount})</h3>
-                <div className='make_comment_wrapper'>
-                  <div className='img_wrapper'>
-                    <img
-                      src={userInfo?.aviUrls.smallAviUrl ?? ''}
-                      alt='My avi'
-                    />
+                {isUserLoggedIn && (
+                  <div className='make_comment_wrapper'>
+                    <div className='img_wrapper'>
+                      <img
+                        src={userInfo?.aviUrls.smallAviUrl ?? ''}
+                        alt='My avi'
+                      />
+                    </div>
+
+                    <form className='comment_form'>
+                      <textarea
+                        name=''
+                        id=''
+                        placeholder='Contribute to discussion'
+                        ref={commentRef}
+                      ></textarea>
+                      <button type='submit' className='spc_btn'>
+                        Contribute
+                      </button>
+                    </form>
                   </div>
-                  <form className='comment_form'>
-                    <textarea
-                      name=''
-                      id=''
-                      placeholder='Contribute to discussion'
-                    ></textarea>
-                    <button type='submit' className='spc_btn'>
-                      Contribute
-                    </button>
-                  </form>
-                </div>
+                )}
 
                 <div className='comments_wrapper'>
                   {/* <Comment comments={comments} /> */}
@@ -190,56 +300,39 @@ const Post = () => {
               </div>
             </div>
 
-            <div className='read_next_sect'>
-              <h2>Read next</h2>
-              <Link to='/p/dummyUser/dummyPost' className='read_post'>
-                <div className='img_wrapper'>
-                  <img src={avatar} alt='' />
-                </div>
-                <div className='post_info'>
-                  <h3 className='title'>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  </h3>
-                  <p className='more_info'>Lorem Dolor - Feb 17</p>
-                </div>
-              </Link>
+            {displayPostContent.isPublished && (
+              <div className='read_next_sect'>
+                <h2>Read next</h2>
 
-              <Link to='/p/dummyUser/dummyPost' className='read_post'>
-                <div className='img_wrapper'>
-                  <img src={avatar} alt='' />
-                </div>
-                <div className='post_info'>
-                  <h3 className='title'>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  </h3>
-                  <p className='more_info'>Lorem Dolor - Feb 17</p>
-                </div>
-              </Link>
-
-              <Link to='/p/dummyUser/dummyPost' className='read_post'>
-                <div className='img_wrapper'>
-                  <img src={avatar} alt='' />
-                </div>
-                <div className='post_info'>
-                  <h3 className='title'>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  </h3>
-                  <p className='more_info'>Lorem Dolor - Feb 17</p>
-                </div>
-              </Link>
-
-              <Link to='/p/dummyUser/dummyPost' className='read_post'>
-                <div className='img_wrapper'>
-                  <img src={avatar} alt='' />
-                </div>
-                <div className='post_info'>
-                  <h3 className='title'>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  </h3>
-                  <p className='more_info'>Lorem Dolor - Feb 17</p>
-                </div>
-              </Link>
-            </div>
+                {isNextPostsLoading ? (
+                  <div className='loading_spinner'>
+                    <ImSpinner />
+                  </div>
+                ) : nextPosts.length ? (
+                  nextPosts.map((post) => (
+                    <Link
+                      to={`/${post.uid}/${post.postId}`}
+                      className='read_post'
+                      key={post.postId}
+                    >
+                      <div className='img_wrapper'>
+                        <img src={post.aviUrl} alt='Author avi' />
+                      </div>
+                      <div className='post_info'>
+                        <h3 className='title'>{post.title}</h3>
+                        <p className='more_info'>
+                          {post.author} -{' '}
+                          {(post.publishedAt as string).split(' ')[1]}{' '}
+                          {(post.publishedAt as string).split(' ')[2]}
+                        </p>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <h3 className='empty'>No Posts</h3>
+                )}
+              </div>
+            )}
 
             <div className='poster_more'>
               <div className='about_poster'>
@@ -252,50 +345,59 @@ const Post = () => {
 
                 <div className='mid'>
                   {/* TODO YOU NEED SOME MANIPULATIONS HERE */}
-                  <button className='follow_btn spc_btn'>Follow</button>
+                  <button className='follow_btn spc_btn' onClick={handleFollow}>
+                    Follow
+                  </button>
                   <p className='author_about'>{displayPostContent.bio}</p>
                 </div>
               </div>
 
-              <div className='author_posts'>
-                <h3>
-                  More from{' '}
-                  <Link to={`/p/${displayPostContent.uid}`}>
-                    {displayPostContent.author}
-                  </Link>
-                </h3>
+              {morePosts.length ? (
+                <div className='author_posts'>
+                  <h3>
+                    More from{' '}
+                    <Link to={`/p/${displayPostContent.uid}`}>
+                      {displayPostContent.author}
+                    </Link>
+                  </h3>
 
-                {/* TODO WORK HERE ALSO */}
-                <Link to='/dummyName/dummyPost' className='post'>
-                  <span className='post_title'>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Sit mollitia dolores dolorem?
-                  </span>
-                  <span className='post_category'>category</span>
-                </Link>
-
-                <Link to='/dummyName/dummyPost' className='post'>
-                  <span className='post_title'>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Sit mollitia dolores dolorem?
-                  </span>
-                  <span className='post_category'>category</span>
-                </Link>
-              </div>
+                  {morePosts.map((post) => (
+                    <Link
+                      to={`/${post.uid}/${post.postId}`}
+                      className='post'
+                      key={post.postId}
+                    >
+                      <span className='post_title'>{post.title}</span>
+                      {post.selCategs?.map((categ) => (
+                        <span className='post_category' key={categ}>
+                          {categ}
+                        </span>
+                      ))}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
 
             <footer className='fixed_bottom'>
               <Interactions
                 type='like'
                 count={displayPostContent.likes.length}
+                post={displayPostContent}
+                isInt={isLiked}
               />
               <Interactions
                 type='comment'
                 count={displayPostContent.commentsCount}
+                commentEl={commentRef.current}
               />
               <Interactions
                 type='bookmark'
                 count={displayPostContent.bookmarks.length}
+                post={displayPostContent}
+                isInt={isBkm}
               />
               <button className='share_opts_btn'>
                 <BsThreeDots />
@@ -313,34 +415,38 @@ const Post = () => {
               </Link>
 
               <div className='mid'>
-                {/* TODO AND MORE WORK */}
                 <button className='follow_btn spc_btn'>Follow</button>
                 <p className='author_about'>{displayPostContent.bio}</p>
               </div>
             </div>
 
-            <div className='author_posts'>
-              {/* TODO STILL MORE WORK */}
-              <h3>
-                More from <Link to='/p/dummyUser'>{'dummyAuthor'}</Link>
-              </h3>
+            {morePosts.length ? (
+              <div className='author_posts'>
+                <h3>
+                  More from{' '}
+                  <Link to={`/p/${displayPostContent.uid}`}>
+                    {displayPostContent.author}
+                  </Link>
+                </h3>
 
-              <Link to='/dummyName/dummyPost' className='post'>
-                <span className='post_title'>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit
-                  mollitia dolores dolorem?
-                </span>
-                <span className='post_category'>category</span>
-              </Link>
-
-              <Link to='/dummyName/dummyPost' className='post'>
-                <span className='post_title'>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit
-                  mollitia dolores dolorem?
-                </span>
-                <span className='post_category'>category</span>
-              </Link>
-            </div>
+                {morePosts.map((post) => (
+                  <Link
+                    to={`/${post.uid}/${post.postId}`}
+                    className='post'
+                    key={post.postId}
+                  >
+                    <span className='post_title'>{post.title}</span>
+                    {post.selCategs?.map((categ) => (
+                      <span className='post_category' key={categ}>
+                        {categ}
+                      </span>
+                    ))}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <></>
+            )}
           </aside>
         </div>
       )}
@@ -351,35 +457,116 @@ const Post = () => {
 export interface InteractionsInt {
   type: string;
   count: number;
+  isInt?: boolean;
+  post?: PostInt;
+  commentEl?: HTMLTextAreaElement | null;
 }
 
 interface CommentPropInt {
   comments: CommentInt[];
 }
 
-const Interactions: React.FC<InteractionsInt> = ({ type, count }) => {
-  // todo Fix in all the click events
+const Interactions: React.FC<InteractionsInt> = ({
+  type,
+  count,
+  isInt,
+  post,
+  commentEl,
+}) => {
+  const { isUserLoggedIn, userInfo } = useBlogSelector((state) => state.user);
+  const [isIntLoading, setIsIntLoading] = useState(false);
+  const blogServices = new BlogServices();
+
+  const interaction = async (list: string[]) => {
+    let modList: string[] = [];
+    if (isUserLoggedIn && isInt) {
+      modList = [...list];
+      modList = modList.filter((bId) => bId !== userInfo?.uid);
+    }
+
+    if (isUserLoggedIn && !isInt) {
+      modList = [...list];
+      if (!modList.find((bId) => bId === userInfo?.uid)) {
+        modList.push(userInfo?.uid ?? '');
+      } else return;
+    }
+
+    try {
+      setIsIntLoading(true);
+      await blogServices.updatePost(
+        type === 'bookmark' ? { bookmarks: modList } : { likes: modList },
+        post!.postId,
+        true,
+        post!.uid
+      );
+      await blogServices.updatePost(
+        type === 'bookmark' ? { bookmarks: modList } : { likes: modList },
+        post!.postId,
+        false,
+        post!.uid
+      );
+    } catch (error) {
+      toast.error('Operation failed');
+      console.log(
+        `${type === 'bookmark' ? 'Bookmark' : 'Like'} operation error: ${error}`
+      );
+    } finally {
+      setIsIntLoading(false);
+    }
+  };
+
+  const handleIntClick = async () => {
+    switch (type) {
+      case 'bookmark':
+        interaction(post!.bookmarks);
+        break;
+      case 'like':
+        interaction(post!.likes);
+        break;
+      case 'comment':
+        commentEl?.focus();
+        break;
+      default:
+        return;
+    }
+  };
 
   return (
     <button
       className={`icon_wrapper 
-      ${
-        type === 'like'
-          ? type
+      ${type} ${isIntLoading ? 'disable' : ''} ${isInt ? 'active' : ''}
+      `}
+      style={!isUserLoggedIn ? { pointerEvents: 'none' } : {}}
+      onClick={handleIntClick}
+      disabled={isIntLoading}
+      title={
+        type === 'bookmark'
+          ? isInt
+            ? 'Remove Bookmark'
+            : 'Add Bookmark'
+          : type === 'like'
+          ? isInt
+            ? 'Unlike Post'
+            : 'Like Post'
           : type === 'comment'
-          ? type
-          : type === 'bookmark'
-          ? type
+          ? 'Make Comment'
           : ''
       }
-      `}
     >
       {type === 'like' ? (
-        <AiOutlineHeart />
+        isInt ? (
+          <AiFillHeart />
+        ) : (
+          <AiOutlineHeart />
+        )
       ) : type === 'comment' ? (
         <BiComment />
       ) : type === 'bookmark' ? (
-        <BsBookmarkPlus />
+        isInt ? (
+          <BsBookmarkDashFill />
+        ) : (
+          <BsBookmarkPlus />
+        )
       ) : (
         ''
       )}

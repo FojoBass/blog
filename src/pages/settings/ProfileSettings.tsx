@@ -74,9 +74,6 @@ const ProfileSettings = () => {
 
     formRefsAction('userNameInputRef', 'Invalid username');
     return false;
-
-    // todo check if any any user has that username
-    // todo can create a username collection for that
   };
 
   const validateSocials = (): boolean => {

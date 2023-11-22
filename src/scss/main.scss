@@ -53,6 +53,10 @@
   text-align: center !important;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .gen_sect {
   min-height: 75vh;
 }
@@ -89,6 +93,11 @@
       @include navHover();
     }
   }
+}
+
+.bkmark_btn.active,
+.bookmark.active {
+  color: var(--acc_clr) !important;
 }
 
 // * For Image Input Field

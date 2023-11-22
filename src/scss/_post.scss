@@ -294,12 +294,16 @@ $brd_clr: #9c9c9cbd;
         transition: all ease $fmid_trans;
         color: var(--txt_clr1);
 
+        &.like.active {
+          color: #ff0000;
+        }
+
         &.comment:hover {
-          color: red;
+          color: var(--spc_clr2);
         }
 
         &.like:hover {
-          color: rgb(209, 209, 3);
+          color: #ff0000;
         }
 
         &.bookmark:hover {
@@ -503,6 +507,20 @@ $brd_clr: #9c9c9cbd;
       background-color: var(--bg_clr1);
       padding: $padding;
       margin-bottom: 20px;
+
+      .loading_spinner {
+        text-align: center;
+        font-size: 2rem;
+        color: var(--txt_clr1);
+        animation: spinnerAnim 1.5s linear 0s infinite;
+      }
+
+      .empty {
+        text-align: center;
+        font-size: $txt_size3;
+        font-family: $fnt_hdg2;
+        color: var(--txt_clr1);
+      }
 
       h2 {
         font-size: $txt_size3;
@@ -711,5 +729,19 @@ $brd_clr: #9c9c9cbd;
   a {
     color: var(--acc_clr);
     text-decoration: underline;
+  }
+}
+
+@keyframes spinnerAnim {
+  0% {
+    color: var(--txt_clr1);
+    rotate: 0deg;
+  }
+  50% {
+    color: var(--txt_clr3);
+  }
+  100% {
+    color: var(--txt_clr1);
+    rotate: 360deg;
   }
 }

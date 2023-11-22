@@ -437,8 +437,6 @@ const NewPost = () => {
     }
   }, [uploadingFailed, uploadingSucceed, dataPost, isPubClicked]);
 
-  // TODO TEST POST UPLOAD, AND FIX BUGS
-
   useEffect(() => {
     if (isPostImgReady && postMainRef.current) {
       const el = postMainRef.current;

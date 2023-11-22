@@ -9,6 +9,7 @@ import { useBlogSelector } from '../../app/store';
 import { BlogServices } from '../../services/firebase/blogServices';
 import { toast } from 'react-toastify';
 import { followsHandler } from '../../helpers/followsHandler';
+import { useGlobalContext } from '../../context';
 
 export interface SinglePostProps {
   posterName: string;
@@ -23,6 +24,7 @@ export interface SinglePostProps {
   aboutPoster: string;
   uid: string;
   bookmarks: string[];
+  isHome?: boolean;
 }
 
 const SinglePost: React.FC<SinglePostProps> = ({
@@ -38,6 +40,7 @@ const SinglePost: React.FC<SinglePostProps> = ({
   aboutPoster,
   uid,
   bookmarks,
+  isHome,
 }) => {
   const [isUser, setIsUser] = useState(false);
   const [modDate] = useState({
@@ -183,7 +186,9 @@ const SinglePost: React.FC<SinglePostProps> = ({
               <div className='bottom_right'>
                 {isBookmarked ? (
                   <button
-                    className={`bkmark_btn ${isBkmLoading ? 'disable' : ''}`}
+                    className={`bkmark_btn active ${
+                      isBkmLoading ? 'disable' : ''
+                    }`}
                     disabled={isBkmLoading}
                     onClick={handleRemoveBk}
                     title='Remove bookmark'

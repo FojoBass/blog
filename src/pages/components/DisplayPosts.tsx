@@ -64,6 +64,7 @@ const DisplayPosts: React.FC<PropInt> = ({ posts, target }) => {
             aboutPoster={(post as PostInt).bio}
             uid={(post as PostInt).uid}
             bookmarks={(post as PostInt).bookmarks}
+            isHome={target === 'home'}
           />
         )
       )}

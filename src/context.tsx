@@ -27,7 +27,6 @@ import {
 } from 'firebase/firestore';
 import { CategoryPosts } from './pages';
 import ShortUniqueId from 'short-unique-id';
-// import { getPosts } from './features/blogAsyncThunk';
 
 interface ContextInt {
   searchString?: string;
