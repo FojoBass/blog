@@ -176,7 +176,7 @@ const Post = () => {
   };
 
   useEffect(() => {
-    if (displayPostContent) {
+    if (displayPostContent && displayPostContent.postId === postId) {
       setIsBkm(
         Boolean(
           displayPostContent.bookmarks.find((bId) => bId === userInfo?.uid)
@@ -187,6 +187,7 @@ const Post = () => {
         Boolean(displayPostContent.likes.find((lId) => lId === userInfo?.uid))
       );
 
+      setComments([]);
       fetchComments();
     }
   }, [displayPostContent]);
@@ -278,7 +279,7 @@ const Post = () => {
   }, [fetch2]);
 
   useEffect(() => {
-    if (displayPostContent) {
+    if (displayPostContent && displayPostContent.postId === postId) {
       setMainPost(handleParsePost(displayPostContent.post));
 
       displayPostContent.isPublished && fetchNextPosts();
