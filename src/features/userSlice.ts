@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
+  addFollow,
   forgotPword,
   userGitSignIn,
   userGooSignIn,
@@ -19,6 +20,8 @@ interface InitialStateInt {
   signInError: string;
   noUserInfo: boolean;
   isSuccessLogin: boolean;
+  followLoading: boolean;
+  followError: any;
 }
 
 const initialState: InitialStateInt = {
@@ -26,12 +29,13 @@ const initialState: InitialStateInt = {
   isUserLoggedIn: false,
   isSignupLoading: false,
   isSignedUp: false,
-  // userInfoLoading: true,
+  followLoading: false,
   isJustLoggedIn: false,
   isLogInLoading: false,
   signInError: '',
   noUserInfo: false,
   isSuccessLogin: false,
+  followError: '',
 };
 
 export const userSlice = createSlice({
@@ -62,9 +66,9 @@ export const userSlice = createSlice({
     resetIsLogInLoading(state) {
       state.isLogInLoading = false;
     },
-    // setUserInfoLoading(state, action) {
-    //   state.userInfoLoading = action.payload;
-    // },
+    resetFollowError(state) {
+      state.followError = '';
+    },
   },
   extraReducers: (builder) => {
     // *Signup User
@@ -95,6 +99,19 @@ export const userSlice = createSlice({
         state.signInError = error.payload as string;
       });
 
+    // *Follows
+    builder
+      .addCase(addFollow.pending, (state) => {
+        state.followLoading = true;
+      })
+      .addCase(addFollow.fulfilled, (state) => {
+        state.followLoading = false;
+      })
+      .addCase(addFollow.rejected, (state, error) => {
+        state.followLoading = false;
+        state.followError = error.payload as any;
+      });
+
     // *Sign in
     // ?Email
     builder
@@ -116,9 +133,6 @@ export const userSlice = createSlice({
       })
       .addCase(userGitSignIn.fulfilled, (state, action) => {
         state.isSuccessLogin = true;
-        // state.isLogInLoading = false;
-        // state.isUserLoggedIn = true;
-        // state.isJustLoggedIn = true;
       })
       .addCase(userGitSignIn.rejected, (state, error) => {
         state.isLogInLoading = false;
@@ -132,9 +146,6 @@ export const userSlice = createSlice({
       })
       .addCase(userGooSignIn.fulfilled, (state, action) => {
         state.isSuccessLogin = true;
-        // state.isLogInLoading = false;
-        // state.isUserLoggedIn = true;
-        // state.isJustLoggedIn = true;
       })
       .addCase(userGooSignIn.rejected, (state, error) => {
         state.isLogInLoading = false;

@@ -36,6 +36,7 @@ import {
 } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
 import {
+  CommentDataInt,
   FollowsInt,
   PostInt,
   UpdateDataInt,
@@ -123,8 +124,6 @@ export class BlogServices {
 
   addUserPosts(data: PostInt) {
     const docRef = doc(db, `users/${data.uid}/posts/${data.postId}`);
-    // console.log('data: ', data);
-
     return setDoc(docRef, data);
   }
 
@@ -152,6 +151,11 @@ export class BlogServices {
       limit(4)
     );
     return getDocs(q);
+  }
+
+  addComment(data: CommentDataInt, postId: string) {
+    const docRef = doc(db, `posts/${postId}/comments/${data.commentId}`);
+    return setDoc(docRef, data);
   }
 
   getUserPosts(

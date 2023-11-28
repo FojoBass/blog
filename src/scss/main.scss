@@ -309,3 +309,24 @@ html {
     }
   }
 }
+
+.loading_spinner {
+  text-align: center;
+  font-size: 2rem;
+  color: var(--txt_clr1);
+  animation: spinnerAnim 1.5s linear 0s infinite;
+}
+
+@keyframes spinnerAnim {
+  0% {
+    color: var(--txt_clr1);
+    rotate: 0deg;
+  }
+  50% {
+    color: var(--txt_clr3);
+  }
+  100% {
+    color: var(--txt_clr1);
+    rotate: 360deg;
+  }
+}

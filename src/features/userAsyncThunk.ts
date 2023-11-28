@@ -3,7 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { BlogServices } from '../services/firebase/blogServices';
 import { UserCredential } from 'firebase/auth';
 import { getDownloadURL } from 'firebase/storage';
-import { FormDataInt, UserInfoInt } from '../types';
+import { FollowsInt, FormDataInt, UserInfoInt } from '../types';
 import {
   collection,
   onSnapshot,
@@ -13,6 +13,8 @@ import {
 } from 'firebase/firestore';
 import { auth, db } from '../services/firebase/config';
 import { userSlice } from './userSlice';
+import { followsHandler } from '../helpers/followsHandler';
+import { RootState } from '../app/store';
 
 interface UserSignUpPayloadInt {
   email: string;
@@ -20,6 +22,13 @@ interface UserSignUpPayloadInt {
   bigAviFile: File;
   smallAviFile: File;
   formData: FormDataInt;
+}
+
+interface FollowPayInt {
+  isFollow: boolean;
+  posterName: string;
+  uid: string;
+  avi: string;
 }
 
 const blogServices = new BlogServices();
@@ -126,44 +135,25 @@ export const userGooSignIn = createAsyncThunk<void, void>(
   }
 );
 
-// * Get User info
-// export const getUserInfo = createAsyncThunk<void, { email: string }>(
-//   'user/getUserInfo',
-//   async (payload, thunkApi) => {
-//     const { email } = payload;
-//     let userInfo;
+export const addFollow = createAsyncThunk<void, FollowPayInt>(
+  'blog/addFollow',
+  async (payload, thunkApi) => {
+    const { isFollow, posterName, uid, avi } = payload;
+    const userInfo = (thunkApi.getState() as RootState).user.userInfo;
+    try {
+      const info = await blogServices.getUserInfo(uid);
+      let followers = info.data()!.followers as FollowsInt[];
 
-//     const { setUserInfo, setNoUserInfo } = userSlice.actions;
-
-//     try {
-//       const snapQuery = query(
-//         collection(db, 'users'),
-//         where('email', '==', email)
-//       );
-
-//       onSnapshot(snapQuery, (querySnapshot) => {
-//         console.log('USERINFO SNAP FIRED');
-
-//         querySnapshot.forEach((doc) => {
-//           userInfo = doc.data() ?? null;
-
-//           thunkApi.dispatch(
-//             setUserInfo({
-//               ...userInfo,
-//               createdAt: userInfo.createdAt
-//                 ? userInfo.createdAt.toDate().toString()
-//                 : '',
-//             })
-//           );
-//         });
-
-//         !querySnapshot.size && thunkApi.dispatch(setNoUserInfo(true));
-//       });
-//     } catch (error) {
-//       return thunkApi.rejectWithValue(`Get user info ${error}`);
-//     }
-//   }
-// );
+      await followsHandler(userInfo!, followers, isFollow, {
+        posterName,
+        uid,
+        avi,
+      });
+    } catch (error) {
+      return thunkApi.rejectWithValue(error);
+    }
+  }
+);
 
 // *Forgot Password
 export const forgotPword = createAsyncThunk<void, { email: string }>(

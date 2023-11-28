@@ -13,10 +13,8 @@ export interface PostInt {
   post: string;
   bannerUrl: string;
   isPublished: boolean;
-  comments: CommentInt[];
   likes: string[];
   bookmarks: string[];
-  commentsCount: number;
   publishedAt?: FieldValue | string;
   createdAt: FieldValue | string;
   selCategs?: string[];
@@ -32,7 +30,6 @@ export interface UpdatePostInt {
   post?: string;
   bannerUrl?: string;
   isPublished?: boolean;
-  comments?: CommentInt[];
   likes?: string[];
   bookmarks?: string[];
   commentsCount?: number;
@@ -42,15 +39,18 @@ export interface UpdatePostInt {
   title?: string;
 }
 
-export interface CommentInt {
+export interface CommentInt extends CommentDataInt {
   aviUrl: string;
   replierName: string;
+}
+
+export interface CommentDataInt {
   createdAt: FieldValue | string;
   comment: string;
   likes: string[];
-  id: string;
-  isFirstLevel: boolean;
-  comments: CommentInt[];
+  commentId: string;
+  uid: string;
+  parentId: null | string;
 }
 
 export interface CountryInt {
@@ -130,4 +130,14 @@ export interface UserInfoInt extends FormDataInt {
   userColor: string;
   postCount: number;
   dispEmail: boolean;
+}
+
+export interface DateExtractInt {
+  day: string;
+  month: string;
+  date: string;
+  year: string;
+  hours: string;
+  mins: string;
+  secs: string;
 }

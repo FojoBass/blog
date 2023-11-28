@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+// !DO NOT INCLUDE USER INFO (incluing author) IN POST DATA
+// !FETCH AUTHOR'S INFO FOR EVERY OPENED POSTS
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { BiComment } from 'react-icons/bi';
 import {
@@ -8,24 +10,44 @@ import {
   BsDot,
 } from 'react-icons/bs';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CommentInt, PostInt } from '../types';
+import { CommentDataInt, CommentInt, DateExtractInt, PostInt } from '../types';
 import { useGlobalContext } from '../context';
 import PostLoading from './components/PostLoading';
-import { MdOutlineError } from 'react-icons/md';
+import {
+  MdDeleteOutline,
+  MdOutlineError,
+  MdOutlineModeEdit,
+} from 'react-icons/md';
 import { BlogServices } from '../services/firebase/blogServices';
-import { useBlogSelector } from '../app/store';
+import { useBlogDispatch, useBlogSelector } from '../app/store';
 import { handleParsePost } from '../helpers/handleParsePost';
 import DOMPurify from 'dompurify';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  where,
+} from 'firebase/firestore';
 import { db } from '../services/firebase/config';
 import { ImSpinner } from 'react-icons/im';
 import { toast } from 'react-toastify';
+import { addFollow } from '../features/userAsyncThunk';
+import ShortUniqueId from 'short-unique-id';
+import { useDateExtractor } from './hooks/useDateExtractor';
+import { dateExtractor } from '../helpers/dateExtractor';
+import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
 
 const Post = () => {
   const { uid: authorId, postId } = useParams();
   const { displayPostContent, setDisplayPostContent } = useGlobalContext();
   const [fetchingPost, setFetchingPost] = useState(true);
-  const [modDate, setModDate] = useState({ day: '', month: '', year: '' });
+  const modDate = useDateExtractor(
+    displayPostContent?.isPublished
+      ? displayPostContent.publishedAt!
+      : displayPostContent?.createdAt!
+  );
   const { userInfo, isUserLoggedIn } = useBlogSelector((state) => state.user);
   const [mainPost, setMainPost] = useState('');
   const [fetch2, setFetch2] = useState(false);
@@ -36,11 +58,97 @@ const Post = () => {
   const [isBkm, setIsBkm] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const commentRef = useRef<HTMLTextAreaElement | null>(null);
+  const [isFollow, setIsFollow] = useState(false);
+  const { followLoading } = useBlogSelector((state) => state.user);
+  const dispatch = useBlogDispatch();
+  const [isFetchingComments, setIsFetchingComments] = useState(true);
+  const [comments, setComments] = useState<CommentInt[]>([]);
+  const blogServices = new BlogServices();
+
+  const commentsByParentId = useMemo(() => {
+    const group: Record<string, CommentInt[]> = {};
+    comments.forEach((comment) => {
+      group[comment.parentId ?? 'null'] ||= [];
+      group[comment.parentId ?? 'null'].push(comment);
+    });
+    return group;
+  }, [comments]);
+
+  const getReplies = (parentId: string): CommentInt[] =>
+    commentsByParentId[parentId];
 
   const handleFollow = () => {
     if (!isUserLoggedIn) navigate('/enter');
     else {
-      console.log('Follow');
+      dispatch(
+        addFollow({
+          isFollow,
+          posterName: displayPostContent!.author,
+          uid: displayPostContent!.uid,
+          avi: displayPostContent!.aviUrl,
+        })
+      );
+    }
+  };
+
+  const fetchComments = async () => {
+    if (displayPostContent) {
+      const q = query(
+        collection(db, `posts/${displayPostContent.postId}/comments`),
+        orderBy('createdAt', 'desc')
+      );
+
+      onSnapshot(
+        q,
+        async (querySnapshot) => {
+          let modComments: any = [];
+          querySnapshot.forEach((doc) => {
+            const comData = doc.data();
+
+            modComments.push({
+              ...comData,
+              createdAt: comData.createdAt?.toDate().toString(),
+            });
+          });
+
+          try {
+            let userInfos: any[] = [];
+            for (let i = 0; i < modComments.length; i++) {
+              let uData: any;
+              const storedData = userInfos.find(
+                (info) => info.uid === modComments[i].uid
+              );
+              if (!storedData) {
+                uData = await blogServices.getUserInfo(
+                  modComments[i].uid as string
+                );
+
+                modComments[i] = {
+                  ...modComments[i],
+                  aviUrl: uData.data()?.aviUrls.smallAviUrl,
+                  replierName: uData.data()?.userName,
+                };
+
+                userInfos.push(uData.data());
+              } else {
+                modComments[i] = {
+                  ...modComments[i],
+                  aviUrl: storedData?.aviUrls.smallAviUrl,
+                  replierName: storedData?.userName,
+                };
+              }
+            }
+
+            setComments(modComments as CommentInt[]);
+            setIsFetchingComments(false);
+          } catch (error) {
+            console.log('Error fetching replier info: ', error);
+          }
+        },
+        (error) => {
+          console.log('Comments fetching failed: ', error);
+        }
+      );
     }
   };
 
@@ -49,10 +157,7 @@ const Post = () => {
     let nextPosts: PostInt[] = [];
 
     try {
-      const res = await new BlogServices().getRelatedPosts(
-        categs,
-        postId ?? ''
-      );
+      const res = await blogServices.getRelatedPosts(categs, postId ?? '');
       res.forEach((doc) => {
         const postInfo = doc.data();
         nextPosts.push({
@@ -81,12 +186,18 @@ const Post = () => {
       setIsLiked(
         Boolean(displayPostContent.likes.find((lId) => lId === userInfo?.uid))
       );
+
+      fetchComments();
     }
   }, [displayPostContent]);
 
   useEffect(() => {
-    // TODO Fit in every variable where needed
+    if (userInfo) {
+      setIsFollow(!!userInfo.followings.find((flw) => flw.id === authorId));
+    }
+  }, [userInfo]);
 
+  useEffect(() => {
     let unsub: () => void;
     let unsubMore: () => void;
 
@@ -168,20 +279,6 @@ const Post = () => {
 
   useEffect(() => {
     if (displayPostContent) {
-      let day: string;
-      let month: string;
-      let year: string;
-      if (displayPostContent.isPublished) {
-        day = (displayPostContent.publishedAt! as string).split(' ')[2];
-        month = (displayPostContent.publishedAt! as string).split(' ')[1];
-        year = (displayPostContent.publishedAt! as string).split(' ')[3];
-      } else {
-        day = (displayPostContent.createdAt as string).split(' ')[2];
-        month = (displayPostContent.createdAt as string).split(' ')[1];
-        year = (displayPostContent.createdAt as string).split(' ')[3];
-      }
-      setModDate({ day, month, year });
-
       setMainPost(handleParsePost(displayPostContent.post));
 
       displayPostContent.isPublished && fetchNextPosts();
@@ -210,7 +307,7 @@ const Post = () => {
             />
             <Interactions
               type='comment'
-              count={displayPostContent.commentsCount}
+              count={comments.length}
               commentEl={commentRef.current}
             />
             <Interactions
@@ -270,7 +367,7 @@ const Post = () => {
               ></div>
 
               <div className='comments_super_wrapper'>
-                <h3>Comments ({displayPostContent.commentsCount})</h3>
+                <h3>Comments ({comments.length})</h3>
                 {isUserLoggedIn && (
                   <div className='make_comment_wrapper'>
                     <div className='img_wrapper'>
@@ -280,22 +377,21 @@ const Post = () => {
                       />
                     </div>
 
-                    <form className='comment_form'>
-                      <textarea
-                        name=''
-                        id=''
-                        placeholder='Contribute to discussion'
-                        ref={commentRef}
-                      ></textarea>
-                      <button type='submit' className='spc_btn'>
-                        Contribute
-                      </button>
-                    </form>
+                    <CommentForm commentRef={commentRef} />
                   </div>
                 )}
 
                 <div className='comments_wrapper'>
-                  {/* <Comment comments={comments} /> */}
+                  {isFetchingComments ? (
+                    <div className='loading_spinner'>
+                      <ImSpinner />
+                    </div>
+                  ) : (
+                    <Comment
+                      comments={getReplies('null')}
+                      getReplies={getReplies}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -344,10 +440,16 @@ const Post = () => {
                 </Link>
 
                 <div className='mid'>
-                  {/* TODO YOU NEED SOME MANIPULATIONS HERE */}
-                  <button className='follow_btn spc_btn' onClick={handleFollow}>
-                    Follow
-                  </button>
+                  {userInfo?.uid !== displayPostContent.uid && (
+                    <button
+                      className={`follow_btn spc_btn ${
+                        followLoading ? 'loading' : ''
+                      }`}
+                      onClick={handleFollow}
+                    >
+                      {isFollow ? 'Unfollow' : 'Follow'}
+                    </button>
+                  )}
                   <p className='author_about'>{displayPostContent.bio}</p>
                 </div>
               </div>
@@ -390,7 +492,7 @@ const Post = () => {
               />
               <Interactions
                 type='comment'
-                count={displayPostContent.commentsCount}
+                count={comments.length}
                 commentEl={commentRef.current}
               />
               <Interactions
@@ -415,7 +517,16 @@ const Post = () => {
               </Link>
 
               <div className='mid'>
-                <button className='follow_btn spc_btn'>Follow</button>
+                {userInfo?.uid !== displayPostContent.uid && (
+                  <button
+                    className={`follow_btn spc_btn ${
+                      followLoading ? 'loading' : ''
+                    }`}
+                    onClick={handleFollow}
+                  >
+                    {isFollow ? 'Unfollow' : 'Follow'}
+                  </button>
+                )}
                 <p className='author_about'>{displayPostContent.bio}</p>
               </div>
             </div>
@@ -464,6 +575,18 @@ export interface InteractionsInt {
 
 interface CommentPropInt {
   comments: CommentInt[];
+  getReplies: (parentId: string) => CommentInt[];
+}
+
+interface CommentFormInt {
+  commentRef?: React.MutableRefObject<HTMLTextAreaElement | null>;
+  setShowReply?: React.Dispatch<React.SetStateAction<boolean>>;
+  showReply?: boolean;
+  parentId?: null | string;
+}
+
+interface SingleCommentInt extends CommentInt {
+  getReplies: (parentId: string) => CommentInt[];
 }
 
 const Interactions: React.FC<InteractionsInt> = ({
@@ -473,7 +596,9 @@ const Interactions: React.FC<InteractionsInt> = ({
   post,
   commentEl,
 }) => {
-  const { isUserLoggedIn, userInfo } = useBlogSelector((state) => state.user);
+  const { isUserLoggedIn, userInfo, followLoading } = useBlogSelector(
+    (state) => state.user
+  );
   const [isIntLoading, setIsIntLoading] = useState(false);
   const blogServices = new BlogServices();
 
@@ -533,8 +658,9 @@ const Interactions: React.FC<InteractionsInt> = ({
 
   return (
     <button
-      className={`icon_wrapper 
-      ${type} ${isIntLoading ? 'disable' : ''} ${isInt ? 'active' : ''}
+      className={`icon_wrapper ${type} ${isIntLoading ? 'disable' : ''} ${
+        isInt ? 'active' : ''
+      }
       `}
       style={!isUserLoggedIn ? { pointerEvents: 'none' } : {}}
       onClick={handleIntClick}
@@ -575,53 +701,219 @@ const Interactions: React.FC<InteractionsInt> = ({
   );
 };
 
-// const Comment: React.FC<CommentPropInt> = ({ comments }) => {
-//   return (
-//     <>
-//       {comments.map(({ id, reply, replies, likes, isFirstLevel }) => {
-//         return (
-//           <article
-//             className='super_comment_wrapper'
-//             key={id}
-//             style={isFirstLevel ? { marginLeft: '10px' } : {}}
-//           >
-//             <div className='comment_wrapper'>
-//               <Link to='/p/dummyUser' className='img_wrapper'>
-//                 <img src={avatar} alt='' />
-//               </Link>
+const Comment: React.FC<CommentPropInt> = ({ comments, getReplies }) => {
+  return (
+    <>
+      {comments?.map(
+        ({
+          commentId,
+          uid,
+          aviUrl,
+          replierName,
+          likes,
+          comment,
+          createdAt,
+          parentId,
+        }) => {
+          return (
+            <SingleComment
+              commentId={commentId}
+              uid={uid}
+              aviUrl={aviUrl}
+              replierName={replierName}
+              likes={likes}
+              comment={comment}
+              createdAt={createdAt}
+              parentId={parentId}
+              key={commentId}
+              getReplies={getReplies}
+            />
+          );
+        }
+      )}
+    </>
+  );
+};
 
-//               <div className='wrapper'>
-//                 <div className='main_comment'>
-//                   <div className='top'>
-//                     <Link to='/p/dummyUser'>Dummy User</Link>{' '}
-//                     <span className='dot_seperator'>
-//                       <BsDot />
-//                     </span>{' '}
-//                     <span className='created_at'>Feb 28</span>
-//                   </div>
+const SingleComment: React.FC<SingleCommentInt> = ({
+  commentId,
+  uid,
+  aviUrl,
+  replierName,
+  likes,
+  comment,
+  createdAt,
+  parentId,
+  getReplies,
+}) => {
+  const modDate = useDateExtractor(createdAt);
+  const [showReply, setShowReply] = useState(false);
+  const replyRef = useRef<HTMLTextAreaElement | null>(null);
+  const childReplies = useMemo(() => {
+    return getReplies(commentId);
+  }, [commentId]);
+  const [showNest, setShowNest] = useState(false);
 
-//                   <p className='main'>{reply}</p>
-//                 </div>
+  return (
+    <article className='super_comment_wrapper' key={commentId}>
+      <div className='comment_wrapper'>
+        <Link to='/p/dummyUser' className='img_wrapper'>
+          <img src={aviUrl} alt='avi' />
+        </Link>
 
-//                 <div className='btns_wrapper'>
-//                   <button className='like_btn'>
-//                     <AiOutlineHeart />
-//                     <span>{likes}</span>
-//                   </button>
+        <div className='wrapper'>
+          <div className='main_comment'>
+            <div className='top'>
+              <Link to={`/p/${uid}`}>{replierName}</Link>{' '}
+              <span className='dot_seperator'>
+                <BsDot />
+              </span>{' '}
+              <span className='created_at'>
+                {modDate.month} {modDate.date}, {modDate.year}, {modDate.hours}:
+                {modDate.mins}
+              </span>
+            </div>
 
-//                   <button className='reply_btn'>
-//                     <BiComment />
-//                   </button>
-//                 </div>
-//               </div>
-//             </div>
+            <p className='main'>{comment}</p>
+          </div>
 
-//             <Comment comments={replies} />
-//           </article>
-//         );
-//       })}
-//     </>
-//   );
-// };
+          <div className='btns_wrapper'>
+            <button className='like_btn' title='Like'>
+              <AiOutlineHeart />
+              <span>{likes.length}</span>
+            </button>
+
+            <button
+              className='reply_btn'
+              title='Reply'
+              onClick={(e) => {
+                setShowReply(!showReply);
+                setShowNest(true);
+              }}
+            >
+              <BiComment />
+            </button>
+
+            <button className='edit_btn' title='Edit'>
+              <MdOutlineModeEdit />
+            </button>
+
+            <button className='del_btn' title='Delete'>
+              <MdDeleteOutline />
+            </button>
+
+            {childReplies?.length ? (
+              <button
+                className='nest_btn'
+                title={showNest ? 'Hide replies' : 'Show replies'}
+                onClick={() => setShowNest(!showNest)}
+              >
+                {showNest ? <FaAngleUp /> : <FaAngleDown />}
+              </button>
+            ) : (
+              ''
+            )}
+          </div>
+        </div>
+      </div>
+
+      {showReply && (
+        <CommentForm
+          parentId={commentId}
+          setShowReply={setShowReply}
+          showReply={showReply}
+          commentRef={replyRef}
+        />
+      )}
+
+      {showNest && <Comment comments={childReplies} getReplies={getReplies} />}
+    </article>
+  );
+};
+
+const CommentForm: React.FC<CommentFormInt> = ({
+  commentRef,
+  parentId = null,
+  setShowReply,
+  showReply,
+}) => {
+  const [loading, setLoading] = useState(false);
+  const [comment, setComment] = useState('');
+  const { userInfo } = useBlogSelector((state) => state.user);
+  const blogServices = new BlogServices();
+  const { postId } = useParams();
+
+  useEffect(() => {
+    if (showReply) commentRef?.current?.focus();
+  }, []);
+
+  const handleComment = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    parentId: null | string = null
+  ) => {
+    e.preventDefault();
+    if (comment.trim()) {
+      const commentId = new ShortUniqueId({ length: 7 }).rnd();
+      const commentData: CommentDataInt = {
+        createdAt: serverTimestamp(),
+        likes: [],
+        commentId,
+        uid: userInfo!.uid,
+        parentId,
+        comment,
+      };
+
+      try {
+        setLoading(true);
+        await blogServices.addComment(commentData, postId ?? '');
+        setComment('');
+        setShowReply && setShowReply(false);
+      } catch (error) {
+        console.log('Commenting failed: ', error);
+        toast.error('Please try again', { toastId: 'commnet_failed' });
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  return (
+    <form className='comment_form'>
+      <textarea
+        name=''
+        id=''
+        placeholder={showReply ? 'Give reply' : 'Contribute to discussion'}
+        ref={commentRef}
+        onChange={(e) => setComment(e.target.value)}
+        value={comment}
+      ></textarea>
+      <div className='btns_wrapper'>
+        <button
+          type='submit'
+          className={`spc_btn ${loading ? 'disable' : ''}`}
+          onClick={(e) => handleComment(e, parentId)}
+          disabled={loading}
+        >
+          {loading
+            ? showReply
+              ? 'Replying...'
+              : 'Contributing'
+            : showReply
+            ? 'Reply'
+            : 'Contribute'}
+        </button>
+        {showReply && (
+          <button
+            className={`cancel_btn ${loading ? 'disable' : ''}`}
+            disabled={loading}
+            onClick={() => setShowReply && setShowReply(false)}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+    </form>
+  );
+};
 
 export default Post;

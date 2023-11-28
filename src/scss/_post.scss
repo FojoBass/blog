@@ -363,36 +363,6 @@ $brd_clr: #9c9c9cbd;
               border-radius: 50%;
             }
           }
-
-          .comment_form {
-            @include flexDisplay(center, center, column);
-            width: 100%;
-
-            textarea {
-              width: 100%;
-              height: 200px;
-              resize: none;
-              border: 2px solid var(--brd_clr);
-              padding: 10px;
-              border-radius: 5px;
-              font-size: 1.5rem;
-              transition: all ease $vfast_trans;
-              color: var(--txt_clr3);
-              font-family: $fnt_spc1;
-              line-height: 2.5rem;
-
-              &:focus-within {
-                border-color: var(--acc_clr);
-              }
-            }
-
-            button {
-              width: 100%;
-              margin-top: 10px;
-              padding: 10px 0;
-              margin-bottom: 10px;
-            }
-          }
         }
 
         .comments_wrapper {
@@ -486,6 +456,22 @@ $brd_clr: #9c9c9cbd;
                   @include flexDisplay(center, center);
                   transition: all ease $fast_trans;
 
+                  &.like_btn {
+                    color: #ff0000;
+
+                    span {
+                      color: var(--txt_clr1);
+                    }
+                  }
+
+                  &.del_btn {
+                    color: $dlt_clr;
+                  }
+
+                  &.edit_btn {
+                    color: var(--acc_clr);
+                  }
+
                   &:hover {
                     background-color: var(--bg_clr2);
                   }
@@ -508,13 +494,6 @@ $brd_clr: #9c9c9cbd;
       padding: $padding;
       margin-bottom: 20px;
 
-      .loading_spinner {
-        text-align: center;
-        font-size: 2rem;
-        color: var(--txt_clr1);
-        animation: spinnerAnim 1.5s linear 0s infinite;
-      }
-
       .empty {
         text-align: center;
         font-size: $txt_size3;
@@ -533,6 +512,11 @@ $brd_clr: #9c9c9cbd;
         padding: 10px 0;
         transition: all ease $fast_trans;
         color: var(--txt_clr2);
+        border-bottom: 1.5px dashed var(--shw_clr_shd);
+
+        &:last-of-type {
+          border-bottom: none;
+        }
 
         &:hover {
           color: var(--acc_clr);
@@ -602,12 +586,16 @@ $brd_clr: #9c9c9cbd;
         transition: all ease $fmid_trans;
         color: var(--txt_clr1);
 
+        &.like.active {
+          color: #ff0000;
+        }
+
         &.comment:hover {
-          color: red;
+          color: var(--spc_clr2);
         }
 
         &.like:hover {
-          color: rgb(209, 209, 3);
+          color: #ff0000;
         }
 
         &.bookmark:hover {
@@ -732,16 +720,59 @@ $brd_clr: #9c9c9cbd;
   }
 }
 
-@keyframes spinnerAnim {
-  0% {
-    color: var(--txt_clr1);
-    rotate: 0deg;
-  }
-  50% {
+.comment_form {
+  @include flexDisplay(center, center, column);
+
+  textarea {
+    width: 100%;
+    height: 200px;
+    resize: none;
+    border: 2px solid var(--brd_clr);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1.5rem;
+    transition: all ease $vfast_trans;
     color: var(--txt_clr3);
+    font-family: $fnt_spc1;
+    line-height: 2.5rem;
+
+    &:focus-within {
+      border-color: var(--acc_clr);
+    }
   }
-  100% {
-    color: var(--txt_clr1);
-    rotate: 360deg;
+
+  .btns_wrapper {
+    align-self: flex-start;
+    width: 100%;
+
+    button {
+      width: fit-content;
+      margin-top: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+
+      &.cancel_btn {
+        font-family: $fnt_spc2;
+        font-size: 1.5rem;
+        margin-left: 15px;
+        letter-spacing: 0.1rem;
+        background-color: var(--bg_clr1);
+        border-radius: 8px;
+        transition: all ease $fmid_trans;
+
+        &:hover {
+          background-color: var(--bg_clr2);
+        }
+      }
+    }
   }
+}
+
+.super_comment_wrapper .comment_form {
+  margin-left: 50px;
+  margin-top: 10px;
+}
+
+.make_comment_wrapper .comment_form {
+  width: 100%;
 }

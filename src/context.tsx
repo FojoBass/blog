@@ -27,6 +27,7 @@ import {
 } from 'firebase/firestore';
 import { CategoryPosts } from './pages';
 import ShortUniqueId from 'short-unique-id';
+import { toast } from 'react-toastify';
 
 interface ContextInt {
   searchString?: string;
@@ -93,7 +94,7 @@ const BlogContext = createContext<ContextInt>({});
 export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { userInfo, noUserInfo, isUserLoggedIn, isSuccessLogin } =
+  const { userInfo, noUserInfo, isUserLoggedIn, isSuccessLogin, followError } =
     useBlogSelector((state) => state.user);
   const [homeLastDocTime, setHomeLastDocTime] = useState<Timestamp | null>(
     null
@@ -169,6 +170,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     resetIsLogInLoading,
     setAuthError,
     setUserInfo,
+    resetFollowError,
   } = userSlice.actions;
   const { setTheme } = themeSlice.actions;
 
@@ -416,7 +418,6 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     // *Get UserInfo on login
-
     if (isSuccessLogin) {
       const email = auth.currentUser?.email ?? '';
       let userInfo;
@@ -535,6 +536,20 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
       );
     else StorageFuncs.setStorage('local', storageKeys.theme, 'light');
   }, []);
+
+  useEffect(() => {
+    if (followError) {
+      const msg = followError.message ?? followError;
+      if (msg.includes('Already a follower'))
+        toast.error('Already a follower', { toastId: 'follow_error' });
+      if (msg.includes('Not a follower'))
+        toast.error('Not a follower', { toastId: 'follow_error' });
+      if (msg.includes('offline'))
+        toast.error('Check internet connection', { toastId: 'follow_error' });
+      else toast.error('Following failed', { toastId: 'follow_error' });
+      dispatch(resetFollowError());
+    }
+  }, [followError]);
 
   return (
     <BlogContext.Provider value={sharedProps}>{children}</BlogContext.Provider>
