@@ -391,6 +391,7 @@ const Post = () => {
                     <Comment
                       comments={getReplies('null')}
                       getReplies={getReplies}
+                      commentsByParentId={commentsByParentId}
                     />
                   )}
                 </div>
@@ -577,6 +578,7 @@ export interface InteractionsInt {
 interface CommentPropInt {
   comments: CommentInt[];
   getReplies: (parentId: string) => CommentInt[];
+  commentsByParentId: Record<string, CommentInt[]>;
 }
 
 interface CommentFormInt {
@@ -588,6 +590,7 @@ interface CommentFormInt {
 
 interface SingleCommentInt extends CommentInt {
   getReplies: (parentId: string) => CommentInt[];
+  commentsByParentId: Record<string, CommentInt[]>;
 }
 
 const Interactions: React.FC<InteractionsInt> = ({
@@ -702,7 +705,11 @@ const Interactions: React.FC<InteractionsInt> = ({
   );
 };
 
-const Comment: React.FC<CommentPropInt> = ({ comments, getReplies }) => {
+const Comment: React.FC<CommentPropInt> = ({
+  comments,
+  getReplies,
+  commentsByParentId,
+}) => {
   return (
     <>
       {comments?.map(
@@ -728,6 +735,7 @@ const Comment: React.FC<CommentPropInt> = ({ comments, getReplies }) => {
               parentId={parentId}
               key={commentId}
               getReplies={getReplies}
+              commentsByParentId={commentsByParentId}
             />
           );
         }
@@ -746,13 +754,14 @@ const SingleComment: React.FC<SingleCommentInt> = ({
   createdAt,
   parentId,
   getReplies,
+  commentsByParentId,
 }) => {
   const modDate = useDateExtractor(createdAt);
   const [showReply, setShowReply] = useState(false);
   const replyRef = useRef<HTMLTextAreaElement | null>(null);
   const childReplies = useMemo(() => {
     return getReplies(commentId);
-  }, [commentId]);
+  }, [commentsByParentId]);
   const [showNest, setShowNest] = useState(false);
 
   return (
@@ -827,7 +836,13 @@ const SingleComment: React.FC<SingleCommentInt> = ({
         />
       )}
 
-      {showNest && <Comment comments={childReplies} getReplies={getReplies} />}
+      {showNest && (
+        <Comment
+          comments={childReplies}
+          getReplies={getReplies}
+          commentsByParentId={commentsByParentId}
+        />
+      )}
     </article>
   );
 };
