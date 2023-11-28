@@ -27,3 +27,5 @@ firestore.indexes.json
 firestore.rules
 .firebaserc
 storage.rules
+
+.VSCodeCounter
