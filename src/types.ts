@@ -51,6 +51,13 @@ export interface CommentDataInt {
   commentId: string;
   uid: string;
   parentId: null | string;
+  isDelete: boolean;
+}
+
+export interface UpdateCommentDataInt {
+  comment?: string;
+  likes?: string[];
+  isDelete?: boolean;
 }
 
 export interface CountryInt {

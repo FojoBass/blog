@@ -118,6 +118,7 @@ $brd_clr: #9c9c9cbd;
     &_category {
       @include category;
       font-size: $txt_size1;
+      margin-right: 2px;
     }
   }
 }
@@ -394,6 +395,17 @@ $brd_clr: #9c9c9cbd;
               margin-right: 10px;
               box-shadow: 0 8px 0 3px var(--bg_clr3);
 
+              .img_icon {
+                color: var(--txt_clr1);
+                display: block;
+                background-color: var(--bg_clr3);
+                font-size: 2rem;
+                border-radius: 50%;
+                width: 100%;
+                @include flexDisplay(center, center);
+                height: 3.5rem;
+              }
+
               img {
                 border-radius: 50%;
               }
@@ -406,6 +418,17 @@ $brd_clr: #9c9c9cbd;
                 border: 2px solid var(--brd_clr);
                 padding: 10px;
                 border-radius: 5px;
+
+                &.del {
+                  background-color: var(--bg_clr1);
+
+                  .main {
+                    text-align: center;
+                    font-style: italic;
+                    color: var(--txt_clr1);
+                    font-family: $fnt_spc2;
+                  }
+                }
 
                 .top {
                   margin-bottom: 15px;

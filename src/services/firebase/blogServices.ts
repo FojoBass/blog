@@ -39,6 +39,7 @@ import {
   CommentDataInt,
   FollowsInt,
   PostInt,
+  UpdateCommentDataInt,
   UpdateDataInt,
   UpdatePostInt,
   UserInfoInt,
@@ -156,6 +157,16 @@ export class BlogServices {
   addComment(data: CommentDataInt, postId: string) {
     const docRef = doc(db, `posts/${postId}/comments/${data.commentId}`);
     return setDoc(docRef, data);
+  }
+
+  updateComment(data: UpdateCommentDataInt, postId: string, commentId: string) {
+    const docRef = doc(db, `posts/${postId}/comments/${commentId}`);
+    return updateDoc(docRef, { ...data });
+  }
+
+  delComment(postId: string, commentId: string) {
+    const docRef = doc(db, `posts/${postId}/comments/${commentId}`);
+    return deleteDoc(docRef);
   }
 
   getUserPosts(

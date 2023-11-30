@@ -138,6 +138,9 @@ const Profile = () => {
     setModUserPosts(modPosts);
   }, [userPosts]);
 
+  // TODO Get Follow up and running
+  // Todo Then work on either search or dashboard
+
   return (
     <section id='profile_sect' className='gen_sect'>
       {userInfoLoading ? (

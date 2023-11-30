@@ -10,7 +10,13 @@ import {
   BsDot,
 } from 'react-icons/bs';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CommentDataInt, CommentInt, DateExtractInt, PostInt } from '../types';
+import {
+  CommentDataInt,
+  CommentInt,
+  DateExtractInt,
+  PostInt,
+  UpdateCommentDataInt,
+} from '../types';
 import { useGlobalContext } from '../context';
 import PostLoading from './components/PostLoading';
 import {
@@ -36,8 +42,7 @@ import { toast } from 'react-toastify';
 import { addFollow } from '../features/userAsyncThunk';
 import ShortUniqueId from 'short-unique-id';
 import { useDateExtractor } from './hooks/useDateExtractor';
-import { dateExtractor } from '../helpers/dateExtractor';
-import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
+import { FaAngleDown, FaAngleUp, FaUser } from 'react-icons/fa';
 
 const Post = () => {
   const { uid: authorId, postId } = useParams();
@@ -308,7 +313,7 @@ const Post = () => {
             />
             <Interactions
               type='comment'
-              count={comments.length}
+              count={comments.filter((com) => !com.isDelete).length}
               commentEl={commentRef.current}
             />
             <Interactions
@@ -368,7 +373,9 @@ const Post = () => {
               ></div>
 
               <div className='comments_super_wrapper'>
-                <h3>Comments ({comments.length})</h3>
+                <h3>
+                  Comments ({comments.filter((com) => !com.isDelete).length})
+                </h3>
                 {isUserLoggedIn && (
                   <div className='make_comment_wrapper'>
                     <div className='img_wrapper'>
@@ -472,11 +479,13 @@ const Post = () => {
                       key={post.postId}
                     >
                       <span className='post_title'>{post.title}</span>
-                      {post.selCategs?.map((categ) => (
-                        <span className='post_category' key={categ}>
-                          {categ}
-                        </span>
-                      ))}
+                      <div className='post_categ_wrapper'>
+                        {post.selCategs?.map((categ) => (
+                          <span className='post_category' key={categ}>
+                            {categ}
+                          </span>
+                        ))}
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -494,7 +503,7 @@ const Post = () => {
               />
               <Interactions
                 type='comment'
-                count={comments.length}
+                count={comments.filter((com) => !com.isDelete).length}
                 commentEl={commentRef.current}
               />
               <Interactions
@@ -549,11 +558,13 @@ const Post = () => {
                     key={post.postId}
                   >
                     <span className='post_title'>{post.title}</span>
-                    {post.selCategs?.map((categ) => (
-                      <span className='post_category' key={categ}>
-                        {categ}
-                      </span>
-                    ))}
+                    <div className='post_categ_wrapper'>
+                      {post.selCategs?.map((categ) => (
+                        <span className='post_category' key={categ}>
+                          {categ}
+                        </span>
+                      ))}
+                    </div>
                   </Link>
                 ))}
               </div>
@@ -586,6 +597,10 @@ interface CommentFormInt {
   setShowReply?: React.Dispatch<React.SetStateAction<boolean>>;
   showReply?: boolean;
   parentId?: null | string;
+  edit?: { state: boolean; comment: string; commentId: string };
+  setEdit?: React.Dispatch<
+    React.SetStateAction<{ state: boolean; comment: string; commentId: string }>
+  >;
 }
 
 interface SingleCommentInt extends CommentInt {
@@ -608,39 +623,43 @@ const Interactions: React.FC<InteractionsInt> = ({
 
   const interaction = async (list: string[]) => {
     let modList: string[] = [];
-    if (isUserLoggedIn && isInt) {
-      modList = [...list];
-      modList = modList.filter((bId) => bId !== userInfo?.uid);
-    }
+    if (isUserLoggedIn) {
+      if (isInt) {
+        modList = [...list];
+        modList = modList.filter((bId) => bId !== userInfo?.uid);
+      }
 
-    if (isUserLoggedIn && !isInt) {
-      modList = [...list];
-      if (!modList.find((bId) => bId === userInfo?.uid)) {
-        modList.push(userInfo?.uid ?? '');
-      } else return;
-    }
+      if (!isInt) {
+        modList = [...list];
+        if (!modList.find((bId) => bId === userInfo?.uid)) {
+          modList.push(userInfo?.uid ?? '');
+        } else return;
+      }
 
-    try {
-      setIsIntLoading(true);
-      await blogServices.updatePost(
-        type === 'bookmark' ? { bookmarks: modList } : { likes: modList },
-        post!.postId,
-        true,
-        post!.uid
-      );
-      await blogServices.updatePost(
-        type === 'bookmark' ? { bookmarks: modList } : { likes: modList },
-        post!.postId,
-        false,
-        post!.uid
-      );
-    } catch (error) {
-      toast.error('Operation failed');
-      console.log(
-        `${type === 'bookmark' ? 'Bookmark' : 'Like'} operation error: ${error}`
-      );
-    } finally {
-      setIsIntLoading(false);
+      try {
+        setIsIntLoading(true);
+        await blogServices.updatePost(
+          type === 'bookmark' ? { bookmarks: modList } : { likes: modList },
+          post!.postId,
+          true,
+          post!.uid
+        );
+        await blogServices.updatePost(
+          type === 'bookmark' ? { bookmarks: modList } : { likes: modList },
+          post!.postId,
+          false,
+          post!.uid
+        );
+      } catch (error) {
+        toast.error('Operation failed');
+        console.log(
+          `${
+            type === 'bookmark' ? 'Bookmark' : 'Like'
+          } operation error: ${error}`
+        );
+      } finally {
+        setIsIntLoading(false);
+      }
     }
   };
 
@@ -722,6 +741,7 @@ const Comment: React.FC<CommentPropInt> = ({
           comment,
           createdAt,
           parentId,
+          isDelete,
         }) => {
           return (
             <SingleComment
@@ -736,6 +756,7 @@ const Comment: React.FC<CommentPropInt> = ({
               key={commentId}
               getReplies={getReplies}
               commentsByParentId={commentsByParentId}
+              isDelete={isDelete}
             />
           );
         }
@@ -755,6 +776,7 @@ const SingleComment: React.FC<SingleCommentInt> = ({
   parentId,
   getReplies,
   commentsByParentId,
+  isDelete,
 }) => {
   const modDate = useDateExtractor(createdAt);
   const [showReply, setShowReply] = useState(false);
@@ -763,54 +785,156 @@ const SingleComment: React.FC<SingleCommentInt> = ({
     return getReplies(commentId);
   }, [commentsByParentId]);
   const [showNest, setShowNest] = useState(false);
+  const { userInfo, isUserLoggedIn } = useBlogSelector((state) => state.user);
+  const [isLiking, setIsLiking] = useState(false);
+  const isLiked = useMemo(() => {
+    return !!likes.find((id) => id === userInfo?.uid);
+  }, [likes]);
+  const blogServices = new BlogServices();
+  const { postId } = useParams();
+  const [edit, setEdit] = useState({ state: false, comment, commentId });
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleCommentLike = async () => {
+    let modLikes = [...likes];
+    if (isUserLoggedIn) {
+      if (isLiked) {
+        modLikes = modLikes.filter((id) => id !== userInfo?.uid);
+      }
+
+      if (!isLiked) {
+        if (!modLikes.find((id) => id === userInfo?.uid))
+          modLikes.push(userInfo?.uid ?? '');
+        else return;
+      }
+
+      try {
+        setIsLiking(true);
+        await blogServices.updateComment(
+          { likes: modLikes },
+          postId ?? '',
+          commentId
+        );
+      } catch (error) {
+        toast.error('Operation failed');
+        console.log('Comment liking failed: ', error);
+      } finally {
+        setIsLiking(false);
+      }
+    }
+  };
+
+  const handleEditComment = () => {
+    setShowReply(true);
+    setEdit({ state: true, comment, commentId });
+  };
+
+  const handleDeleteComment = async () => {
+    try {
+      setIsDeleting(true);
+      await blogServices.updateComment(
+        { isDelete: true },
+        postId ?? '',
+        commentId
+      );
+    } catch (error) {
+      console.log('Comment Delete failed: ', error);
+      toast.error('Deleting failed', { toastId: 'del_comm' });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <article className='super_comment_wrapper' key={commentId}>
       <div className='comment_wrapper'>
-        <Link to='/p/dummyUser' className='img_wrapper'>
-          <img src={aviUrl} alt='avi' />
-        </Link>
+        {isDelete ? (
+          <span className='img_wrapper'>
+            <span className='img_icon'>
+              <FaUser />
+            </span>
+          </span>
+        ) : (
+          <Link to={`/p/${uid}`} className='img_wrapper'>
+            <img src={aviUrl} alt='avi' />
+          </Link>
+        )}
 
         <div className='wrapper'>
-          <div className='main_comment'>
-            <div className='top'>
-              <Link to={`/p/${uid}`}>{replierName}</Link>{' '}
-              <span className='dot_seperator'>
-                <BsDot />
-              </span>{' '}
-              <span className='created_at'>
-                {modDate.month} {modDate.date}, {modDate.year}, {modDate.hours}:
-                {modDate.mins}
-              </span>
+          {isDelete ? (
+            <div className='main_comment del'>
+              <p className='main'>Comment deleted</p>
             </div>
+          ) : (
+            <>
+              <div className='main_comment'>
+                <div className='top'>
+                  <Link to={`/p/${uid}`}>{replierName}</Link>{' '}
+                  <span className='dot_seperator'>
+                    <BsDot />
+                  </span>{' '}
+                  <span className='created_at'>
+                    {modDate.month} {modDate.date}, {modDate.year},{' '}
+                    {modDate.hours}:{modDate.mins}
+                  </span>
+                </div>
 
-            <p className='main'>{comment}</p>
-          </div>
+                <p className='main'>{comment}</p>
+              </div>
+            </>
+          )}
 
           <div className='btns_wrapper'>
-            <button className='like_btn' title='Like'>
-              <AiOutlineHeart />
-              <span>{likes.length}</span>
-            </button>
+            {isDelete || (
+              <>
+                <button
+                  className={`like_btn ${isLiking ? 'disable' : ''}`}
+                  title='Like'
+                  disabled={isLiking}
+                  onClick={handleCommentLike}
+                  style={!isUserLoggedIn ? { pointerEvents: 'none' } : {}}
+                >
+                  {isLiked ? <AiFillHeart /> : <AiOutlineHeart />}
+                  <span>{likes.length}</span>
+                </button>
 
-            <button
-              className='reply_btn'
-              title='Reply'
-              onClick={(e) => {
-                setShowReply(!showReply);
-                setShowNest(true);
-              }}
-            >
-              <BiComment />
-            </button>
+                {isUserLoggedIn && (
+                  <>
+                    <button
+                      className='reply_btn'
+                      title='Reply'
+                      onClick={() => {
+                        setShowReply(!showReply);
+                        setShowNest(true);
+                      }}
+                    >
+                      <BiComment />
+                    </button>
+                  </>
+                )}
 
-            <button className='edit_btn' title='Edit'>
-              <MdOutlineModeEdit />
-            </button>
+                {userInfo?.uid === uid && (
+                  <>
+                    <button
+                      className='edit_btn'
+                      title='Edit'
+                      onClick={handleEditComment}
+                    >
+                      <MdOutlineModeEdit />
+                    </button>
 
-            <button className='del_btn' title='Delete'>
-              <MdDeleteOutline />
-            </button>
+                    <button
+                      className={`del_btn ${isDeleting ? 'disable' : ''}`}
+                      title='Delete'
+                      disabled={isDeleting}
+                      onClick={handleDeleteComment}
+                    >
+                      <MdDeleteOutline />
+                    </button>
+                  </>
+                )}
+              </>
+            )}
 
             {childReplies?.length ? (
               <button
@@ -833,6 +957,8 @@ const SingleComment: React.FC<SingleCommentInt> = ({
           setShowReply={setShowReply}
           showReply={showReply}
           commentRef={replyRef}
+          edit={edit}
+          setEdit={setEdit}
         />
       )}
 
@@ -852,9 +978,11 @@ const CommentForm: React.FC<CommentFormInt> = ({
   parentId = null,
   setShowReply,
   showReply,
+  edit,
+  setEdit,
 }) => {
   const [loading, setLoading] = useState(false);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState(edit?.state ? edit.comment : '');
   const { userInfo } = useBlogSelector((state) => state.user);
   const blogServices = new BlogServices();
   const { postId } = useParams();
@@ -869,23 +997,38 @@ const CommentForm: React.FC<CommentFormInt> = ({
   ) => {
     e.preventDefault();
     if (comment.trim()) {
-      const commentId = new ShortUniqueId({ length: 7 }).rnd();
-      const commentData: CommentDataInt = {
-        createdAt: serverTimestamp(),
-        likes: [],
-        commentId,
-        uid: userInfo!.uid,
-        parentId,
-        comment,
-      };
+      const commentId = edit?.state
+        ? edit.commentId
+        : new ShortUniqueId({ length: 7 }).rnd();
+      const commentData: CommentDataInt | UpdateCommentDataInt = edit?.state
+        ? { comment }
+        : {
+            createdAt: serverTimestamp(),
+            likes: [],
+            commentId,
+            uid: userInfo!.uid,
+            parentId,
+            comment,
+            isDelete: false,
+          };
 
       try {
         setLoading(true);
-        await blogServices.addComment(commentData, postId ?? '');
+        edit?.state
+          ? await blogServices.updateComment(
+              commentData,
+              postId ?? '',
+              edit?.commentId ?? ''
+            )
+          : await blogServices.addComment(
+              commentData as CommentDataInt,
+              postId ?? ''
+            );
+        setEdit && setEdit((prev) => ({ ...prev, state: false }));
         setComment('');
         setShowReply && setShowReply(false);
       } catch (error) {
-        console.log('Commenting failed: ', error);
+        console.log('Commenting/Editing failed: ', error);
         toast.error('Please try again', { toastId: 'commnet_failed' });
       } finally {
         setLoading(false);
@@ -911,9 +1054,13 @@ const CommentForm: React.FC<CommentFormInt> = ({
           disabled={loading}
         >
           {loading
-            ? showReply
+            ? edit?.state
+              ? 'Editing'
+              : showReply
               ? 'Replying...'
               : 'Contributing'
+            : edit?.state
+            ? 'Edit'
             : showReply
             ? 'Reply'
             : 'Contribute'}
@@ -922,7 +1069,10 @@ const CommentForm: React.FC<CommentFormInt> = ({
           <button
             className={`cancel_btn ${loading ? 'disable' : ''}`}
             disabled={loading}
-            onClick={() => setShowReply && setShowReply(false)}
+            onClick={() => {
+              setShowReply && setShowReply(false);
+              setEdit && setEdit((prev) => ({ ...prev, state: false }));
+            }}
           >
             Cancel
           </button>
