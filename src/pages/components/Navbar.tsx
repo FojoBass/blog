@@ -26,6 +26,7 @@ const Navbar = () => {
   const profileOptsRef = useRef<HTMLButtonElement>(null);
   const { userInfo } = useBlogSelector((state) => state.user);
   const { storageKeys } = useGlobalContext();
+  const { dummyImg } = useGlobalContext();
 
   return (
     <nav id='nav_sect'>
@@ -94,10 +95,11 @@ const Navbar = () => {
                 className='profile_opts_btn'
                 onClick={() => setIsDropdown(!isDropdown)}
                 ref={profileOptsRef}
+                style={{ pointerEvents: `${!userInfo ? 'none' : 'auto'}` }}
               >
                 <div className='img_wrapper'>
                   <img
-                    src={`${userInfo?.aviUrls.smallAviUrl}`}
+                    src={userInfo ? userInfo.aviUrls.smallAviUrl : dummyImg}
                     alt='user avatar'
                     className='avatar'
                   />
@@ -136,7 +138,7 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
 
   const dropLinks: DropLinkType[] = [
     {
-      title: 'Username',
+      title: `${userInfo?.userName}`,
       link: `/p/${userInfo?.uid}`,
       param: true,
       position: 'top',
@@ -155,7 +157,7 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
     },
     {
       title: 'Settings',
-      link: `/settings/${userInfo?.uid}`,
+      link: `/settings/${userInfo?.userId}`,
       param: false,
       position: 'mid',
     },

@@ -38,14 +38,16 @@ import {
 } from './pages';
 import { useBlogSelector, useBlogDispatch } from './app/store';
 import { toggleTab } from './features/tabSlice';
-import { FollowsInt, UserInfoInt } from './types';
+import { FollowsInt, SearchFollowsInt, UserInfoInt } from './types';
 import { userSlice } from './features/userSlice';
 import { StorageFuncs } from './services/storages';
 import { useGlobalContext } from './context';
 import GetUserInfo from './modals/GetUserInfo';
-import { auth } from './services/firebase/config';
+import { auth, db } from './services/firebase/config';
 import Verification from './modals/Verification';
 import Bookmarks from './pages/dashboard/Bookmarks';
+import { BlogServices } from './services/firebase/blogServices';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 
 const App = () => {
   const auth = getAuth();
@@ -56,14 +58,14 @@ const App = () => {
   );
   const { userPosts } = useBlogSelector((state) => state.blog);
   const dispatch = useBlogDispatch();
-  const [dummyFollows] = React.useState<FollowsInt[]>([
-    { userName: 'Dummy name', id: 'asdf', avi },
-    { userName: 'Dummy name', id: 'asdfd', avi },
-    { userName: 'Dummy name', id: 'asdfs', avi },
-    { userName: 'Dummy name', id: 'asdf8', avi },
-    { userName: 'Dummy name', id: 'asdfd4', avi },
-    { userName: 'Dummy name', id: 'asdfsl', avi },
-  ]);
+  // const [dummyFollows] = React.useState<SearchFollowsInt[]>([
+  //   { userName: 'Dummy name', id: 'asdf', avi, isDummy: true, postId: '' },
+  //   { userName: 'Dummy name', id: 'asdfd', avi, isDummy: true, postId: '' },
+  //   { userName: 'Dummy name', id: 'asdfs', avi, isDummy: true, postId: '' },
+  //   { userName: 'Dummy name', id: 'asdf8', avi, isDummy: true, postId: '' },
+  //   { userName: 'Dummy name', id: 'asdfd4', avi, isDummy: true, postId: '' },
+  //   { userName: 'Dummy name', id: 'asdfsl', avi, isDummy: true, postId: '' },
+  // ]);
 
   const { setUserInfo, setIsUserLoggedIn, setNoUserInfo } = userSlice.actions;
   const { storageKeys, loginPersistence, setAuthLoading } = useGlobalContext();
@@ -90,11 +92,39 @@ const App = () => {
           <Route path='posts' element={<Posts />} />
           <Route
             path='followers'
-            element={<DisplayUsers users={dummyFollows} />}
+            element={
+              <DisplayUsers
+                users={
+                  userInfo?.followers
+                    ? userInfo.followers.map((fol) => ({
+                        ...fol,
+                        isDummy: false,
+                        postId: '',
+                        createdAt: '',
+                      }))
+                    : []
+                }
+                type='followers'
+              />
+            }
           />
           <Route
             path='followings'
-            element={<DisplayUsers users={dummyFollows.slice(0, 3)} />}
+            element={
+              <DisplayUsers
+                users={
+                  userInfo?.followings
+                    ? userInfo.followings.map((fol) => ({
+                        ...fol,
+                        isDummy: false,
+                        postId: '',
+                        createdAt: '',
+                      }))
+                    : []
+                }
+                type='followings'
+              />
+            }
           />
           <Route path='bookmarks' element={<Bookmarks />} />
         </Route>
@@ -145,34 +175,54 @@ const App = () => {
 
   useEffect(() => {
     document.documentElement.classList.add('mouse');
+    let unsub: () => void;
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
         // console.log(user.uid);
         // * User log in variable is false, and there is userInfo
-        if (
-          !isUserLoggedIn &&
-          storageKeys &&
-          StorageFuncs.checkStorage(
-            loginPersistence ? 'local' : 'session',
-            storageKeys.currUser
-          )
-        ) {
-          const userInfo = StorageFuncs.getStorage<UserInfoInt>(
-            loginPersistence ? 'local' : 'session',
-            storageKeys.currUser
-          );
-          dispatch(setUserInfo(userInfo));
-          dispatch(setIsUserLoggedIn(true));
+        if (isUserLoggedIn && !userInfo) {
+          try {
+            let userInfo;
+            const snapQuery = query(
+              collection(db, 'users'),
+              where('email', '==', user.email)
+            );
+
+            unsub = onSnapshot(snapQuery, (querySnapshot) => {
+              querySnapshot.forEach((doc) => {
+                userInfo = doc.data() ?? null;
+
+                dispatch(
+                  setUserInfo({
+                    ...userInfo,
+                    createdAt: userInfo.createdAt
+                      ? userInfo.createdAt.toDate().toString()
+                      : '',
+                  })
+                );
+              });
+
+              if (!querySnapshot.size) {
+                dispatch(setNoUserInfo(true));
+                dispatch(setIsUserLoggedIn(true));
+                unsub();
+              }
+            });
+          } catch (error) {
+            console.log('User info fetch failed: ', error);
+          }
+          // dispatch(setIsUserLoggedIn(true));
         }
 
         // console.log('signed in: ');
         // console.log('signed in: ', user);
       } else {
-        // console.log('signed out');
+        console.log('signed out');
       }
       setAuthLoading && setAuthLoading(false);
     });
+    return () => unsub?.();
   }, [storageKeys, loginPersistence]);
 
   useEffect(() => {
@@ -189,13 +239,25 @@ const Root = () => {
   const location = useLocation();
   const theme = useBlogSelector((state) => state.theme);
   const { noUserInfo, isUserLoggedIn } = useBlogSelector((state) => state.user);
-  const { delAcc } = useGlobalContext();
+  const {
+    delAcc,
+    searchString,
+    setSearchString,
+    setSearchResults,
+    skeletonPosts,
+  } = useGlobalContext();
 
   useEffect(() => {
+    document.documentElement.style.scrollBehavior = 'auto';
     window.scrollTo(0, 0);
-  }, [location.pathname]);
+    document.documentElement.style.scrollBehavior = 'smooth';
 
-  // TODO Utilize useHistory to detect change of route from profile to another, and use that to reset displayInfo
+    if (!location.pathname.includes('search')) {
+      setSearchString && setSearchString((prev) => (prev ? '' : prev));
+
+      skeletonPosts && setSearchResults && setSearchResults([...skeletonPosts]);
+    }
+  }, [location.pathname]);
 
   return (
     <>

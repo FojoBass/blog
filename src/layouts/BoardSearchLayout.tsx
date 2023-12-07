@@ -1,8 +1,9 @@
-import React, { FC, ReactNode, useEffect, useState } from 'react';
+import React, { FC, ReactNode, useEffect, useState, useRef } from 'react';
 import { NavLink, Outlet, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import SearchForm from '../pages/components/SearchForm';
 import { useGlobalContext } from '../context';
+import { useBlogSelector } from '../app/store';
 
 interface BSLInt {
   isPosts: PostInt;
@@ -39,9 +40,42 @@ const BoardSearchLayout: FC<BSLInt> = ({
   isSettings,
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { isUserLoggedIn } = useBlogSelector((state) => state.user);
 
-  const { searchString, filters, orderBy, setFilters, setOrderBy } =
-    useGlobalContext();
+  const {
+    searchString,
+    filters,
+    orderBy,
+    setFilters,
+    setOrderBy,
+    skeletonPosts,
+    setSearchResults,
+    fetchSearchResults,
+  } = useGlobalContext();
+
+  const handleFilterChange = (item: string) => {
+    setSearchParams({
+      s: searchString ? searchString : '',
+      filters: item,
+      orderBy: orderBy ?? '',
+    });
+
+    skeletonPosts && setSearchResults && setSearchResults([...skeletonPosts]);
+    fetchSearchResults &&
+      fetchSearchResults(item, orderBy ?? '', searchString ?? '', false);
+  };
+
+  const handleSortChange = (item: string) => {
+    setSearchParams({
+      s: searchString ? searchString : '',
+      filters: filters ?? '',
+      orderBy: item,
+    });
+
+    skeletonPosts && setSearchResults && setSearchResults([...skeletonPosts]);
+    fetchSearchResults &&
+      fetchSearchResults(filters ?? '', item, searchString ?? '', false);
+  };
 
   useEffect(() => {
     if (!isSettings) {
@@ -96,13 +130,7 @@ const BoardSearchLayout: FC<BSLInt> = ({
                 <button
                   className={`sort_by_opt ${orderBy === item ? 'active' : ''}`}
                   key={v4()}
-                  onClick={() =>
-                    setSearchParams({
-                      s: searchString ? searchString : '',
-                      filters: filters ?? '',
-                      orderBy: item,
-                    })
-                  }
+                  onClick={() => handleSortChange(item)}
                 >
                   {item}
                 </button>
@@ -119,25 +147,34 @@ const BoardSearchLayout: FC<BSLInt> = ({
           {navItems
             ? navItems.map(({ url, count, title }) => (
                 <NavLink to={url} className='nav_opt' key={v4()}>
-                  {title} {count ? `(${count})` : ''}
+                  {title}{' '}
+                  {count ? `(${count})` : count === 0 ? `(${count})` : ''}
                 </NavLink>
               ))
             : filterItems
-            ? filterItems.filters.map((item) => (
-                <button
-                  className={`nav_opt ${item === filters ? 'active' : ''}`}
-                  key={v4()}
-                  onClick={() =>
-                    setSearchParams({
-                      s: searchString ? searchString : '',
-                      filters: item,
-                      orderBy: orderBy ?? '',
-                    })
-                  }
-                >
-                  {item}
-                </button>
-              ))
+            ? filterItems.filters.map((item) =>
+                item.includes('my posts only') ? (
+                  isUserLoggedIn ? (
+                    <button
+                      className={`nav_opt ${item === filters ? 'active' : ''}`}
+                      key={v4()}
+                      onClick={() => handleFilterChange(item)}
+                    >
+                      {item}
+                    </button>
+                  ) : (
+                    ''
+                  )
+                ) : (
+                  <button
+                    className={`nav_opt ${item === filters ? 'active' : ''}`}
+                    key={v4()}
+                    onClick={() => handleFilterChange(item)}
+                  >
+                    {item}
+                  </button>
+                )
+              )
             : ''}
         </div>
 
@@ -157,27 +194,38 @@ const BoardSearchLayout: FC<BSLInt> = ({
             {navItems
               ? navItems.map(({ url, count, title }) => (
                   <NavLink to={url} className='side_bsl_nav' key={v4()}>
-                    {title} {count ? `(${count})` : ''}
+                    {title}{' '}
+                    {count ? `(${count})` : count === 0 ? `(${count})` : ''}
                   </NavLink>
                 ))
               : filterItems
-              ? filterItems.filters.map((item) => (
-                  <button
-                    className={`side_bsl_nav ${
-                      item === filters ? 'active' : ''
-                    }`}
-                    key={v4()}
-                    onClick={() =>
-                      setSearchParams({
-                        s: searchString ? searchString : '',
-                        filters: item,
-                        orderBy: orderBy ?? '',
-                      })
-                    }
-                  >
-                    {item}
-                  </button>
-                ))
+              ? filterItems.filters.map((item) =>
+                  item.includes('my posts only') ? (
+                    isUserLoggedIn ? (
+                      <button
+                        className={`side_bsl_nav ${
+                          item === filters ? 'active' : ''
+                        }`}
+                        key={v4()}
+                        onClick={() => handleFilterChange(item)}
+                      >
+                        {item}
+                      </button>
+                    ) : (
+                      ''
+                    )
+                  ) : (
+                    <button
+                      className={`side_bsl_nav ${
+                        item === filters ? 'active' : ''
+                      }`}
+                      key={v4()}
+                      onClick={() => handleFilterChange(item)}
+                    >
+                      {item}
+                    </button>
+                  )
+                )
               : ''}
           </aside>
           <Outlet />

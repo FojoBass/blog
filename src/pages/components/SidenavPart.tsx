@@ -27,6 +27,7 @@ const SidenavPart = () => {
               to={link}
               key={v4()}
               target='_blank'
+              rel='noreferrer'
             >
               <Icon />
             </Link>

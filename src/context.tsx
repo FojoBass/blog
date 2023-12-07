@@ -6,7 +6,14 @@ import {
   useEffect,
   useRef,
 } from 'react';
-import { CountryInt, DummyPostsInt, PostInt, UserInfoInt } from './types';
+import {
+  CountryInt,
+  DummyPostsInt,
+  FollowsInt,
+  PostInt,
+  SearchFollowsInt,
+  UserInfoInt,
+} from './types';
 import { useBlogDispatch, useBlogSelector } from './app/store';
 import { StorageFuncs } from './services/storages';
 import { auth, db } from './services/firebase/config';
@@ -28,6 +35,17 @@ import {
 import { CategoryPosts } from './pages';
 import ShortUniqueId from 'short-unique-id';
 import { toast } from 'react-toastify';
+import dummyImg from './assets/dummy-image.jpg';
+
+interface FetchSearchResultInt {
+  (
+    filter: string,
+    order: string,
+    str: string,
+    isMore: boolean,
+    isRecall?: boolean
+  ): void;
+}
 
 interface ContextInt {
   searchString?: string;
@@ -69,14 +87,22 @@ interface ContextInt {
   setHomePosts?: Dispatch<React.SetStateAction<DummyPostsInt[] | PostInt[]>>;
   userPosts?: DummyPostsInt[] | PostInt[];
   setUserPosts?: Dispatch<React.SetStateAction<DummyPostsInt[] | PostInt[]>>;
+  searchResults?: DummyPostsInt[] | PostInt[] | SearchFollowsInt[];
+  setSearchResults?: Dispatch<
+    React.SetStateAction<DummyPostsInt[] | PostInt[] | SearchFollowsInt[]>
+  >;
   homeLoading?: boolean;
   setHomeLoading?: Dispatch<React.SetStateAction<boolean>>;
   setHomeLastDocTime?: Dispatch<React.SetStateAction<Timestamp | null>>;
+  homeLastDocTime?: Timestamp | null;
   userLastDocTime?: Timestamp | null;
   userPostsLoading?: boolean;
   setUserPostsLoading?: Dispatch<React.SetStateAction<boolean>>;
   setUserLastDocTime?: Dispatch<React.SetStateAction<Timestamp | null>>;
-  homeLastDocTime?: Timestamp | null;
+  searchLastDocTime?: Timestamp | null;
+  searchLoading?: boolean;
+  setSearchLoading?: Dispatch<React.SetStateAction<boolean>>;
+  setSearchLastDocTime?: Dispatch<React.SetStateAction<Timestamp | null>>;
   fetchMoreHomePosts?: () => Promise<void>;
   fetchMoreUserPosts?: () => Promise<void>;
   targetUserId?: string;
@@ -87,9 +113,11 @@ interface ContextInt {
   displayPostContent?: PostInt | null;
   setDisplayUserInfo?: Dispatch<React.SetStateAction<UserInfoInt | null>>;
   setDisplayPostContent?: Dispatch<React.SetStateAction<PostInt | null>>;
+  fetchSearchResults?: FetchSearchResultInt;
+  dummyImg: string;
 }
 
-const BlogContext = createContext<ContextInt>({});
+const BlogContext = createContext<ContextInt>({ dummyImg });
 
 export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -100,6 +128,9 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     null
   );
   const [userLastDocTime, setUserLastDocTime] = useState<Timestamp | null>(
+    null
+  );
+  const [searchLastDocTime, setSearchLastDocTime] = useState<Timestamp | null>(
     null
   );
 
@@ -129,6 +160,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isVerifyOpen, setIsVerifyOpen] = useState(true);
   const [homeLoading, setHomeLoading] = useState(true);
   const [userPostsLoading, setUserPostsLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(true);
   const delayListener = useRef(true);
   const isInitial = useRef(true);
 
@@ -155,10 +187,14 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userPosts, setUserPosts] = useState<DummyPostsInt[] | PostInt[]>([
     ...skeletonPosts,
   ]);
+  const [searchResults, setSearchResults] = useState<
+    SearchFollowsInt[] | DummyPostsInt[] | PostInt[]
+  >([...skeletonPosts]);
 
   const [loginPersistence, setLoginPersistence] = useState(
     StorageFuncs.getStorage<boolean>('local', storageKeys.logPers) ?? false
   );
+  const searchLastDocTimeRef = useRef<Timestamp | null>(null);
 
   const dispatch = useBlogDispatch();
 
@@ -171,6 +207,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     setAuthError,
     setUserInfo,
     resetFollowError,
+    resetUserInfo,
   } = userSlice.actions;
   const { setTheme } = themeSlice.actions;
 
@@ -180,11 +217,19 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const logOut = async () => {
     await blogServices.logOut();
     dispatch(setIsUserLoggedIn(false));
+    dispatch(resetUserInfo());
     isInitial.current = true;
 
     if (storageKeys) {
-      !loginPersistence &&
-        StorageFuncs.clearStorage('session', storageKeys.currUser);
+      StorageFuncs.clearStorage(
+        loginPersistence ? 'local' : 'session',
+        storageKeys.currUser
+      );
+
+      StorageFuncs.clearStorage(
+        loginPersistence ? 'local' : 'session',
+        storageKeys.isUserInfo
+      );
 
       StorageFuncs.clearStorage(
         loginPersistence ? 'local' : 'session',
@@ -195,6 +240,108 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         loginPersistence ? 'local' : 'session',
         storageKeys.userInfoData
       );
+    }
+  };
+
+  const checkResult = (res: any[], str: string, isUsers: boolean): any[] => {
+    let check: any[] = [];
+    if (!isUsers)
+      check = res.filter((item) =>
+        item.title.toLowerCase().includes(str.toLowerCase().trim())
+      );
+    else
+      check = res.filter(
+        (item) =>
+          item.userName.toLowerCase().includes(str.toLowerCase()) ||
+          item.fullName.toLowerCase().includes(str.toLowerCase())
+      );
+
+    return check;
+  };
+
+  const fetchSearchResults: FetchSearchResultInt = async (
+    filter,
+    order,
+    str,
+    isMore,
+    isRecall
+  ) => {
+    const isUsers = filter === 'users';
+    const isUserPosts = filter === 'my posts only';
+    const orderBy = order === 'newest' ? 'desc' : 'asc';
+
+    try {
+      setSearchLoading(true);
+      const res = await blogServices.getSearchResults(
+        isUsers,
+        isUserPosts,
+        userInfo?.uid ?? '',
+        isMore,
+        !isRecall ? searchLastDocTime : searchLastDocTimeRef.current,
+        str,
+        orderBy
+      );
+      let results: any[] = [];
+      let modResults: any[] = [];
+
+      res.forEach((doc) => {
+        results.push(doc.data());
+      });
+
+      results = checkResult(results, str, isUsers);
+      if (results.length) {
+        if (!isUsers) {
+          results.forEach((item) => {
+            modResults.push({
+              ...item,
+              publishedAt: item.publishedAt
+                ? item.publishedAt.toDate().toString()
+                : '',
+              createdAt: item.createdAt
+                ? item.createdAt.toDate().toString()
+                : '',
+            });
+          });
+        } else {
+          results.forEach((item) => {
+            modResults.push({
+              userName: item.userName,
+              id: item.uid,
+              avi: item.aviUrls.smallAviUrl,
+              createdAt: item.createdAt
+                ? item.createdAt.toDate().toString()
+                : '',
+            });
+          });
+        }
+      } else {
+        if (res.docs.length) {
+          searchLastDocTimeRef.current = res.docs[res.docs.length - 1]
+            ? !isUsers && !isUserPosts
+              ? res.docs[res.docs.length - 1].data().publishedAt
+              : res.docs[res.docs.length - 1].data().createdAt
+            : null;
+          fetchSearchResults(filter, order, str, true, true);
+        }
+      }
+
+      const lastDocTime = res.docs[res.docs.length - 1]
+        ? !isUsers && !isUserPosts
+          ? res.docs[res.docs.length - 1].data().publishedAt
+          : res.docs[res.docs.length - 1].data().createdAt
+        : null;
+
+      searchLastDocTimeRef.current = null;
+      lastDocTime && setSearchLastDocTime(lastDocTime as Timestamp);
+
+      setSearchResults((prev) => [
+        ...prev.filter((p) => !p.isDummy),
+        ...(modResults as SearchFollowsInt[] | PostInt[]),
+      ]);
+    } catch (error) {
+      console.log('Search failed: ', error);
+    } finally {
+      setSearchLoading(false);
     }
   };
 
@@ -322,6 +469,11 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     displayUserInfo,
     setDisplayPostContent,
     setDisplayUserInfo,
+    fetchSearchResults,
+    searchResults,
+    setSearchResults,
+    searchLoading,
+    dummyImg,
   };
 
   // * Fetches
@@ -485,10 +637,10 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (userInfo) {
-      StorageFuncs.setStorage<UserInfoInt>(
+      StorageFuncs.setStorage<string>(
         loginPersistence ? 'local' : 'session',
         storageKeys.currUser,
-        userInfo
+        userInfo.uid
       );
     }
   }, [userInfo, loginPersistence]);

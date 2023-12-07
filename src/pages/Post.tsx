@@ -434,7 +434,7 @@ const Post = () => {
                     </Link>
                   ))
                 ) : (
-                  <h3 className='empty'>No Posts</h3>
+                  <h3 className='empty_data'>No Post</h3>
                 )}
               </div>
             )}

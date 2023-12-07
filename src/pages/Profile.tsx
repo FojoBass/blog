@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import avi from '../assets/Me cropped.jpg';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { BsThreeDots, BsBoxArrowUpRight, BsPersonHearts } from 'react-icons/bs';
 import { ImLocation2 } from 'react-icons/im';
 import { MdCake, MdMail, MdOutlineError } from 'react-icons/md';
@@ -15,16 +14,19 @@ import {
 import { DisplayPosts, Loading } from './components';
 import { DummyPostsInt, PostInt, UserInfoInt } from '../types';
 import { v4 } from 'uuid';
-import { useBlogSelector } from '../app/store';
+import { useBlogDispatch, useBlogSelector } from '../app/store';
 import { useGlobalContext } from '../context';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { userSlice } from '../features/userSlice';
 import { BlogServices } from '../services/firebase/blogServices';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../services/firebase/config';
+import { addFollow } from '../features/userAsyncThunk';
 
 const Profile = () => {
-  const { isUserLoggedIn, userInfo } = useBlogSelector((state) => state.user);
+  const { isUserLoggedIn, userInfo, followLoading } = useBlogSelector(
+    (state) => state.user
+  );
   const theme = useBlogSelector((state) => state.theme);
   const [userInfoLoading, setUserInfoLoading] = useState(true);
   const [displayInfo, setDisplayInfo] = useState<UserInfoInt | null>(null);
@@ -44,6 +46,25 @@ const Profile = () => {
   );
 
   const { uid } = useParams();
+  const isFollow = useMemo(() => {
+    return !!userInfo?.followings.find((flw) => flw.id === uid);
+  }, [userInfo?.followings]);
+  const dispatch = useBlogDispatch();
+  const navigate = useNavigate();
+
+  const handleFollow = () => {
+    if (!isUserLoggedIn) navigate('/enter');
+    else {
+      dispatch(
+        addFollow({
+          isFollow,
+          posterName: displayInfo?.userName ?? '',
+          uid: uid ?? '',
+          avi: displayInfo?.aviUrls.smallAviUrl ?? '',
+        })
+      );
+    }
+  };
 
   useEffect(() => {
     if (typeof authLoading === 'boolean' && !authLoading) {
@@ -116,8 +137,6 @@ const Profile = () => {
   }, [userInfoLoading, targetUserId]);
 
   useEffect(() => {
-    console.log('User Posts: ', userPosts);
-
     let uniqueIds = new Set<string>();
     let modPosts: PostInt[] | DummyPostsInt[] = [];
 
@@ -137,9 +156,6 @@ const Profile = () => {
     }
     setModUserPosts(modPosts);
   }, [userPosts]);
-
-  // TODO Get Follow up and running
-  // Todo Then work on either search or dashboard
 
   return (
     <section id='profile_sect' className='gen_sect'>
@@ -179,8 +195,8 @@ const Profile = () => {
                 </div>
 
                 <div className='right_side'>
-                  {isUserLoggedIn ? (
-                    uid === userInfo?.uid ? (
+                  {isUserLoggedIn &&
+                    (uid === userInfo?.uid ? (
                       <Link
                         to={`/settings/${userInfo?.userId}/profile`}
                         className='spc_btn edit_btn'
@@ -189,25 +205,27 @@ const Profile = () => {
                       </Link>
                     ) : (
                       <>
-                        <button className='spc_btn follow_btn'>Follow</button>
+                        <button
+                          className={`follow_btn spc_btn ${
+                            followLoading ? 'loading' : ''
+                          }`}
+                          onClick={handleFollow}
+                        >
+                          {isFollow ? 'Unfollow' : 'Follow'}
+                        </button>
                         <button className='more_opts'>
                           <BsThreeDots />
                         </button>
                       </>
-                    )
-                  ) : (
-                    <>
-                      <button className='spc_btn follow_btn'>Follow</button>
-                      <button className='more_opts'>
-                        <BsThreeDots />
-                      </button>
-                    </>
-                  )}
+                    ))}
                 </div>
               </div>
 
               <div className='mid'>
-                <div className='user_info'>
+                <div
+                  className='user_info'
+                  style={!isUserLoggedIn ? { marginTop: '7rem' } : {}}
+                >
                   <h3 className='user_name'>{displayInfo?.userName}</h3>
                   <p className='about_user'>{displayInfo?.bio}</p>
                 </div>
@@ -233,7 +251,11 @@ const Profile = () => {
 
                   {displayInfo?.socials.url && (
                     <article className='more_info_opt'>
-                      <a href='https://fast.com' target='_blank'>
+                      <a
+                        href='https://fast.com'
+                        target='_blank'
+                        rel='noreferrer'
+                      >
                         <div className='icon_wrapper'>
                           <BsBoxArrowUpRight />
                         </div>
@@ -258,6 +280,7 @@ const Profile = () => {
                       href={`${displayInfo?.socials.git}`}
                       className='social_link'
                       target='_blank'
+                      rel='noreferrer'
                     >
                       <AiFillGithub />
                     </a>
@@ -268,6 +291,7 @@ const Profile = () => {
                       href={`${displayInfo?.socials.X}`}
                       className='social_link'
                       target='_blank'
+                      rel='noreferrer'
                     >
                       <AiOutlineTwitter />
                     </a>
@@ -278,6 +302,7 @@ const Profile = () => {
                       href={`${displayInfo?.socials.fb}`}
                       className='social_link'
                       target='_blank'
+                      rel='noreferrer'
                     >
                       <AiFillFacebook />
                     </a>
@@ -288,6 +313,7 @@ const Profile = () => {
                       href={`${displayInfo?.socials.ins}`}
                       className='social_link'
                       target='_blank'
+                      rel='noreferrer'
                     >
                       <AiFillInstagram />
                     </a>
@@ -298,6 +324,7 @@ const Profile = () => {
                       href={`${displayInfo?.socials.be}`}
                       className='social_link'
                       target='_blank'
+                      rel='noreferrer'
                     >
                       <AiFillBehanceSquare />
                     </a>

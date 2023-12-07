@@ -71,6 +71,12 @@ export interface FollowsInt {
   avi: string;
 }
 
+export interface SearchFollowsInt extends FollowsInt {
+  isDummy: boolean;
+  postId: string;
+  createdAt: string;
+}
+
 export interface PostInfoType {
   title: string;
   createdAt: string;

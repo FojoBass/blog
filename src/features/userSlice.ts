@@ -8,6 +8,7 @@ import {
   userSignUp,
 } from './userAsyncThunk';
 import { UserInfoInt } from '../types';
+import { StorageFuncs } from '../services/storages';
 
 interface InitialStateInt {
   userInfo: null | UserInfoInt;
@@ -24,9 +25,15 @@ interface InitialStateInt {
   followError: any;
 }
 
+const loginPersistence =
+  StorageFuncs.getStorage<boolean>('local', 'devie_login_persistence') ?? false;
+
 const initialState: InitialStateInt = {
   userInfo: null,
-  isUserLoggedIn: false,
+  isUserLoggedIn: StorageFuncs.checkStorage(
+    loginPersistence ? 'local' : 'session',
+    'devie_current_user'
+  ),
   isSignupLoading: false,
   isSignedUp: false,
   followLoading: false,
@@ -50,6 +57,9 @@ export const userSlice = createSlice({
     },
     setUserInfo(state, action) {
       state.userInfo = action.payload as UserInfoInt;
+    },
+    resetUserInfo(state) {
+      state.userInfo = null;
     },
     setAuthError(state, action) {
       state.signInError = action.payload;

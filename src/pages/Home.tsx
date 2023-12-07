@@ -18,7 +18,7 @@ export interface HandleStickInt {
 
 const Home = () => {
   const asideRef = useRef<HTMLDivElement>(null);
-  const { setSearchString, homePosts } = useGlobalContext();
+  const { homePosts } = useGlobalContext();
   const { isUserLoggedIn, isSignedUp } = useBlogSelector((state) => state.user);
   const { setIsSignedUp } = userSlice.actions;
   const [modHomePost, setModHomePost] = useState<PostInt[] | DummyPostsInt[]>(
@@ -26,10 +26,6 @@ const Home = () => {
   );
 
   const dispatch = useBlogDispatch();
-
-  useEffect(() => {
-    if (setSearchString) setSearchString('');
-  }, []);
 
   useEffect(() => {
     let uniqueIds = new Set<string>();

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useGlobalContext } from '../context';
 import { useSearchParams } from 'react-router-dom';
 import BoardSearchLayout from '../layouts/BoardSearchLayout';
-import { FollowsInt, DummyPostsInt } from '../types';
+import { DummyPostsInt, FollowsInt, PostInt } from '../types';
 import { v4 } from 'uuid';
 import { DisplayPosts, DisplayUsers } from './components';
-import avi from '../assets/Me cropped.jpg';
+import ShortUniqueId from 'short-unique-id';
 
 const Search = () => {
   const {
@@ -15,27 +15,16 @@ const Search = () => {
     isSearch,
     filters,
     orderBy,
-    // setFilters,
+    fetchSearchResults,
+    searchResults,
+    skeletonPosts,
+    setSearchResults,
   } = useGlobalContext();
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  // TODO Placeholder for loading purposes
-  const searchPosts: DummyPostsInt[] = [
-    { isDummy: true, postId: v4() },
-    { isDummy: true, postId: v4() },
-    { isDummy: true, postId: v4() },
-    { isDummy: true, postId: v4() },
-    { isDummy: true, postId: v4() },
-  ];
+  const randId = new ShortUniqueId({ length: 10 });
+  const initialEntry = useRef(true);
 
-  const [dummyFollows] = React.useState<FollowsInt[]>([
-    { userName: 'Dummy name', id: 'asdf', avi },
-    { userName: 'Dummy name', id: 'asdfd', avi },
-    { userName: 'Dummy name', id: 'asdfs', avi },
-    { userName: 'Dummy name', id: 'asdf8', avi },
-    { userName: 'Dummy name', id: 'asdfd4', avi },
-    { userName: 'Dummy name', id: 'asdfsl', avi },
-  ]);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     if (setSearchString && setIsSearch && isSearch) {
@@ -47,9 +36,47 @@ const Search = () => {
         },
         { replace: true }
       );
+
+      if (!initialEntry.current)
+        fetchSearchResults &&
+          fetchSearchResults(
+            filters ?? '',
+            orderBy ?? '',
+            searchString ?? '',
+            false
+          );
+
       setIsSearch(false);
     }
   }, [isSearch]);
+
+  useEffect(() => {
+    const searchString = searchParams.get('s');
+    const filters =
+      searchParams.get('filters') === 'my posts only'
+        ? 'posts'
+        : searchParams.get('filters');
+    const orderBy = searchParams.get('orderBy');
+
+    if (initialEntry.current && filters && orderBy && searchString) {
+      if (searchParams.get('filters') === 'my posts only')
+        setSearchParams(
+          {
+            s: searchString ? searchString : '',
+            filters: 'posts',
+            orderBy: orderBy ?? '',
+          },
+          { replace: true }
+        );
+
+      setSearchString && setSearchString(searchString);
+
+      fetchSearchResults &&
+        fetchSearchResults(filters, orderBy, searchString, false);
+
+      initialEntry.current = false;
+    }
+  }, [searchParams]);
 
   return (
     <BoardSearchLayout
@@ -64,11 +91,11 @@ const Search = () => {
       isSettings={false}
     >
       {filters === 'posts' ? (
-        <DisplayPosts posts={searchPosts} target={'search'} />
+        <DisplayPosts posts={searchResults ?? []} target={'search'} />
       ) : filters === 'users' ? (
-        <DisplayUsers users={dummyFollows} />
+        <DisplayUsers users={searchResults ?? []} type='search' />
       ) : filters === 'my posts only' ? (
-        <DisplayPosts posts={searchPosts} target={'search'} />
+        <DisplayPosts posts={searchResults ?? []} target={'search'} />
       ) : (
         ''
       )}

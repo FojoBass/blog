@@ -101,9 +101,6 @@ const ProfileSettings = () => {
     return false;
   };
 
-  // TODO VALIDATE NAMES AND EMAIL BEFORE SUBMISSION
-  // TODO BEFORE HITTING ENDPOINT, ENSURING CORRECT DATA IS PREPPED UP
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -214,18 +211,6 @@ const ProfileSettings = () => {
         </article>
 
         <article className='form_opt'>
-          {/* <div className='top_field'>
-            <label htmlFor='email'>Email</label>
-            <input
-              type='email'
-              placeholder='Enter email'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              id='email'
-              ref={formRefs.emailInputRef}
-            />
-          </div> */}
-
           <div className='bottom_field'>
             <input
               type='checkbox'

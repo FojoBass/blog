@@ -148,9 +148,12 @@ $acc_clr: var(--acc_clr);
       .img_wrapper {
         border-radius: 50%;
         pointer-events: none;
+        height: 5rem;
 
         img {
-          width: 40px;
+          width: 5rem;
+          height: 100%;
+          object-fit: cover;
           background-color: var(--shw_clr_shd);
         }
       }

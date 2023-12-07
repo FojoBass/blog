@@ -144,6 +144,53 @@ export class BlogServices {
     return getDocs(q);
   }
 
+  getSearchResults(
+    isUsers: boolean,
+    isUserPosts: boolean,
+    uid: string,
+    isMore: boolean,
+    lastDocTime: Timestamp | null,
+    searchString: string,
+    order: 'desc' | 'asc'
+  ) {
+    const q = isUsers
+      ? isMore
+        ? query(
+            collection(db, 'users'),
+            orderBy('createdAt', order),
+            startAfter(lastDocTime),
+            limit(10)
+          )
+        : query(collection(db, 'users'), orderBy('createdAt', order), limit(10))
+      : isUserPosts
+      ? isMore
+        ? query(
+            collection(db, `users/${uid}/posts`),
+            orderBy('createdAt', order),
+            startAfter(lastDocTime),
+            limit(10)
+          )
+        : query(
+            collection(db, `users/${uid}/posts`),
+            orderBy('createdAt', order),
+            limit(10)
+          )
+      : isMore
+      ? query(
+          collection(db, 'posts'),
+          orderBy('publishedAt', order),
+          startAfter(lastDocTime),
+          limit(10)
+        )
+      : query(
+          collection(db, 'posts'),
+          orderBy('publishedAt', order),
+          limit(10)
+        );
+
+    return getDocs(q);
+  }
+
   getRelatedPosts(categs: string[], postId: string) {
     const q = query(
       collection(db, 'posts'),

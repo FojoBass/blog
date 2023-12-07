@@ -27,7 +27,8 @@ const Login = () => {
     useBlogSelector((state) => state.user);
   const dispatch = useBlogDispatch();
 
-  const { setLoginPersistence, setIsVerifyOpen } = useGlobalContext();
+  const { setLoginPersistence, setIsVerifyOpen, loginPersistence } =
+    useGlobalContext();
 
   const [email, setEmail] = useState('');
   const [pword, setPword] = useState('');
@@ -253,6 +254,7 @@ const Login = () => {
                     <input
                       type='checkbox'
                       id='logged_in'
+                      checked={loginPersistence}
                       onChange={(e) =>
                         setLoginPersistence &&
                         setLoginPersistence(e.target.checked)

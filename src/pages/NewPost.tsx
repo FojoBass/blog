@@ -677,7 +677,7 @@ const NewPost = () => {
               <button className='publish_btn spc_btn loading' disabled>
                 {isPubClicked ? 'Publishing' : 'Saving'}
               </button>
-            ) : (
+            ) : userInfo ? (
               <>
                 <div className='left_side'>
                   <button
@@ -708,6 +708,12 @@ const NewPost = () => {
 
                 <button className='revert_btn'>Revert</button>
               </>
+            ) : (
+              <div className='loader' style={{ height: 'fit-content' }}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
             )}
           </footer>
 

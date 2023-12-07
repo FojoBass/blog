@@ -41,9 +41,9 @@ const SinglePost: React.FC<SinglePostProps> = ({
 }) => {
   const [isUser, setIsUser] = useState(false);
   const [modDate] = useState({
-    day: date.split(' ')[2],
-    month: date.split(' ')[1],
-    year: date.split(' ')[3],
+    day: date?.split(' ')[2],
+    month: date?.split(' ')[1],
+    year: date?.split(' ')[3],
   });
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isBkmLoading, setIsBkmLoading] = useState(false);
@@ -59,7 +59,7 @@ const SinglePost: React.FC<SinglePostProps> = ({
   const handleAddBk = async () => {
     if (isUserLoggedIn) {
       const bkmList = [...bookmarks];
-      if (!bkmList.find((bm) => bm === userInfo?.uid)) {
+      if (!bkmList?.find((bm) => bm === userInfo?.uid)) {
         bkmList.push(userInfo?.uid ?? '');
 
         setBkms(bkmList);
@@ -82,7 +82,7 @@ const SinglePost: React.FC<SinglePostProps> = ({
   const handleRemoveBk = async () => {
     if (isUserLoggedIn) {
       let bkmList = [...bookmarks];
-      if (bkmList.find((bm) => bm === userInfo?.uid)) {
+      if (bkmList?.find((bm) => bm === userInfo?.uid)) {
         bkmList = bkmList.filter((bm) => bm !== userInfo?.uid);
         setBkms(bkmList);
 
@@ -113,10 +113,10 @@ const SinglePost: React.FC<SinglePostProps> = ({
   useEffect(() => {
     if (uid === userInfo?.uid) setIsUser(true);
 
-    if (userInfo?.followings.find((flw) => flw.id === uid)) setIsFollow(true);
+    if (userInfo?.followings?.find((flw) => flw.id === uid)) setIsFollow(true);
     else setIsFollow(false);
 
-    if (bkms.find((bm) => bm === userInfo?.uid)) setIsBookmarked(true);
+    if (bkms?.find((bm) => bm === userInfo?.uid)) setIsBookmarked(true);
     else setIsBookmarked(false);
   }, [uid, userInfo, bkms]);
 

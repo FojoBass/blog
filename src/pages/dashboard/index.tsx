@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { AiFillCaretDown } from 'react-icons/ai';
 import Posts from './UserPosts';
 import DisplayUsers from '../components/DisplayUsers';
@@ -16,24 +16,33 @@ const Dashboard = () => {
     status: pathname.split('/').length === 3 ? true : false,
     items: [],
   });
-  const [navItems] = useState<NavInt[]>([
-    { title: 'Posts', count: 3, url: `/${userInfo?.userId}/dashboard/posts` },
-    {
-      title: 'Followers',
-      count: 5,
-      url: `/${userInfo?.userId}/dashboard/followers`,
-    },
-    {
-      title: 'Followings',
-      count: 6,
-      url: `/${userInfo?.userId}/dashboard/followings`,
-    },
-    {
-      title: 'Bookmarks',
-      count: 2,
-      url: `/${userInfo?.userId}/dashboard/bookmarks`,
-    },
-  ]);
+  // Todo Fetch all Users posts and set all needed dynamic variables
+  // Todo Add Bookmarks to userinfo
+  // Todo On entering dashboard, ensure the current tab is selected in the sidebar
+  // Todo Also work on making the pathname dynamic also, factoring reloads and loader
+  // Todo God speed bruff
+
+  const navItems = useMemo<NavInt[]>(
+    () => [
+      { title: 'Posts', count: 3, url: `/${userInfo?.userId}/dashboard/posts` },
+      {
+        title: 'Followers',
+        count: userInfo?.followers.length ?? 0,
+        url: `/${userInfo?.userId}/dashboard/followers`,
+      },
+      {
+        title: 'Followings',
+        count: userInfo?.followings.length ?? 0,
+        url: `/${userInfo?.userId}/dashboard/followings`,
+      },
+      {
+        title: 'Bookmarks',
+        count: 2,
+        url: `/${userInfo?.userId}/dashboard/bookmarks`,
+      },
+    ],
+    [userInfo]
+  );
   const navigate = useNavigate();
 
   useEffect(() => {

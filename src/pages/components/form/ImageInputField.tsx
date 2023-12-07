@@ -33,9 +33,21 @@ const ImageInputField = () => {
     <div className='form_opt'>
       <div
         className='img_wrapper'
-        style={!aviSrc ? { visibility: 'hidden' } : {}}
+        style={
+          !aviSrc
+            ? { visibility: 'hidden', width: '5rem', height: '5rem' }
+            : { width: '5rem', height: '5rem' }
+        }
       >
-        {aviSrc ? <img src={aviSrc} alt='' /> : ''}
+        {aviSrc ? (
+          <img
+            src={aviSrc}
+            alt=''
+            style={{ height: '100%', width: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          ''
+        )}
       </div>
       <input
         type='file'
