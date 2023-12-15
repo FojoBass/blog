@@ -36,6 +36,7 @@ import {
 } from 'firebase/firestore';
 import ShortUniqueId from 'short-unique-id';
 import {
+  BookmarkInt,
   CommentDataInt,
   FollowsInt,
   PostInt,
@@ -108,6 +109,11 @@ export class BlogServices {
     return updateDoc(docRef, { ...data });
   }
 
+  updateBookmarks(uid: string, data: { bookmarks: BookmarkInt[] }) {
+    const docRef = doc(db, `users/${uid}`);
+    return updateDoc(docRef, { ...data });
+  }
+
   getUserInfo(userId: string) {
     const docRef = doc(db, `users/${userId}`);
     return getDoc(docRef);
@@ -142,6 +148,11 @@ export class BlogServices {
           limit(10)
         );
     return getDocs(q);
+  }
+
+  getPost(id: string) {
+    const docRef = doc(db, `posts/${id}`);
+    return getDoc(docRef);
   }
 
   getSearchResults(

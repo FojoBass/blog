@@ -47,7 +47,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!isUserLoggedIn) navigate('/enter', { replace: true });
-    else navigate('/dummies/dashboard/posts');
+    else navigate(navItems[0].url);
   }, [isUserLoggedIn]);
 
   useEffect(() => {

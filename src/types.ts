@@ -143,6 +143,22 @@ export interface UserInfoInt extends FormDataInt {
   userColor: string;
   postCount: number;
   dispEmail: boolean;
+  bookmarks: BookmarkInt[];
+}
+
+export interface BookmarksInt {
+  aviUrl: string;
+  title: string;
+  uid: string;
+  postId: string;
+  publishedAt: FieldValue | string;
+  author: string;
+  categs: string[];
+}
+
+export interface BookmarkInt {
+  postId: string;
+  uid: string;
 }
 
 export interface DateExtractInt {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthorInfo from './AuthorInfo';
 import { BsBookmarkPlus, BsBookmarkDashFill } from 'react-icons/bs';
-import { FollowsInt } from '../../types';
+import { BookmarkInt, FollowsInt } from '../../types';
 import { useBlogDispatch, useBlogSelector } from '../../app/store';
 import { BlogServices } from '../../services/firebase/blogServices';
 import { toast } from 'react-toastify';
@@ -59,14 +59,19 @@ const SinglePost: React.FC<SinglePostProps> = ({
   const handleAddBk = async () => {
     if (isUserLoggedIn) {
       const bkmList = [...bookmarks];
+      let userBkms: BookmarkInt[] = [];
       if (!bkmList?.find((bm) => bm === userInfo?.uid)) {
         bkmList.push(userInfo?.uid ?? '');
+        userBkms.push({ postId: id, uid });
 
         setBkms(bkmList);
         try {
           setIsBkmLoading(true);
           await blogServices.updatePost({ bookmarks: bkmList }, id, true, uid);
           await blogServices.updatePost({ bookmarks: bkmList }, id, false, uid);
+          await blogServices.updateBookmarks(userInfo?.uid ?? '', {
+            bookmarks: userBkms,
+          });
         } catch (error) {
           toast.error('Bookmarking failed');
           console.log('Bookmark add error: ', error);
@@ -82,14 +87,19 @@ const SinglePost: React.FC<SinglePostProps> = ({
   const handleRemoveBk = async () => {
     if (isUserLoggedIn) {
       let bkmList = [...bookmarks];
+      let userBkms: BookmarkInt[] = [];
       if (bkmList?.find((bm) => bm === userInfo?.uid)) {
         bkmList = bkmList.filter((bm) => bm !== userInfo?.uid);
         setBkms(bkmList);
+        userBkms = userBkms.filter((bkm) => bkm.postId !== id);
 
         try {
           setIsBkmLoading(true);
           await blogServices.updatePost({ bookmarks: bkmList }, id, true, uid);
           await blogServices.updatePost({ bookmarks: bkmList }, id, false, uid);
+          await blogServices.updateBookmarks(userInfo?.uid ?? '', {
+            bookmarks: userBkms,
+          });
         } catch (error) {
           toast.error('Bookmark remove failed');
           console.log('Bookmark remove error: ', error);

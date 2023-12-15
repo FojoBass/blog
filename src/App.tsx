@@ -58,14 +58,6 @@ const App = () => {
   );
   const { userPosts } = useBlogSelector((state) => state.blog);
   const dispatch = useBlogDispatch();
-  // const [dummyFollows] = React.useState<SearchFollowsInt[]>([
-  //   { userName: 'Dummy name', id: 'asdf', avi, isDummy: true, postId: '' },
-  //   { userName: 'Dummy name', id: 'asdfd', avi, isDummy: true, postId: '' },
-  //   { userName: 'Dummy name', id: 'asdfs', avi, isDummy: true, postId: '' },
-  //   { userName: 'Dummy name', id: 'asdf8', avi, isDummy: true, postId: '' },
-  //   { userName: 'Dummy name', id: 'asdfd4', avi, isDummy: true, postId: '' },
-  //   { userName: 'Dummy name', id: 'asdfsl', avi, isDummy: true, postId: '' },
-  // ]);
 
   const { setUserInfo, setIsUserLoggedIn, setNoUserInfo } = userSlice.actions;
   const { storageKeys, loginPersistence, setAuthLoading } = useGlobalContext();

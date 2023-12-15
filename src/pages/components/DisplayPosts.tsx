@@ -58,8 +58,6 @@ const DisplayPosts: React.FC<PropInt> = ({ posts, target }) => {
     }
   };
 
-  // TODO THOROUGHLY WORK SEARCH PAGE
-
   return (
     <main className='main_side'>
       {!posts.length ? (

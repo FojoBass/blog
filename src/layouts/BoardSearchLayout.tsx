@@ -1,5 +1,10 @@
 import React, { FC, ReactNode, useEffect, useState, useRef } from 'react';
-import { NavLink, Outlet, useSearchParams } from 'react-router-dom';
+import {
+  NavLink,
+  Outlet,
+  useLocation,
+  useSearchParams,
+} from 'react-router-dom';
 import { v4 } from 'uuid';
 import SearchForm from '../pages/components/SearchForm';
 import { useGlobalContext } from '../context';

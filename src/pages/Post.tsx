@@ -11,6 +11,7 @@ import {
 } from 'react-icons/bs';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
+  BookmarkInt,
   CommentDataInt,
   CommentInt,
   DateExtractInt,
@@ -622,17 +623,29 @@ const Interactions: React.FC<InteractionsInt> = ({
   const blogServices = new BlogServices();
 
   const interaction = async (list: string[]) => {
-    let modList: string[] = [];
+    let modList: string[] = [...list];
+    let modBkms: BookmarkInt[] = [];
     if (isUserLoggedIn) {
       if (isInt) {
-        modList = [...list];
         modList = modList.filter((bId) => bId !== userInfo?.uid);
+
+        if (type === 'bookmark' && userInfo) {
+          modBkms = userInfo.bookmarks;
+          modBkms = modBkms.filter((bkm) => bkm.postId !== post?.postId);
+        }
       }
 
       if (!isInt) {
-        modList = [...list];
         if (!modList.find((bId) => bId === userInfo?.uid)) {
           modList.push(userInfo?.uid ?? '');
+        } else return;
+
+        if (
+          type === 'bookmark' &&
+          userInfo &&
+          !modBkms.find((bkm) => bkm.postId === post?.postId)
+        ) {
+          modBkms.push({ postId: post?.postId ?? '', uid: post?.uid ?? '' });
         } else return;
       }
 
@@ -650,6 +663,10 @@ const Interactions: React.FC<InteractionsInt> = ({
           false,
           post!.uid
         );
+        type === 'bookmark' &&
+          (await blogServices.updateBookmarks(userInfo?.uid ?? '', {
+            bookmarks: modBkms,
+          }));
       } catch (error) {
         toast.error('Operation failed');
         console.log(

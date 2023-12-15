@@ -84,6 +84,7 @@ export const userSignUp = createAsyncThunk<void, UserSignUpPayloadInt>(
         userColor: '#000000',
         postCount: 0,
         dispEmail: true,
+        bookmarks: [],
       });
       if (!password) thunkApi.dispatch(setNoUserInfo(false));
     } catch (error) {
