@@ -37,7 +37,7 @@ const Dashboard = () => {
       },
       {
         title: 'Bookmarks',
-        count: 2,
+        count: userInfo?.bookmarks.length ?? 0,
         url: `/${userInfo?.userId}/dashboard/bookmarks`,
       },
     ],

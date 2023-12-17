@@ -59,7 +59,7 @@ const SinglePost: React.FC<SinglePostProps> = ({
   const handleAddBk = async () => {
     if (isUserLoggedIn) {
       const bkmList = [...bookmarks];
-      let userBkms: BookmarkInt[] = [];
+      let userBkms: BookmarkInt[] = [...(userInfo?.bookmarks ?? [])];
       if (!bkmList?.find((bm) => bm === userInfo?.uid)) {
         bkmList.push(userInfo?.uid ?? '');
         userBkms.push({ postId: id, uid });

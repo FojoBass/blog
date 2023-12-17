@@ -155,6 +155,7 @@ $acc_clr: var(--acc_clr);
           height: 100%;
           object-fit: cover;
           background-color: var(--shw_clr_shd);
+          object-position: 0 0.1px;
         }
       }
     }
