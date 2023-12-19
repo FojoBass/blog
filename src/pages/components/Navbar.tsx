@@ -145,7 +145,7 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
     },
     {
       title: 'Dashboard',
-      link: `/${userInfo?.uid}/dashboard`,
+      link: `/${userInfo?.userId}/dashboard`,
       param: true,
       position: 'mid',
     },

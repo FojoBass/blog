@@ -114,6 +114,19 @@ export class BlogServices {
     return updateDoc(docRef, { ...data });
   }
 
+  addLikesViews(authorId: string, uid: string, type: 'likes' | 'views') {
+    const docRef = doc(
+      db,
+      `users/${authorId}/${type === 'likes' ? type : type}/${uid}`
+    );
+    return setDoc(docRef, { id: uid });
+  }
+
+  removeLikes(authorId: string, uid: string) {
+    const docRef = doc(db, `users/${authorId}/likes/${uid}`);
+    return deleteDoc(docRef);
+  }
+
   getUserInfo(userId: string) {
     const docRef = doc(db, `users/${userId}`);
     return getDoc(docRef);
@@ -153,6 +166,11 @@ export class BlogServices {
   getPost(id: string) {
     const docRef = doc(db, `posts/${id}`);
     return getDoc(docRef);
+  }
+
+  getComments(postId: string) {
+    const colRef = collection(db, `posts/${postId}/comments`);
+    return getDocs(colRef);
   }
 
   getSearchResults(
@@ -231,7 +249,8 @@ export class BlogServices {
     isMore: boolean,
     lastDocTime: Timestamp | null,
     userId: string,
-    isPubOnly: boolean
+    isPubOnly: boolean,
+    lim: number
   ) {
     const q = isPubOnly
       ? isMore
@@ -240,25 +259,25 @@ export class BlogServices {
             where('uid', '==', userId),
             orderBy('publishedAt', 'desc'),
             startAfter(lastDocTime),
-            limit(3)
+            limit(lim)
           )
         : query(
             collection(db, `posts`),
             where('uid', '==', userId),
             orderBy('publishedAt', 'desc'),
-            limit(3)
+            limit(lim)
           )
       : isMore
       ? query(
           collection(db, `users/${userId}/posts`),
           orderBy('createdAt', 'desc'),
           startAfter(lastDocTime),
-          limit(3)
+          limit(lim)
         )
       : query(
           collection(db, `users/${userId}/posts`),
           orderBy('createdAt', 'desc'),
-          limit(3)
+          limit(lim)
         );
     return getDocs(q);
   }

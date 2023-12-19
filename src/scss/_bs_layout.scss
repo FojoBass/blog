@@ -141,12 +141,9 @@
 
       .user_posts {
         background-color: var(--bg_clr3);
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         border-radius: 5px;
         border: 2px solid var(--brd_clr);
-        @include mediaQueries(min, 800px) {
-          margin: 0;
-        }
 
         .user_post {
           @include flexDisplay(flex-start, center, column);
@@ -157,6 +154,26 @@
           color: var(--txt_clr1);
           @include mediaQueries(min, 900px) {
             @include flexDisplay(center, space-between);
+          }
+
+          &.dummy {
+            .post_title {
+              width: 80%;
+              height: 35px;
+              border-radius: 5px;
+            }
+
+            .icons_info_wrapper {
+              width: 30%;
+              height: 20px;
+              border-radius: 5px;
+            }
+
+            .post_btn {
+              width: 7rem;
+              display: inline-block;
+              height: 15px;
+            }
           }
 
           .left_sect {
@@ -175,6 +192,7 @@
             }
 
             .pub_details {
+              font-style: italic;
               span {
                 font-weight: bold;
               }
@@ -234,6 +252,23 @@
 
           &:hover {
             background-color: var(--bg_clr1);
+          }
+        }
+
+        .load_more_btn {
+          max-width: 200px;
+          border: 1px solid var(--txt_clr1);
+          margin: 10px auto;
+          display: block;
+          color: var(--txt_clr1);
+          padding: 10px 25px;
+          border-radius: 5px;
+          font-family: $fnt_spc1;
+          transition: all ease $vfast_trans;
+
+          &:hover {
+            color: var(--txt_clr3);
+            border-color: var(--txt_clr3);
           }
         }
       }

@@ -224,6 +224,7 @@ const App = () => {
   useEffect(() => {
     document.documentElement.style.overflowY = noUserInfo ? 'hidden' : 'auto';
   }, [noUserInfo]);
+
   return <RouterProvider router={router} />;
 };
 

@@ -20,7 +20,7 @@ const Bookmarks = () => {
   ]);
   const blogServices = new BlogServices();
   const [fetchStop, setFetchStop] = useState(0);
-  const fetchCount = useRef(2);
+  const fetchCount = useRef(5);
 
   const fetchBookmarks = async (userBkms: BookmarkInt[]) => {
     let modBkms: BkmsInt[] = bookmarks.filter(
@@ -70,7 +70,10 @@ const Bookmarks = () => {
   useEffect(() => {
     const userBkms = [...(userInfo?.bookmarks ?? [])];
     if (userBkms.length) fetchBookmarks(userBkms);
-    else setIsBkmLoading(false);
+    else {
+      setIsBkmLoading(false);
+      setBoookmarks([]);
+    }
   }, []);
 
   return (
@@ -136,7 +139,7 @@ const Bookmarks = () => {
           </button>
         </>
       ) : (
-        <h3 className='empty_post'>No bookmarks</h3>
+        <h3 className='empty_data'>No bookmarks</h3>
       )}
     </section>
   );

@@ -1,5 +1,3 @@
-// !DO NOT INCLUDE USER INFO (incluing author) IN POST DATA
-// !FETCH AUTHOR'S INFO FOR EVERY OPENED POSTS
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { BiComment } from 'react-icons/bi';
@@ -44,6 +42,7 @@ import { addFollow } from '../features/userAsyncThunk';
 import ShortUniqueId from 'short-unique-id';
 import { useDateExtractor } from './hooks/useDateExtractor';
 import { FaAngleDown, FaAngleUp, FaUser } from 'react-icons/fa';
+import { v4 } from 'uuid';
 
 const Post = () => {
   const { uid: authorId, postId } = useParams();
@@ -70,6 +69,7 @@ const Post = () => {
   const [isFetchingComments, setIsFetchingComments] = useState(true);
   const [comments, setComments] = useState<CommentInt[]>([]);
   const blogServices = new BlogServices();
+  const viewsSet = useRef(false);
 
   const commentsByParentId = useMemo(() => {
     const group: Record<string, CommentInt[]> = {};
@@ -180,6 +180,44 @@ const Post = () => {
       setIsNextPostsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const viewTimeout = setTimeout(async () => {
+      if (displayPostContent?.isPublished && !viewsSet.current) {
+        let modViews: string[] = [...displayPostContent.views];
+        modViews.push(userInfo?.uid ?? v4());
+
+        try {
+          await blogServices.updatePost(
+            { views: modViews },
+            postId ?? '',
+            false,
+            authorId ?? ''
+          );
+
+          await blogServices.updatePost(
+            { views: modViews },
+            postId ?? '',
+            true,
+            ''
+          );
+
+          await blogServices.addLikesViews(
+            authorId ?? '',
+            userInfo?.uid ?? v4(),
+            'views'
+          );
+        } catch (error) {
+          console.log(`Views or likes adding error ${error}`);
+        } finally {
+          viewsSet.current = true;
+          clearTimeout(viewTimeout);
+        }
+      }
+    }, 2000);
+
+    return () => clearTimeout(viewTimeout);
+  }, [postId, userInfo, authorId, displayPostContent]);
 
   useEffect(() => {
     if (displayPostContent && displayPostContent.postId === postId) {
@@ -640,13 +678,11 @@ const Interactions: React.FC<InteractionsInt> = ({
           modList.push(userInfo?.uid ?? '');
         } else return;
 
-        if (
-          type === 'bookmark' &&
-          userInfo &&
-          !modBkms.find((bkm) => bkm.postId === post?.postId)
-        ) {
-          modBkms.push({ postId: post?.postId ?? '', uid: post?.uid ?? '' });
-        } else return;
+        if (type === 'bookmark' && userInfo) {
+          if (!modBkms.find((bkm) => bkm.postId === post?.postId))
+            modBkms.push({ postId: post?.postId ?? '', uid: post?.uid ?? '' });
+          else return;
+        }
       }
 
       try {
@@ -667,6 +703,21 @@ const Interactions: React.FC<InteractionsInt> = ({
           (await blogServices.updateBookmarks(userInfo?.uid ?? '', {
             bookmarks: modBkms,
           }));
+
+        if (type === 'like') {
+          !isInt &&
+            (await blogServices.addLikesViews(
+              post?.uid ?? '',
+              userInfo?.uid ?? '',
+              'likes'
+            ));
+
+          isInt &&
+            (await blogServices.removeLikes(
+              post?.uid ?? '',
+              userInfo?.uid ?? ''
+            ));
+        }
       } catch (error) {
         toast.error('Operation failed');
         console.log(

@@ -19,6 +19,7 @@ interface BSLInt {
   modClass?: string;
   isSearch: boolean;
   isSettings: boolean;
+  isDashboard?: boolean;
   className?: string;
 }
 
@@ -43,6 +44,7 @@ const BoardSearchLayout: FC<BSLInt> = ({
   isSearch,
   className,
   isSettings,
+  isDashboard,
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { isUserLoggedIn } = useBlogSelector((state) => state.user);
@@ -83,7 +85,7 @@ const BoardSearchLayout: FC<BSLInt> = ({
   };
 
   useEffect(() => {
-    if (!isSettings) {
+    if (!isSettings && !isDashboard) {
       if (!searchParams.get('filters'))
         setSearchParams(
           {

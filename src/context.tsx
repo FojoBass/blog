@@ -385,7 +385,8 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         true,
         userLastDocTime,
         targetUserId,
-        true
+        true,
+        10
       );
       let posts: any[] = [];
 

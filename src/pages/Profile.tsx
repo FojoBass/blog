@@ -105,7 +105,8 @@ const Profile = () => {
             false,
             null,
             targetUserId,
-            true
+            true,
+            10
           );
           let posts: any[] = [];
 

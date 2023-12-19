@@ -347,6 +347,7 @@ const NewPost = () => {
             title: post.postTitle,
             followers: userInfo?.followers ?? [],
             bio: userInfo?.bio ?? '',
+            views: [],
           };
           dispatch(addPosts({ data: postData, type: 'save' }));
           break;
@@ -371,6 +372,7 @@ const NewPost = () => {
             title: post.postTitle,
             followers: userInfo?.followers ?? [],
             bio: userInfo?.bio ?? '',
+            views: [],
           };
           dispatch(addPosts({ data: postData, type: 'pub' }));
           break;

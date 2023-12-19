@@ -24,6 +24,7 @@ export interface PostInt {
   title: string;
   followers: FollowsInt[];
   bio: string;
+  views: string[];
 }
 
 export interface UpdatePostInt {
@@ -37,6 +38,7 @@ export interface UpdatePostInt {
   desc?: string;
   aviUrl?: string;
   title?: string;
+  views?: string[];
 }
 
 export interface CommentInt extends CommentDataInt {
