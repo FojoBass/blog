@@ -9,7 +9,7 @@ import React, {
 import { FaTimes } from 'react-icons/fa';
 import { AiOutlineLink } from 'react-icons/ai';
 import { BsFileImage } from 'react-icons/bs';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { resizeImg } from '../helpers/imgResize';
 import { useBlogSelector, useBlogDispatch } from '../app/store';
 import { BlogServices } from '../services/firebase/blogServices';
@@ -22,8 +22,9 @@ import ShortUniqueId from 'short-unique-id';
 import { toast } from 'react-toastify';
 import { serverTimestamp } from 'firebase/firestore';
 import { addPosts } from '../features/blogAsyncThunk';
-import { PostInt } from '../types';
+import { PostInt, UpdatePostInt } from '../types';
 import { auth } from '../services/firebase/config';
+import { useGlobalContext } from '../context';
 
 interface EditorFuncInt {
   (
@@ -68,8 +69,11 @@ const NewPost = () => {
     postTitle,
   });
   const [parsedPost, setParsedPost] = useState('');
-  const [isPubClicked, setIsPubClicked] = useState(false);
+  const [clickedAction, setClickedAction] = useState<OpEnum | 'edit' | ''>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { edit, setEdit, setNavigateUrl } = useGlobalContext();
+  const params = useParams();
 
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -326,7 +330,7 @@ const NewPost = () => {
     );
   };
 
-  const handlePost = (op: OpEnum): void => {
+  const handlePost = (op: OpEnum | 'edit'): void => {
     if (bannerUrl && postTitle && postMain) {
       let postData: PostInt;
       switch (op) {
@@ -350,6 +354,7 @@ const NewPost = () => {
             views: [],
           };
           dispatch(addPosts({ data: postData, type: 'save' }));
+          setDataPost(postData);
           break;
 
         case 'publish':
@@ -375,18 +380,31 @@ const NewPost = () => {
             views: [],
           };
           dispatch(addPosts({ data: postData, type: 'pub' }));
+          setDataPost(postData);
+          break;
+
+        case 'edit':
+          console.log('Edit this post man');
+          // TODO FINISH EDIT FUNCTIONALITY
+          // TODO NOT DONE TWEAKING THAT FOR PUBLISHED POST
+          // TODO ENSURE ALL TOASTS ARE WORKING FINE ALSO
+          // TODO CIAO
           break;
 
         default:
           return;
       }
-
-      setDataPost(postData);
     } else {
       if (!bannerUrl) toast.error('Upload banner image!');
       else if (!postTitle) toast.error('Give post a descriptive titile!');
       else toast.error('Post is empty!');
     }
+  };
+
+  const handleEditorClose = () => {
+    setEdit && setEdit({ state: false, postInfo: null });
+    setNavigateUrl && setNavigateUrl('');
+    navigate(-1);
   };
 
   useEffect(() => {
@@ -410,7 +428,7 @@ const NewPost = () => {
     if (uploadingFailed) {
       toast.error('Uploading Failed!');
       dispatch(resetProp('uploadingFailed'));
-      setIsPubClicked(false);
+      setClickedAction('');
       setDataPost(null);
     }
 
@@ -426,14 +444,24 @@ const NewPost = () => {
         ])
       );
 
-      toast.success(`Post ${isPubClicked ? 'published' : 'saved'}`);
+      toast.success(
+        `Post ${
+          clickedAction === OpEnum.pub
+            ? 'published'
+            : clickedAction === OpEnum.sav
+            ? 'saved'
+            : clickedAction === 'edit'
+            ? 'edite'
+            : ''
+        }`
+      );
 
       dispatch(resetProp('uploadingSucceed'));
-      navigate(`/${userInfo?.userId}/${dataPost.postId}`);
-      setIsPubClicked(false);
+      navigate(`/${userInfo?.uid}/${dataPost.postId}`);
+      setClickedAction('');
       setDataPost(null);
     }
-  }, [uploadingFailed, uploadingSucceed, dataPost, isPubClicked]);
+  }, [uploadingFailed, uploadingSucceed, dataPost, clickedAction]);
 
   useEffect(() => {
     if (isPostImgReady && postMainRef.current) {
@@ -466,6 +494,21 @@ const NewPost = () => {
     if (!isUserLoggedIn) navigate('/enter', { replace: true });
   }, [isUserLoggedIn]);
 
+  useEffect(() => {
+    if (params.uid && !userInfo) navigate(-1);
+    else {
+      if (edit) {
+        const { postInfo: post } = edit;
+        console.log({ post });
+        setPostTitle(post?.title ?? '');
+        setBannerUrl(post?.bannerUrl ?? '');
+        setPostMain(post?.post ?? '');
+        setDesc(post?.desc ?? '');
+        setSelCategs([...(post?.selCategs ?? [])]);
+      }
+    }
+  }, [edit, params, userInfo]);
+
   return (
     <section id='editor_sect'>
       {isUserLoggedIn && (
@@ -488,7 +531,7 @@ const NewPost = () => {
               </button>
             </div>
 
-            <button className='close_btn' onClick={() => navigate(-1)}>
+            <button className='close_btn' onClick={handleEditorClose}>
               <FaTimes />
             </button>
           </nav>
@@ -507,7 +550,7 @@ const NewPost = () => {
                         onChange={handleBannerFileChange}
                         ref={bannerInputRef}
                       />
-                      {bannerImgFile ? (
+                      {bannerImgFile || bannerUrl ? (
                         isUploadingBannerImg ? (
                           <p className='upload_progress'>
                             <span
@@ -677,35 +720,59 @@ const NewPost = () => {
           <footer className='editor_footer'>
             {uploading ? (
               <button className='publish_btn spc_btn loading' disabled>
-                {isPubClicked ? 'Publishing' : 'Saving'}
+                {clickedAction ? 'Publishing' : 'Saving'}
               </button>
             ) : userInfo ? (
               <>
                 <div className='left_side'>
-                  <button
-                    className={`publish_btn spc_btn ${
-                      isUploadingBannerImg || isUploadingImg ? 'disable' : ''
-                    }`}
-                    onClick={() => {
-                      setIsPubClicked(true);
-                      setIsModalOpen(true);
-                    }}
-                    disabled={isUploadingBannerImg || isUploadingImg}
-                  >
-                    Publish
-                  </button>
-                  <button
-                    className={`save_btn ${
-                      isUploadingBannerImg || isUploadingImg ? 'disable' : ''
-                    }`}
-                    onClick={() => {
-                      setIsPubClicked(false);
-                      handlePost(OpEnum.sav);
-                    }}
-                    disabled={isUploadingBannerImg || isUploadingImg}
-                  >
-                    Save
-                  </button>
+                  {edit?.state ? (
+                    <button
+                      className={`publish_btn spc_btn ${
+                        isUploadingBannerImg || isUploadingImg ? 'disable' : ''
+                      }`}
+                      onClick={() => {
+                        setClickedAction('edit');
+
+                        edit.postInfo?.isPublished
+                          ? setIsModalOpen(true)
+                          : handlePost('edit');
+                      }}
+                      disabled={isUploadingBannerImg || isUploadingImg}
+                    >
+                      Finish
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        className={`publish_btn spc_btn ${
+                          isUploadingBannerImg || isUploadingImg
+                            ? 'disable'
+                            : ''
+                        }`}
+                        onClick={() => {
+                          setClickedAction(OpEnum.pub);
+                          setIsModalOpen(true);
+                        }}
+                        disabled={isUploadingBannerImg || isUploadingImg}
+                      >
+                        Publish
+                      </button>
+                      <button
+                        className={`save_btn ${
+                          isUploadingBannerImg || isUploadingImg
+                            ? 'disable'
+                            : ''
+                        }`}
+                        onClick={() => {
+                          setClickedAction(OpEnum.sav);
+                          handlePost(OpEnum.sav);
+                        }}
+                        disabled={isUploadingBannerImg || isUploadingImg}
+                      >
+                        Save
+                      </button>
+                    </>
+                  )}
                 </div>
 
                 <button className='revert_btn'>Revert</button>
@@ -765,6 +832,7 @@ const PubModal: React.FC<PubModalInt> = ({
 }) => {
   const { categories } = useBlogSelector((state) => state.blog);
   const descRef = useRef<HTMLTextAreaElement | null>(null);
+  const { edit } = useGlobalContext();
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) setSelCategs([...selCategs, e.target.value]);

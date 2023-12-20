@@ -289,6 +289,15 @@ export class BlogServices {
     return updateDoc(docRef, { ...data });
   }
 
+  delPost(postInfo: PostInt, isUser: boolean) {
+    // ?isUser means the post is form the users-post collection
+    const { postId, uid } = postInfo;
+    const docRef = !isUser
+      ? doc(db, `posts/${postId}`)
+      : doc(db, `users/${uid}/posts/${postId}`);
+    return deleteDoc(docRef);
+  }
+
   setTime() {
     const docRef = doc(db, 'currTime/currTime');
     return setDoc(docRef, { time: serverTimestamp() });

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AiOutlineEye, AiOutlineHeart } from 'react-icons/ai';
 import { BiComment } from 'react-icons/bi';
@@ -10,7 +10,8 @@ import { BlogServices } from '../../services/firebase/blogServices';
 import { useBlogSelector } from '../../app/store';
 
 const UserPosts = () => {
-  const { skeletonPosts } = useGlobalContext();
+  const { skeletonPosts, handlePostDel, handleSetEdit, isDelPostLoading } =
+    useGlobalContext();
 
   const [allUserPosts, setAllUsersPosts] = useState<
     PostInt[] | DummyPostsInt[]
@@ -21,7 +22,7 @@ const UserPosts = () => {
   const { userInfo } = useBlogSelector((state) => state.user);
   const isFetched = useRef(false);
   const [limitReached, setLimitReached] = useState(false);
-  const fetchLimit = useRef(2);
+  const fetchLimit = useRef(5);
   const [commentsCounts, setCommentsCounts] = useState<number[]>([]);
   const disableCommEff = useRef(false);
 
@@ -152,12 +153,32 @@ const UserPosts = () => {
                   )}
 
                   <div className='btns_wrapper'>
-                    {!post.isPublished ? (
-                      <button className='post_btn del_btn'>Delete</button>
-                    ) : (
-                      <button className='post_btn'>Manage</button>
-                    )}
-                    <button className='post_btn'>Edit</button>
+                    <button
+                      className={`post_btn del_btn ${
+                        !!isDelPostLoading?.find((d) => d === post.postId)
+                          ? 'disable'
+                          : ''
+                      }`}
+                      onClick={() =>
+                        handlePostDel && handlePostDel(post, setAllUsersPosts)
+                      }
+                      disabled={
+                        !!isDelPostLoading?.find((d) => d === post.postId)
+                      }
+                    >
+                      {!!isDelPostLoading?.find((d) => d === post.postId)
+                        ? 'Deleting'
+                        : 'Delete'}
+                    </button>
+                    <button
+                      className='post_btn'
+                      onClick={() => handleSetEdit && handleSetEdit(post)}
+                      disabled={
+                        !!isDelPostLoading?.find((d) => d === post.postId)
+                      }
+                    >
+                      Edit
+                    </button>
                   </div>
                 </div>
               </article>

@@ -10,6 +10,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
   useLocation,
+  useNavigate,
 } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import {
@@ -127,7 +128,8 @@ const App = () => {
           <Route path='profile/' element={<ProfileSettings />} />
           <Route path='account/' element={<AccountSettings />} />
         </Route>
-        <Route path='/new-post' element={<NewPost />} />
+        <Route path={'/new-post'} element={<NewPost />} />
+        <Route path={'/edit-post/:uid/:postId'} element={<NewPost />} />
         <Route path='/notifications' element={<Notification />} />
         <Route path='/:uid/:postId' element={<Post />} />
         <Route path='/p/:uid' element={<Profile />} />
@@ -238,7 +240,10 @@ const Root = () => {
     setSearchString,
     setSearchResults,
     skeletonPosts,
+    navigateUrl,
+    setNavigateUrl,
   } = useGlobalContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'auto';
@@ -251,6 +256,13 @@ const Root = () => {
       skeletonPosts && setSearchResults && setSearchResults([...skeletonPosts]);
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (navigateUrl) {
+      navigate(navigateUrl);
+      setNavigateUrl && setNavigateUrl('');
+    }
+  }, [navigateUrl]);
 
   return (
     <>

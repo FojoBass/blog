@@ -172,3 +172,8 @@ export interface DateExtractInt {
   mins: string;
   secs: string;
 }
+
+export interface EditInt {
+  state: boolean;
+  postInfo: PostInt | null;
+}

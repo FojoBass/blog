@@ -313,7 +313,9 @@ const Post = () => {
           setDisplayPostContent?.({
             ...(postInfo as PostInt),
             createdAt: postInfo.createdAt.toDate().toString(),
-            publishedAt: postInfo?.publishedAt.toDate().toString(),
+            publishedAt: postInfo?.publishedAt
+              ? postInfo?.publishedAt.toDate().toString()
+              : '',
           });
 
         setFetchingPost(false);
@@ -892,7 +894,7 @@ const SingleComment: React.FC<SingleCommentInt> = ({
     }
   };
 
-  const handleEditComment = () => {
+  const handleSetEditComment = () => {
     setShowReply(true);
     setEdit({ state: true, comment, commentId });
   };
@@ -986,7 +988,7 @@ const SingleComment: React.FC<SingleCommentInt> = ({
                     <button
                       className='edit_btn'
                       title='Edit'
-                      onClick={handleEditComment}
+                      onClick={handleSetEditComment}
                     >
                       <MdOutlineModeEdit />
                     </button>

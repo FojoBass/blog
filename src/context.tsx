@@ -5,10 +5,12 @@ import {
   createContext,
   useEffect,
   useRef,
+  SetStateAction,
 } from 'react';
 import {
   CountryInt,
   DummyPostsInt,
+  EditInt,
   FollowsInt,
   PostInt,
   SearchFollowsInt,
@@ -36,6 +38,7 @@ import { CategoryPosts } from './pages';
 import ShortUniqueId from 'short-unique-id';
 import { toast } from 'react-toastify';
 import dummyImg from './assets/dummy-image.jpg';
+import { v4 } from 'uuid';
 
 interface FetchSearchResultInt {
   (
@@ -45,6 +48,11 @@ interface FetchSearchResultInt {
     isMore: boolean,
     isRecall?: boolean
   ): void;
+}
+
+interface DelClickInt {
+  postId: string;
+  clicked: boolean;
 }
 
 interface ContextInt {
@@ -115,6 +123,19 @@ interface ContextInt {
   setDisplayPostContent?: Dispatch<React.SetStateAction<PostInt | null>>;
   fetchSearchResults?: FetchSearchResultInt;
   dummyImg: string;
+  edit?: EditInt;
+  setEdit?: Dispatch<SetStateAction<EditInt>>;
+  handlePostDel?: (
+    postInfo: PostInt,
+    setAllUserPosts: Dispatch<SetStateAction<DummyPostsInt[] | PostInt[]>>
+  ) => void;
+  handleSetEdit?: (postInfo: PostInt) => void;
+  delClickCount?: DelClickInt[];
+  setDelClickCount?: Dispatch<SetStateAction<DelClickInt[]>>;
+  isDelPostLoading?: string[];
+  setIsDelPostLoading?: Dispatch<SetStateAction<string[]>>;
+  navigateUrl?: string;
+  setNavigateUrl?: Dispatch<SetStateAction<string>>;
 }
 
 const BlogContext = createContext<ContextInt>({ dummyImg });
@@ -133,6 +154,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [searchLastDocTime, setSearchLastDocTime] = useState<Timestamp | null>(
     null
   );
+  const [edit, setEdit] = useState<EditInt>({ state: false, postInfo: null });
 
   const { categories } = useBlogSelector((state) => state.blog);
   const { setCateg } = blogSlice.actions;
@@ -144,7 +166,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [displayPostContent, setDisplayPostContent] = useState<PostInt | null>(
     null
   );
-
+  const [navigateUrl, setNavigateUrl] = useState('');
   const [searchString, setSearchString] = useState(''),
     [isSearch, setIsSearch] = useState(false),
     [filters, setFilters] = useState('posts'),
@@ -163,6 +185,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const [searchLoading, setSearchLoading] = useState(true);
   const delayListener = useRef(true);
   const isInitial = useRef(true);
+  const [isDelPostLoading, setIsDelPostLoading] = useState<string[]>([]);
 
   const [storageKeys] = useState({
     currUser: 'devie_current_user',
@@ -197,6 +220,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
   const searchLastDocTimeRef = useRef<Timestamp | null>(null);
 
   const dispatch = useBlogDispatch();
+  const [delClickCount, setDelClickCount] = useState<DelClickInt[]>([]);
 
   const {
     setNoUserInfo,
@@ -418,6 +442,49 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const handlePostDel = async (
+    postInfo: PostInt,
+    setAllUserPosts: Dispatch<SetStateAction<DummyPostsInt[] | PostInt[]>>
+  ) => {
+    const { postId, isPublished } = postInfo;
+    let resetDelTimeout: NodeJS.Timer | null = null;
+    if (!delClickCount.find((del) => del.postId === postId)) {
+      setDelClickCount((prev) => [...prev, { postId, clicked: true }]);
+      toast.warning('Click delete again to delete post');
+
+      resetDelTimeout = setTimeout(() => {
+        const deReset = !!sessionStorage.getItem(`dereset${postId}`);
+        deReset ||
+          setDelClickCount((prev) => [
+            ...prev.filter((p) => p.postId !== postId),
+          ]);
+        sessionStorage.removeItem(`dereset${postId}`);
+        clearTimeout(resetDelTimeout as NodeJS.Timer);
+      }, 10000);
+    } else {
+      sessionStorage.setItem(`dereset${postId}`, 'true');
+
+      try {
+        await blogServices.delPost(postInfo, true);
+        isPublished && (await blogServices.delPost(postInfo, false));
+        setAllUserPosts((prev) => [...prev.filter((p) => p.postId !== postId)]);
+        toast.success('Post deleted');
+      } catch (error) {
+        console.log('Post deleting faile: ', error);
+        toast.error('Post deleting failed');
+      } finally {
+        setIsDelPostLoading((prev) => [...prev.filter((p) => p !== postId)]);
+      }
+
+      setDelClickCount((prev) => [...prev.filter((p) => p.postId !== postId)]);
+    }
+  };
+
+  const handleSetEdit = (postInfo: PostInt) => {
+    setEdit({ state: true, postInfo });
+    setNavigateUrl(`edit-post/${postInfo.uid}/${postInfo.postId}`);
+  };
+
   const sharedProps: ContextInt = {
     searchString,
     setSearchString,
@@ -475,6 +542,16 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     setSearchResults,
     searchLoading,
     dummyImg,
+    edit,
+    setEdit,
+    handlePostDel,
+    handleSetEdit,
+    delClickCount,
+    setDelClickCount,
+    isDelPostLoading,
+    setIsDelPostLoading,
+    navigateUrl,
+    setNavigateUrl,
   };
 
   // * Fetches
@@ -526,7 +603,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
             if (change.type === 'removed') {
               const post = change.doc.data();
               setHomePosts((prev) =>
-                prev.filter((p) => !p.postId === post.postId)
+                prev.filter((p) => p.postId !== post.postId)
               );
             }
           }
