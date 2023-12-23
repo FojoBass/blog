@@ -41,7 +41,7 @@ $maxWidth: 820px;
     .center_content {
       background-color: var(--bg_clr3);
       min-height: 75vh;
-      // padding: 10px 0 0;
+      overflow: hidden;
       border: 2px solid var(--brd_clr);
       border-radius: 10px;
 

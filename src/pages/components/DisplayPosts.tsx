@@ -72,16 +72,12 @@ const DisplayPosts: React.FC<PropInt> = ({ posts, target }) => {
             ) : (
               <SinglePost
                 key={(post as PostInt).postId ?? v4()}
-                posterName={(post as PostInt).author}
-                avi={(post as PostInt).aviUrl}
                 title={(post as PostInt).title}
                 detail={(post as PostInt)?.desc ?? ''}
                 date={(post as PostInt).publishedAt as string}
                 category={(post as PostInt)?.selCategs ?? []}
                 postImgUrl={(post as PostInt).bannerUrl}
                 id={(post as PostInt).postId}
-                followersCount={(post as PostInt).followers}
-                aboutPoster={(post as PostInt).bio}
                 uid={(post as PostInt).uid}
                 bookmarks={(post as PostInt).bookmarks}
                 isHome={target === 'home'}

@@ -10,6 +10,7 @@ interface InitialStateInt {
   uploadingFailed: boolean;
   uploadingSucceed: boolean;
   categories: string[];
+  // isUpdating: boolean
 }
 
 const initialState: InitialStateInt = {

@@ -20,9 +20,14 @@ const Dashboard = () => {
   });
   const [views, setViews] = useState(0);
   const [likes, setLikes] = useState(0);
+  const [postsCount, setPostsCount] = useState(0);
   const navItems = useMemo<NavInt[]>(
     () => [
-      { title: 'Posts', count: 3, url: `/${userInfo?.userId}/dashboard/posts` },
+      {
+        title: 'Posts',
+        count: postsCount,
+        url: `/${userInfo?.userId}/dashboard/posts`,
+      },
       {
         title: 'Followers',
         count: userInfo?.followers.length ?? 0,
@@ -39,7 +44,7 @@ const Dashboard = () => {
         url: `/${userInfo?.userId}/dashboard/bookmarks`,
       },
     ],
-    [userInfo]
+    [userInfo, postsCount]
   );
   const navigate = useNavigate();
 
@@ -67,12 +72,16 @@ const Dashboard = () => {
   useEffect(() => {
     let unsubLikes: () => void;
     let unsubViews: () => void;
+    let unsubPosts: () => void;
     if (auth.currentUser) {
       const likesQuery = query(
-        collection(db, `users/${auth.currentUser?.uid ?? ''}/likes`)
+        collection(db, `users/${auth.currentUser.uid}/likes`)
       );
       const viewsQuery = query(
-        collection(db, `users/${auth.currentUser?.uid ?? ''}/views`)
+        collection(db, `users/${auth.currentUser.uid}/views`)
+      );
+      const postsQuery = query(
+        collection(db, `users/${auth.currentUser.uid}/posts`)
       );
 
       unsubLikes = onSnapshot(likesQuery, (querySnapshot) => {
@@ -82,11 +91,16 @@ const Dashboard = () => {
       unsubViews = onSnapshot(viewsQuery, (querySnapshot) => {
         setViews(querySnapshot.size);
       });
+
+      unsubPosts = onSnapshot(postsQuery, (querySnapshot) => {
+        setPostsCount(querySnapshot.size);
+      });
     }
 
     return () => {
       unsubLikes && unsubLikes();
       unsubViews && unsubViews();
+      unsubPosts && unsubPosts();
     };
   }, [auth.currentUser]);
 

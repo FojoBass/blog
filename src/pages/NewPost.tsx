@@ -90,6 +90,7 @@ const NewPost = () => {
   const [selCategs, setSelCategs] = useState<string[]>([]);
   const [desc, setDesc] = useState('');
   const [dataPost, setDataPost] = useState<PostInt | null>(null);
+  const [isEditLoading, setIsEditLoading] = useState(false);
 
   const handleBannerFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const imgFile = e.target.files?.[0];
@@ -346,11 +347,7 @@ const NewPost = () => {
             likes: [],
             bookmarks: [],
             createdAt: serverTimestamp(),
-            author: userInfo?.userName ?? '',
-            aviUrl: userInfo?.aviUrls.smallAviUrl ?? '',
             title: post.postTitle,
-            followers: userInfo?.followers ?? [],
-            bio: userInfo?.bio ?? '',
             views: [],
           };
           dispatch(addPosts({ data: postData, type: 'save' }));
@@ -372,11 +369,7 @@ const NewPost = () => {
             createdAt: serverTimestamp(),
             selCategs,
             desc,
-            author: userInfo?.userName ?? '',
-            aviUrl: userInfo?.aviUrls.smallAviUrl ?? '',
             title: post.postTitle,
-            followers: userInfo?.followers ?? [],
-            bio: userInfo?.bio ?? '',
             views: [],
           };
           dispatch(addPosts({ data: postData, type: 'pub' }));
@@ -384,11 +377,43 @@ const NewPost = () => {
           break;
 
         case 'edit':
-          console.log('Edit this post man');
-          // TODO FINISH EDIT FUNCTIONALITY
-          // TODO NOT DONE TWEAKING THAT FOR PUBLISHED POST
-          // TODO ENSURE ALL TOASTS ARE WORKING FINE ALSO
-          // TODO CIAO
+          const editPostData: UpdatePostInt = {
+            post: post.postMain,
+            bannerUrl: post.bannerUrl,
+            selCategs,
+            desc,
+            title: post.postTitle,
+          };
+
+          (async () => {
+            try {
+              setIsEditLoading(true);
+              await new BlogServices().updatePost(
+                editPostData,
+                edit?.postInfo?.postId ?? '',
+                false,
+                edit?.postInfo?.uid ?? ''
+              );
+              edit?.postInfo?.isPublished &&
+                (await new BlogServices().updatePost(
+                  editPostData,
+                  edit.postInfo.postId ?? '',
+                  true,
+                  edit.postInfo.uid
+                ));
+              setEdit && setEdit({ state: false, postInfo: null });
+              toast.success('Post edited');
+              navigate(`/${userInfo?.uid}/${edit?.postInfo?.postId ?? ''}`, {
+                replace: true,
+              });
+            } catch (error) {
+              console.log('Post editing: ', error);
+              toast.error('Post editing failed!');
+            } finally {
+              setIsEditLoading(false);
+            }
+          })();
+
           break;
 
         default:
@@ -499,7 +524,6 @@ const NewPost = () => {
     else {
       if (edit) {
         const { postInfo: post } = edit;
-        console.log({ post });
         setPostTitle(post?.title ?? '');
         setBannerUrl(post?.bannerUrl ?? '');
         setPostMain(post?.post ?? '');
@@ -718,9 +742,9 @@ const NewPost = () => {
           </div>
 
           <footer className='editor_footer'>
-            {uploading ? (
+            {uploading || isEditLoading ? (
               <button className='publish_btn spc_btn loading' disabled>
-                {clickedAction ? 'Publishing' : 'Saving'}
+                {clickedAction === OpEnum.pub ? 'Publishing' : 'Saving'}
               </button>
             ) : userInfo ? (
               <>
@@ -818,7 +842,7 @@ interface PubModalInt {
   setSelCategs: React.Dispatch<React.SetStateAction<string[]>>;
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  handlePost: (op: OpEnum) => void;
+  handlePost: (op: OpEnum | 'edit') => void;
 }
 
 const PubModal: React.FC<PubModalInt> = ({
@@ -843,7 +867,7 @@ const PubModal: React.FC<PubModalInt> = ({
     if (!selCategs.length) toast.info('Select relevant categories');
     else if (!desc.trim()) toast.info('Enter a concise description');
     else {
-      handlePost(OpEnum.pub);
+      edit?.state ? handlePost('edit') : handlePost(OpEnum.pub);
       setIsModalOpen(false);
     }
   };
@@ -858,6 +882,12 @@ const PubModal: React.FC<PubModalInt> = ({
       ? setDesc(e.target.value)
       : toast.error('Description too long', { toastId: 'desc' });
   };
+
+  useEffect(() => {
+    if (edit?.postInfo) {
+      setSelCategs([...(edit.postInfo.selCategs ?? [])]);
+    }
+  }, [edit]);
 
   return (
     <section className={`pub_modal ${!isModalOpen ? 'hide' : ''}`}>
@@ -878,6 +908,7 @@ const PubModal: React.FC<PubModalInt> = ({
                   onChange={handleCheck}
                   id={`categ_check${index}`}
                   value={categ}
+                  checked={!!selCategs.find((catg) => catg === categ)}
                 />
                 <label htmlFor={`categ_check${index}`}>{categ}</label>
               </div>

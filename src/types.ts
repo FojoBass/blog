@@ -19,11 +19,7 @@ export interface PostInt {
   createdAt: FieldValue | string;
   selCategs?: string[];
   desc?: string;
-  author: string;
-  aviUrl: string;
   title: string;
-  followers: FollowsInt[];
-  bio: string;
   views: string[];
 }
 
@@ -36,7 +32,6 @@ export interface UpdatePostInt {
   commentsCount?: number;
   selCategs?: string[];
   desc?: string;
-  aviUrl?: string;
   title?: string;
   views?: string[];
 }

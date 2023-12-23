@@ -668,28 +668,42 @@ $brd_clr: #9c9c9cbd;
 }
 
 .mid_side_head {
-  .poster {
-    padding: $padding;
-    @include flexDisplay(center, flex-start);
+  .poster_info_more {
+    @include flexDisplay(center, space-between);
 
-    &_avi {
-      width: 30px;
-      border-radius: 50%;
-      margin-right: 20px;
+    .pub_draft {
+      background-color: var(--spc_clr2);
+      color: $dft_clr;
+      padding: 5px;
+      border-radius: 5px;
+      display: inline-block;
+      font-size: 1.5rem;
+      margin-right: $padding;
     }
 
-    .info {
-      a {
-        font-size: $txt_size2;
-        font-family: $fnt_hdg1;
-        font-weight: 600;
-        color: var(--txt_clr2);
+    .poster {
+      padding: $padding;
+      @include flexDisplay(center, flex-start);
+
+      &_avi {
+        width: 30px;
+        border-radius: 50%;
+        margin-right: 20px;
       }
-      p {
-        margin-top: 5px;
-        font-size: $txt_size;
-        color: var(--txt_clr1);
-        font-family: $fnt_spc2;
+
+      .info {
+        a {
+          font-size: $txt_size2;
+          font-family: $fnt_hdg1;
+          font-weight: 600;
+          color: var(--txt_clr2);
+        }
+        p {
+          margin-top: 5px;
+          font-size: $txt_size;
+          color: var(--txt_clr1);
+          font-family: $fnt_spc2;
+        }
       }
     }
   }

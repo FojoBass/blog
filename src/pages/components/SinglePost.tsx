@@ -1,40 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthorInfo from './AuthorInfo';
 import { BsBookmarkPlus, BsBookmarkDashFill } from 'react-icons/bs';
-import { BookmarkInt, FollowsInt } from '../../types';
+import { BookmarkInt, FollowsInt, UserInfoInt } from '../../types';
 import { useBlogDispatch, useBlogSelector } from '../../app/store';
 import { BlogServices } from '../../services/firebase/blogServices';
 import { toast } from 'react-toastify';
 import { addFollow } from '../../features/userAsyncThunk';
+import { ImSpinner } from 'react-icons/im';
+import useFetchPosterInfo from '../hooks/useFetchPosterInfo';
 
 export interface SinglePostProps {
-  posterName: string;
-  avi: string;
   title: string;
   detail: string;
   date: string;
   category: string[];
   postImgUrl: string;
   id: string;
-  followersCount: FollowsInt[];
-  aboutPoster: string;
   uid: string;
   bookmarks: string[];
   isHome?: boolean;
 }
 
 const SinglePost: React.FC<SinglePostProps> = ({
-  posterName,
-  avi,
   title,
   detail,
   date,
   category,
   postImgUrl,
   id,
-  followersCount,
-  aboutPoster,
   uid,
   bookmarks,
   isHome,
@@ -55,6 +49,7 @@ const SinglePost: React.FC<SinglePostProps> = ({
   const [isFollow, setIsFollow] = useState(false);
   const dispatch = useBlogDispatch();
   const { followLoading } = useBlogSelector((state) => state.user);
+  const posterInfo = useFetchPosterInfo(uid);
 
   const handleAddBk = async () => {
     if (isUserLoggedIn) {
@@ -113,12 +108,25 @@ const SinglePost: React.FC<SinglePostProps> = ({
   };
 
   const handleFollow = async () => {
-    if (isUserLoggedIn) {
-      dispatch(addFollow({ isFollow, posterName, uid, avi }));
+    if (isUserLoggedIn && posterInfo) {
+      dispatch(
+        addFollow({
+          isFollow,
+          posterName: posterInfo.userName,
+          uid,
+          avi: posterInfo.aviUrls.smallAviUrl,
+        })
+      );
     } else {
       navigate('/enter');
     }
   };
+
+  // const fetchPosterInfo = async () => {
+  //   const res = await blogServices.getUserInfo(uid);
+  //   const data: any = res.data();
+  //   setPosterInfo({ ...data, createdAt: data.createdAt.toDate().toString() });
+  // };
 
   useEffect(() => {
     if (uid === userInfo?.uid) setIsUser(true);
@@ -130,27 +138,46 @@ const SinglePost: React.FC<SinglePostProps> = ({
     else setIsBookmarked(false);
   }, [uid, userInfo, bkms]);
 
+  // useEffect(() => {
+  //   fetchPosterInfo();
+  // }, [uid]);
+
   return (
     <article className='single_post'>
       <div className='post_wrapper'>
         <div className='top'>
           <div className='top_child'>
             <Link className='img_wrapper' to={`/p/${uid}`}>
-              <img src={avi} alt='' />
+              {posterInfo ? (
+                <img src={posterInfo.aviUrls.smallAviUrl} alt='User avi' />
+              ) : (
+                <span className='loading_spinner'>
+                  <ImSpinner />
+                </span>
+              )}
             </Link>
-            <Link to={`/p/${uid}`} className='author_name'>
-              {posterName}
-            </Link>
-            <AuthorInfo
-              imgUrl={avi}
-              name={posterName}
-              about={aboutPoster}
-              isFollow={isFollow}
-              uid={uid}
-              handleFollow={handleFollow}
-              followLoading={followLoading}
-              isUser={isUser}
-            />
+            {posterInfo ? (
+              <Link to={`/p/${uid}`} className='author_name'>
+                {posterInfo.userName}
+              </Link>
+            ) : (
+              <span className='author_name loading_spinner'>
+                <ImSpinner />
+              </span>
+            )}
+
+            {posterInfo && (
+              <AuthorInfo
+                imgUrl={posterInfo.aviUrls.smallAviUrl}
+                name={posterInfo.userName}
+                about={posterInfo.bio}
+                isFollow={isFollow}
+                uid={uid}
+                handleFollow={handleFollow}
+                followLoading={followLoading}
+                isUser={isUser}
+              />
+            )}
           </div>
         </div>
 

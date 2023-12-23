@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { BlogServices } from '../services/firebase/blogServices';
-import { PostInt } from '../types';
+import { PostInt, UpdatePostInt } from '../types';
 import { RootState } from '../app/store';
 
 const blogServices = new BlogServices();

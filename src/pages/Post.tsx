@@ -1,3 +1,8 @@
+// TODO Seems I am done.
+// todo Do all final checks, ensure all things work
+// todo Redirect all links to notifications and other none developed pages back to home
+// todo Also remove links for categories
+// Todo Be good bruff
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { BiComment } from 'react-icons/bi';
@@ -43,6 +48,7 @@ import ShortUniqueId from 'short-unique-id';
 import { useDateExtractor } from './hooks/useDateExtractor';
 import { FaAngleDown, FaAngleUp, FaUser } from 'react-icons/fa';
 import { v4 } from 'uuid';
+import useFetchPosterInfo from './hooks/useFetchPosterInfo';
 
 const Post = () => {
   const { uid: authorId, postId } = useParams();
@@ -70,6 +76,7 @@ const Post = () => {
   const [comments, setComments] = useState<CommentInt[]>([]);
   const blogServices = new BlogServices();
   const viewsSet = useRef(false);
+  const posterInfo = useFetchPosterInfo(authorId ?? '');
 
   const commentsByParentId = useMemo(() => {
     const group: Record<string, CommentInt[]> = {};
@@ -89,9 +96,9 @@ const Post = () => {
       dispatch(
         addFollow({
           isFollow,
-          posterName: displayPostContent!.author,
+          posterName: posterInfo?.userName ?? '',
           uid: displayPostContent!.uid,
-          avi: displayPostContent!.aviUrl,
+          avi: posterInfo?.aviUrls.smallAviUrl ?? '',
         })
       );
     }
@@ -204,7 +211,7 @@ const Post = () => {
 
           await blogServices.addLikesViews(
             authorId ?? '',
-            userInfo?.uid ?? v4(),
+            userInfo?.uid + v4() ?? v4(),
             'views'
           );
         } catch (error) {
@@ -375,22 +382,43 @@ const Post = () => {
                   <img src={displayPostContent.bannerUrl} alt='banner' />
                 </div>
 
-                <div className='poster'>
-                  <Link
-                    to={`/p/${displayPostContent.uid}`}
-                    className='img_wrapper poster_avi'
-                  >
-                    <img src={displayPostContent.aviUrl} alt='author avi' />
-                  </Link>
-                  <div className='info'>
-                    <Link to={`/p/${displayPostContent.uid}`}>
-                      {displayPostContent.author}
+                <div className='poster_info_more'>
+                  <div className='poster'>
+                    <Link
+                      to={`/p/${displayPostContent.uid}`}
+                      className='img_wrapper poster_avi'
+                    >
+                      {posterInfo ? (
+                        <img
+                          src={posterInfo.aviUrls.smallAviUrl}
+                          alt='author avi'
+                        />
+                      ) : (
+                        <span className='loading_spinner'>
+                          <ImSpinner />
+                        </span>
+                      )}
                     </Link>
-                    <p>
-                      {displayPostContent.isPublished ? 'Posted' : 'Created'} on{' '}
-                      {modDate.day} {modDate.month}, {modDate.year}
-                    </p>
+                    <div className='info'>
+                      <Link to={`/p/${displayPostContent.uid}`}>
+                        {posterInfo ? (
+                          posterInfo.userName
+                        ) : (
+                          <span className='loading_spinner'>
+                            <ImSpinner />
+                          </span>
+                        )}
+                      </Link>
+                      <p>
+                        {displayPostContent.isPublished ? 'Posted' : 'Created'}{' '}
+                        on {modDate.day} {modDate.month}, {modDate.year}
+                      </p>
+                    </div>
                   </div>
+
+                  {displayPostContent.isPublished || (
+                    <p className='pub_draft'>Draft</p>
+                  )}
                 </div>
 
                 <h1 className='main_heading'>{displayPostContent.title}</h1>
@@ -413,37 +441,39 @@ const Post = () => {
                 }}
               ></div>
 
-              <div className='comments_super_wrapper'>
-                <h3>
-                  Comments ({comments.filter((com) => !com.isDelete).length})
-                </h3>
-                {isUserLoggedIn && (
-                  <div className='make_comment_wrapper'>
-                    <div className='img_wrapper'>
-                      <img
-                        src={userInfo?.aviUrls.smallAviUrl ?? ''}
-                        alt='My avi'
-                      />
-                    </div>
+              {displayPostContent.isPublished && (
+                <div className='comments_super_wrapper'>
+                  <h3>
+                    Comments ({comments.filter((com) => !com.isDelete).length})
+                  </h3>
+                  {isUserLoggedIn && (
+                    <div className='make_comment_wrapper'>
+                      <div className='img_wrapper'>
+                        <img
+                          src={userInfo?.aviUrls.smallAviUrl ?? ''}
+                          alt='My avi'
+                        />
+                      </div>
 
-                    <CommentForm commentRef={commentRef} />
-                  </div>
-                )}
-
-                <div className='comments_wrapper'>
-                  {isFetchingComments ? (
-                    <div className='loading_spinner'>
-                      <ImSpinner />
+                      <CommentForm commentRef={commentRef} />
                     </div>
-                  ) : (
-                    <Comment
-                      comments={getReplies('null')}
-                      getReplies={getReplies}
-                      commentsByParentId={commentsByParentId}
-                    />
                   )}
+
+                  <div className='comments_wrapper'>
+                    {isFetchingComments ? (
+                      <div className='loading_spinner'>
+                        <ImSpinner />
+                      </div>
+                    ) : (
+                      <Comment
+                        comments={getReplies('null')}
+                        getReplies={getReplies}
+                        commentsByParentId={commentsByParentId}
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {displayPostContent.isPublished && (
@@ -462,12 +492,21 @@ const Post = () => {
                       key={post.postId}
                     >
                       <div className='img_wrapper'>
-                        <img src={post.aviUrl} alt='Author avi' />
+                        {posterInfo ? (
+                          <img
+                            src={posterInfo.aviUrls.smallAviUrl}
+                            alt='Author avi'
+                          />
+                        ) : (
+                          <span className='loading_spinner'>
+                            <ImSpinner />
+                          </span>
+                        )}
                       </div>
                       <div className='post_info'>
                         <h3 className='title'>{post.title}</h3>
                         <p className='more_info'>
-                          {post.author} -{' '}
+                          {posterInfo?.userName} -{' '}
                           {(post.publishedAt as string).split(' ')[1]}{' '}
                           {(post.publishedAt as string).split(' ')[2]}
                         </p>
@@ -484,9 +523,26 @@ const Post = () => {
               <div className='about_poster'>
                 <Link to={`/p/${displayPostContent.uid}`} className='top'>
                   <div className='img_wrapper'>
-                    <img src={displayPostContent.aviUrl} alt="Author's avi" />
+                    {posterInfo ? (
+                      <img
+                        src={posterInfo.aviUrls.smallAviUrl}
+                        alt='Author avi'
+                      />
+                    ) : (
+                      <span className='loading_spinner'>
+                        <ImSpinner />
+                      </span>
+                    )}
                   </div>
-                  <p className='author'>{displayPostContent.author}</p>
+                  <p className='author'>
+                    {posterInfo ? (
+                      posterInfo.userName
+                    ) : (
+                      <span className='loading_spinner'>
+                        <ImSpinner />
+                      </span>
+                    )}
+                  </p>
                 </Link>
 
                 <div className='mid'>
@@ -500,7 +556,15 @@ const Post = () => {
                       {isFollow ? 'Unfollow' : 'Follow'}
                     </button>
                   )}
-                  <p className='author_about'>{displayPostContent.bio}</p>
+                  <p className='author_about'>
+                    {posterInfo ? (
+                      posterInfo.bio
+                    ) : (
+                      <span className='loading_spinner'>
+                        <ImSpinner />
+                      </span>
+                    )}
+                  </p>
                 </div>
               </div>
 
@@ -509,7 +573,13 @@ const Post = () => {
                   <h3>
                     More from{' '}
                     <Link to={`/p/${displayPostContent.uid}`}>
-                      {displayPostContent.author}
+                      {posterInfo ? (
+                        posterInfo.userName
+                      ) : (
+                        <span className='loading_spinner'>
+                          <ImSpinner />
+                        </span>
+                      )}
                     </Link>
                   </h3>
 
@@ -563,9 +633,26 @@ const Post = () => {
             <div className='about_poster'>
               <Link to={`/p/${displayPostContent.uid}`} className='top'>
                 <div className='img_wrapper'>
-                  <img src={displayPostContent.aviUrl} alt="Author's avi" />
+                  {posterInfo ? (
+                    <img
+                      src={posterInfo.aviUrls.smallAviUrl}
+                      alt="Author's avi"
+                    />
+                  ) : (
+                    <span className='loading_spinner'>
+                      <ImSpinner />
+                    </span>
+                  )}
                 </div>
-                <p className='author'>{displayPostContent.author}</p>
+                <p className='author'>
+                  {posterInfo ? (
+                    posterInfo.userName
+                  ) : (
+                    <span className='loading_spinner'>
+                      <ImSpinner />
+                    </span>
+                  )}
+                </p>
               </Link>
 
               <div className='mid'>
@@ -579,7 +666,15 @@ const Post = () => {
                     {isFollow ? 'Unfollow' : 'Follow'}
                   </button>
                 )}
-                <p className='author_about'>{displayPostContent.bio}</p>
+                <p className='author_about'>
+                  {posterInfo ? (
+                    posterInfo.bio
+                  ) : (
+                    <span className='loading_spinner'>
+                      <ImSpinner />
+                    </span>
+                  )}
+                </p>
               </div>
             </div>
 
@@ -588,7 +683,13 @@ const Post = () => {
                 <h3>
                   More from{' '}
                   <Link to={`/p/${displayPostContent.uid}`}>
-                    {displayPostContent.author}
+                    {posterInfo ? (
+                      posterInfo.userName
+                    ) : (
+                      <span className='loading_spinner'>
+                        <ImSpinner />
+                      </span>
+                    )}
                   </Link>
                 </h3>
 
