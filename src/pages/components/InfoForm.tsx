@@ -24,7 +24,6 @@ import { toast } from 'react-toastify';
 import { userSignUp } from '../../features/userAsyncThunk';
 import { FormDataInt } from '../../types';
 import { auth } from '../../services/firebase/config';
-import { BlogServices } from '../../services/firebase/blogServices';
 import { StorageFuncs } from '../../services/storages';
 import { userSlice } from '../../features/userSlice';
 
@@ -59,6 +58,14 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
       fb: '',
       url: '',
     });
+  const [isExempts] = useState(
+    auth.currentUser?.providerData[0].providerId
+      .toLowerCase()
+      .includes('github') ||
+      auth.currentUser?.providerData[0].providerId
+        .toLowerCase()
+        .includes('google')
+  );
 
   const [disableFields, setDisableFields] = useState({
     name: Boolean(auth.currentUser?.displayName),
@@ -181,6 +188,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
   };
 
   const validateFullName = (): boolean => {
+    if (isExempts) return true;
     if (regex.alpha.test(fullName)) return true;
 
     formRefsAction('fullNameInputRef', 'Invalid fullname');
@@ -188,6 +196,12 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
   };
 
   const validateUsername = (): boolean => {
+    if (
+      auth.currentUser?.providerData[0].providerId
+        .toLowerCase()
+        .includes('github')
+    )
+      return true;
     if (regex.alphaNumberic.test(userName)) return true;
 
     formRefsAction('userNameInputRef', 'Invalid username');
