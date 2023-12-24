@@ -890,8 +890,8 @@ const PubModal: React.FC<PubModalInt> = ({
     else if (!desc.trim()) toast.info('Enter a concise description');
     else if (desc.trim().length < 50)
       toast.error('Description should be at least 50 characters long');
-    else if (desc.trim().length > 50)
-      toast.error('Description should be at most 300 characters long');
+    else if (desc.trim().length > 200)
+      toast.error('Description should be at most 200 characters long');
     else {
       edit?.state ? handlePost('edit') : handlePost(OpEnum.pub);
       setIsModalOpen(false);
@@ -949,7 +949,7 @@ const PubModal: React.FC<PubModalInt> = ({
             ref={descRef}
             value={desc}
             onChange={handleDesc}
-            maxLength={300}
+            maxLength={200}
             minLength={50}
           ></textarea>
         </div>

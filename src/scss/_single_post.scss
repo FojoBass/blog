@@ -97,18 +97,18 @@
   }
 
   .post_wrapper + .img_wrapper {
-    width: 80px;
-    height: 80px;
+    width: 10rem;
+    height: 10rem;
     border-radius: 5px;
     @include mediaQueries(max, 500px) {
       width: 60px;
       height: 60px;
     }
 
-    @include mediaQueries(max, 300px) {
-      width: 50px;
-      height: 50px;
-    }
+    // @include mediaQueries(max, 300px) {
+    //   width: 50px;
+    //   height: 50px;
+    // }
 
     &:hover {
       img {
@@ -117,7 +117,7 @@
     }
 
     img {
-      object-fit: cover;
+      @include imgMix;
       transition: all ease-out $fmid_trans;
       border-radius: 5px;
     }
