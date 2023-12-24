@@ -945,6 +945,8 @@ const PubModal: React.FC<PubModalInt> = ({
             ref={descRef}
             value={desc}
             onChange={handleDesc}
+            maxLength={300}
+            minLength={50}
           ></textarea>
         </div>
 
