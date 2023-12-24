@@ -888,6 +888,10 @@ const PubModal: React.FC<PubModalInt> = ({
   const handleContinue = () => {
     if (!selCategs.length) toast.info('Select relevant categories');
     else if (!desc.trim()) toast.info('Enter a concise description');
+    else if (desc.trim().length < 50)
+      toast.error('Description should be at least 50 characters long');
+    else if (desc.trim().length > 50)
+      toast.error('Description should be at most 300 characters long');
     else {
       edit?.state ? handlePost('edit') : handlePost(OpEnum.pub);
       setIsModalOpen(false);
