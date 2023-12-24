@@ -128,16 +128,14 @@ html {
     .img_wrapper {
       background-color: var(--txt_clr3);
       width: 50px;
-      // height: 50px;
+
       display: inline-block;
       margin-right: 20px;
       border-radius: 50%;
       padding: 2px;
 
       img {
-        // height: 100%;
         border-radius: 50%;
-        // object-fit: cover;
       }
     }
   }
@@ -195,9 +193,7 @@ html {
 
       label {
         cursor: pointer;
-        // width: 80px;
         display: inline-block;
-        // background-color: blue;
         position: relative;
         font-family: $fnt_spc2;
         font-size: 1.3rem;
@@ -344,6 +340,63 @@ html {
     &:last-child {
       animation-delay: 150ms;
     }
+  }
+}
+
+// *Error Sect
+#error_sect {
+  height: 100vh;
+  background-color: var(--bg_clr1);
+  @include flexDisplay(center, center);
+
+  .wrapper {
+    text-align: center;
+    color: var(--txt_clr1);
+
+    h3 {
+      text-transform: uppercase;
+      font-family: $fnt_hdg1;
+      font-size: 2rem;
+    }
+
+    h1 {
+      font-family: $fnt_hdg2;
+      font-size: 7rem;
+      letter-spacing: 0.5rem;
+      color: var(--spc_clr2);
+
+      span {
+        color: $dlt_clr;
+      }
+    }
+
+    p {
+      font-size: 1.5rem;
+      font-family: $fnt_spc1;
+      margin-bottom: 0.5rem;
+
+      a {
+        text-decoration: underline;
+        color: var(--acc_clr);
+
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}
+
+#come_soon {
+  @include flexDisplay(center, center);
+
+  h1 {
+    text-align: center;
+    font-size: $txt_size4;
+    font-family: $fnt_hdg1;
+    font-style: italic;
+    color: var(--acc_clr);
+    animation: loaderAnim 2s linear 0s infinite;
   }
 }
 

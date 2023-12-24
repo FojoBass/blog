@@ -1,5 +1,3 @@
-// @import 'config';
-
 * {
   padding: 0;
   margin: 0;
@@ -19,9 +17,9 @@
   }
 }
 
-// TODO Change styles later
 .tab :focus {
-  outline: 2px solid tomato;
+  outline: 2px solid var(--txt_clr3);
+  border-radius: 5px;
 }
 
 body {

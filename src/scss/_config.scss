@@ -35,7 +35,6 @@ $spc_txt_clr: #ffffff;
   --acc_clr2: #3b49df;
   --acc_clr_shd: #3b49df1c;
   --spc_clr: #40404023;
-  // --brd_clr: #0000001a;
   --brd_clr: #f0f0f0;
   --spc_clr2: #fcd34d;
   --shw_clr_shd: #a5a5a5;
@@ -52,7 +51,6 @@ $spc_txt_clr: #ffffff;
   --txt_clr1: #bdbdbd;
   --txt_clr2: #e5e5e5;
   --txt_clr3: #fafafa;
-  // --acc_clr: #818cf8;
   --acc_clr: #3971ec;
   --acc_clr2: #8faceb;
   --acc_clr_shd: #252953;
@@ -221,6 +219,13 @@ $spc_txt_clr: #ffffff;
       }
     }
   }
+}
+
+@mixin imgMix {
+  object-fit: cover;
+  object-position: 0 0.01px;
+  width: 100%;
+  height: 100%;
 }
 
 // * Mixins End

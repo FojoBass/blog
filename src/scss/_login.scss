@@ -118,25 +118,39 @@
         }
       }
 
-      .login_btn {
-        display: block;
-        width: fit-content;
-        padding: 10px 20px;
-        margin: 0 auto;
-        border-radius: 10px;
-        font-size: 1.3rem;
-        font-family: $fnt_spc1;
-        color: var(--shw_clr_txt);
-        transition: all ease $fmid_trans;
-        font-weight: bold;
-        @include neumorph();
+      .logins_wrapper {
+        position: relative;
 
-        &:hover {
-          color: var(--acc_clr);
+        .login_btn {
+          display: block;
+          width: fit-content;
+          padding: 10px 20px;
+          margin: 0 auto;
+          border-radius: 10px;
+          font-size: 1.3rem;
+          font-family: $fnt_spc1;
+          color: var(--shw_clr_txt);
+          transition: all ease $fmid_trans;
+          font-weight: bold;
+          @include neumorph();
+
+          &:hover {
+            color: var(--acc_clr);
+          }
+
+          &:active {
+            @include neumorphPressed();
+          }
         }
 
-        &:active {
-          @include neumorphPressed();
+        .demo_btn {
+          @include position(absolute, right, top, 0px, 50%);
+          text-decoration: none;
+
+          &:hover {
+            color: var(--acc_clr);
+            text-decoration: underline;
+          }
         }
       }
 

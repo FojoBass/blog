@@ -36,7 +36,7 @@ $brd_clr: #9c9c9cbd;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        object-position: 0 0.05px;
+        object-position: 0 0.01px;
       }
     }
 
@@ -362,14 +362,16 @@ $brd_clr: #9c9c9cbd;
           padding: 0 $padding;
 
           .img_wrapper {
-            width: 30px;
+            width: 4rem;
+            height: 4rem;
             border-radius: 50%;
-            padding: 1px;
+            padding: 0.1rem;
             background-color: var(--txt_clr3);
             margin-right: 15px;
 
             img {
               border-radius: 50%;
+              @include imgMix;
             }
           }
         }
@@ -396,9 +398,10 @@ $brd_clr: #9c9c9cbd;
 
             .img_wrapper {
               display: block;
-              width: 30px;
+              width: 4rem;
+              height: 4rem;
               border-radius: 50%;
-              padding: 1px;
+              padding: 0.1rem;
               background-color: var(--txt_clr3);
               margin-right: 10px;
               box-shadow: 0 8px 0 3px var(--bg_clr3);
@@ -416,6 +419,7 @@ $brd_clr: #9c9c9cbd;
 
               img {
                 border-radius: 50%;
+                @include imgMix;
               }
             }
 
@@ -551,14 +555,16 @@ $brd_clr: #9c9c9cbd;
         }
 
         .img_wrapper {
-          width: 50px;
+          width: 5rem;
+          height: 5rem;
           border-radius: 50%;
-          padding: 1px;
+          padding: 0.1rem;
           background-color: var(--txt_clr3);
           transition: all ease $fast_trans;
 
           img {
             border-radius: 50%;
+            @include imgMix;
           }
         }
 
@@ -686,9 +692,14 @@ $brd_clr: #9c9c9cbd;
       @include flexDisplay(center, flex-start);
 
       &_avi {
-        width: 30px;
+        width: 4rem;
+        height: 4rem;
         border-radius: 50%;
         margin-right: 20px;
+
+        img {
+          @include imgMix;
+        }
       }
 
       .info {

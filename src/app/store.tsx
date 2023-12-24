@@ -12,10 +12,6 @@ export const store = configureStore({
     blog: blogReducer,
     user: userReducer,
   },
-  // middleware: (getDefaultMiddleware) =>
-  //   getDefaultMiddleware({
-  //     serializableCheck: false, // Disable the serializableCheck middleware
-  //   }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

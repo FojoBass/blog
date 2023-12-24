@@ -15,7 +15,6 @@ interface InitialStateInt {
   isUserLoggedIn: boolean;
   isSignupLoading: boolean;
   isSignedUp: boolean;
-  // userInfoLoading: boolean;
   isJustLoggedIn: boolean;
   isLogInLoading: boolean;
   signInError: string;
@@ -93,7 +92,6 @@ export const userSlice = createSlice({
       .addCase(userSignUp.rejected, (state, error) => {
         state.isSignupLoading = false;
         state.signInError = error.payload as string;
-        console.log(error);
       });
     // *Forgot Password
     builder

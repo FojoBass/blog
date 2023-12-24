@@ -86,6 +86,7 @@ interface ContextInt {
     isUserInfo: string;
     userInfoData: string;
     theme: string;
+    demo: string;
   };
   logOut?: () => void;
   setDelAcc?: Dispatch<React.SetStateAction<boolean>>;
@@ -136,6 +137,10 @@ interface ContextInt {
   setIsDelPostLoading?: Dispatch<SetStateAction<string[]>>;
   navigateUrl?: string;
   setNavigateUrl?: Dispatch<SetStateAction<string>>;
+  accessSearchResult?: boolean;
+  setAccessSearchResult?: Dispatch<SetStateAction<boolean>>;
+  isDemo?: boolean;
+  setIsDemo?: Dispatch<SetStateAction<boolean>>;
 }
 
 const BlogContext = createContext<ContextInt>({ dummyImg });
@@ -193,7 +198,9 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     isUserInfo: 'isUserInfo',
     userInfoData: 'user_info_data',
     theme: 'devie_theme',
+    demo: 'demo',
   });
+  const [isDemo, setIsDemo] = useState(false);
 
   const [delAcc, setDelAcc] = useState(false);
   const [currYear, setCurrYear] = useState('');
@@ -237,12 +244,14 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const blogServices = new BlogServices();
   const [authLoading, setAuthLoading] = useState(true);
+  const [accessSearchResult, setAccessSearchResult] = useState(false);
 
   const logOut = async () => {
     await blogServices.logOut();
     dispatch(setIsUserLoggedIn(false));
     dispatch(resetUserInfo());
     isInitial.current = true;
+    setIsDemo(false);
 
     if (storageKeys) {
       StorageFuncs.clearStorage(
@@ -264,6 +273,8 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         loginPersistence ? 'local' : 'session',
         storageKeys.userInfoData
       );
+
+      StorageFuncs.clearStorage('session', storageKeys.demo);
     }
   };
 
@@ -363,7 +374,6 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         ...(modResults as SearchFollowsInt[] | PostInt[]),
       ]);
     } catch (error) {
-      console.log('Search failed: ', error);
     } finally {
       setSearchLoading(false);
     }
@@ -395,7 +405,6 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         ...(posts as PostInt[]),
       ]);
     } catch (err) {
-      console.log('Home Post More fetch failed: ', err);
       setHomePosts((prev) => [...prev.filter((p) => !p.isDummy)]);
     } finally {
       setHomeLoading(false);
@@ -435,7 +444,6 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         ...(posts as PostInt[]),
       ]);
     } catch (err) {
-      console.log('User Post More fetch failed: ', err);
       setUserPosts((prev) => [...prev.filter((p) => !p.isDummy)]);
     } finally {
       setUserPostsLoading(false);
@@ -470,7 +478,6 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         setAllUserPosts((prev) => [...prev.filter((p) => p.postId !== postId)]);
         toast.success('Post deleted');
       } catch (error) {
-        console.log('Post deleting faile: ', error);
         toast.error('Post deleting failed');
       } finally {
         setIsDelPostLoading((prev) => [...prev.filter((p) => p !== postId)]);
@@ -552,6 +559,10 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsDelPostLoading,
     navigateUrl,
     setNavigateUrl,
+    accessSearchResult,
+    setAccessSearchResult,
+    isDemo,
+    setIsDemo,
   };
 
   // * Fetches
@@ -571,48 +582,42 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // *Listens to any addition or removal from posts
     const postsRef = collection(db, 'posts');
-    onSnapshot(
-      postsRef,
-      (querySnapshot) => {
-        querySnapshot.docChanges().forEach((change) => {
-          if (!delayListener.current) {
-            if (change.type === 'added') {
-              const post = change.doc.data();
-              const modPost = {
-                ...post,
-                publishedAt: post.publishedAt
-                  ? post.publishedAt.toDate().toString()
-                  : '',
-              } as PostInt;
-              setHomePosts((prev) => [modPost, ...prev]);
-            }
-            if (change.type === 'modified') {
-              const post = change.doc.data();
-              const modPost = {
-                ...post,
-                publishedAt: post.publishedAt
-                  ? post.publishedAt.toDate().toString()
-                  : '',
-              } as PostInt;
-              setHomePosts((prev) =>
-                prev.map((p) =>
-                  p.postId === modPost.postId ? { ...modPost } : p
-                )
-              );
-            }
-            if (change.type === 'removed') {
-              const post = change.doc.data();
-              setHomePosts((prev) =>
-                prev.filter((p) => p.postId !== post.postId)
-              );
-            }
+    onSnapshot(postsRef, (querySnapshot) => {
+      querySnapshot.docChanges().forEach((change) => {
+        if (!delayListener.current) {
+          if (change.type === 'added') {
+            const post = change.doc.data();
+            const modPost = {
+              ...post,
+              publishedAt: post.publishedAt
+                ? post.publishedAt.toDate().toString()
+                : '',
+            } as PostInt;
+            setHomePosts((prev) => [modPost, ...prev]);
           }
-        });
-      },
-      (error) => {
-        console.log(`Home posts listener error: ${error}`);
-      }
-    );
+          if (change.type === 'modified') {
+            const post = change.doc.data();
+            const modPost = {
+              ...post,
+              publishedAt: post.publishedAt
+                ? post.publishedAt.toDate().toString()
+                : '',
+            } as PostInt;
+            setHomePosts((prev) =>
+              prev.map((p) =>
+                p.postId === modPost.postId ? { ...modPost } : p
+              )
+            );
+          }
+          if (change.type === 'removed') {
+            const post = change.doc.data();
+            setHomePosts((prev) =>
+              prev.filter((p) => p.postId !== post.postId)
+            );
+          }
+        }
+      });
+    });
 
     // *Fetches initial first batch of posts
     (async () => {
@@ -638,7 +643,6 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setHomePosts(posts as PostInt[]);
       } catch (err) {
-        console.log('Home post inital fetch failed: ', err);
       } finally {
         setHomeLoading(false);
         delayListener.current = false;
@@ -684,7 +688,6 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         } catch (error) {
           await blogServices.logOut();
           setAuthError(error);
-          console.log(`Get user info ${error}`);
         } finally {
           dispatch(resetIsLogInLoading());
           dispatch(resetIsSuccessLogin());
@@ -765,6 +768,7 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({
         )
       );
     else StorageFuncs.setStorage('local', storageKeys.theme, 'light');
+    setIsDemo(StorageFuncs.checkStorage('session', storageKeys.demo));
   }, []);
 
   useEffect(() => {

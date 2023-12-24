@@ -4,6 +4,7 @@ import dummyImg from '../../assets/Me cropped.jpg';
 import { DummyPostsInt, PostInt, SearchFollowsInt } from '../../types';
 import { useGlobalContext } from '../../context';
 import { v4 } from 'uuid';
+import { Link } from 'react-router-dom';
 
 interface PropInt {
   posts: DummyPostsInt[] | PostInt[] | SearchFollowsInt[];
@@ -61,7 +62,12 @@ const DisplayPosts: React.FC<PropInt> = ({ posts, target }) => {
   return (
     <main className='main_side'>
       {!posts.length ? (
-        <h3 className='empty_data'>No Posts</h3>
+        <>
+          <h3 className='empty_data'>No Posts</h3>
+          {target === 'profile' && (
+            <Link to='/new-post'>Create and publish a post</Link>
+          )}
+        </>
       ) : (
         <>
           {posts.map((post) =>

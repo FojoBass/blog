@@ -1,11 +1,9 @@
-// TODO ADD A GLOBAL VARIABLE FOR SHOWING menu_btn
 import React, { useState, useEffect, useRef } from 'react';
 import { IoMenuOutline } from 'react-icons/io5';
 import { CiSearch } from 'react-icons/ci';
 import { IoNotificationsOutline } from 'react-icons/io5';
 import { FaLightbulb, FaRegLightbulb } from 'react-icons/fa';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-// import avatar from '../../assets/Me cropped.jpg';
 import { useBlogDispatch, useBlogSelector } from '../../app/store';
 import { toggleTheme } from '../../features/themeSlice';
 import { v4 } from 'uuid';
@@ -168,9 +166,7 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
       logOut && logOut();
       dispatch(setNoUserInfo(false));
       navigate('/');
-    } catch (error) {
-      console.log(`Log out failed: ${error}`);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -194,8 +190,6 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
         {dropLinks
           .filter((link) => link.position === 'top')
           .map(({ title, link, param }) => {
-            // TODO UPDATE MODLINK ONCE AUTH UIS UP AND RUNNING
-            // const modLink = param ? link.replace('dum', 'dummies') : link;
             return (
               <Link className='drop_down_links' to={link} key={v4()}>
                 {title}
@@ -207,7 +201,6 @@ const DropDown: React.FC<DropType> = ({ drop, setDrop, profileOptsRef }) => {
         {dropLinks
           .filter((link) => link.position === 'mid')
           .map(({ title, link, param }) => {
-            // TODO UPDATE MODLINK ONCE AUTH UIS UP AND RUNNING
             const modLink = param ? link.replace('dum', 'dummies') : link;
             return (
               <Link className='drop_down_links' to={modLink} key={v4()}>

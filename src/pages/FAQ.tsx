@@ -1,7 +1,8 @@
 import React from 'react';
+import ComingSoon from './components/ComingSoon';
 
 const FAQ = () => {
-  return <div className='gen_sect'>FAQ</div>;
+  return <ComingSoon />;
 };
 
 export default FAQ;

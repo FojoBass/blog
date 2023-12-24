@@ -102,7 +102,6 @@ export const userSignIn = createAsyncThunk<
   const { email, password } = payload;
   try {
     await blogServices.signIn(email, password);
-    // thunkApi.dispatch(getUserInfo({ email }));
   } catch (error) {
     return thunkApi.rejectWithValue(`Signin failed: ${error}`);
   }
@@ -113,10 +112,7 @@ export const userGitSignIn = createAsyncThunk<void, void>(
   'user/userGitSignIn',
   async (payload, thunkApi) => {
     try {
-      console.log('Start git auth');
       const res = await blogServices.signInGit();
-      console.log('End git auth');
-      // thunkApi.dispatch(getUserInfo({ email: res.user.email ?? '' }));
     } catch (error) {
       return thunkApi.rejectWithValue(`Signin failed: ${error}`);
     }
@@ -129,7 +125,6 @@ export const userGooSignIn = createAsyncThunk<void, void>(
   async (payload, thunkApi) => {
     try {
       const res = await blogServices.signInGoo();
-      // thunkApi.dispatch(getUserInfo({ email: res.user.email ?? '' }));
     } catch (error) {
       return thunkApi.rejectWithValue(`Signin failed: ${error}`);
     }

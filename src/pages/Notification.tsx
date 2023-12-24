@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useBlogSelector } from '../app/store';
 import { useNavigate } from 'react-router-dom';
+import ComingSoon from './components/ComingSoon';
 
 const Notification = () => {
   const { isUserLoggedIn } = useBlogSelector((state) => state.user);
@@ -9,7 +10,7 @@ const Notification = () => {
   useEffect(() => {
     if (!isUserLoggedIn) navigate('/enter', { replace: true });
   }, [isUserLoggedIn]);
-  return <>{isUserLoggedIn && <div className='gen_sect'>Notification</div>}</>;
+  return <>{isUserLoggedIn && <ComingSoon />}</>;
 };
 
 export default Notification;

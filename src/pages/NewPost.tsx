@@ -103,7 +103,6 @@ const NewPost = () => {
           setIsBannerReady(true);
         }
       } catch (err) {
-        console.log(err);
       } finally {
         setIsBannerResizing(false);
       }
@@ -121,9 +120,7 @@ const NewPost = () => {
           if (typeof postImg !== 'string') {
             setPostImgFile(postImg.finalFile);
           }
-        } catch (err) {
-          console.log(err);
-        }
+        } catch (err) {}
       }
     }
   };
@@ -142,6 +139,25 @@ const NewPost = () => {
     e.target.style.height = `${e.target.scrollHeight}px`;
   };
 
+  const checkSelection = (btn: string) => {
+    if (btn === 'B' || btn === 'I' || btn === 'S' || btn === 'U') {
+      const insTimeout = setTimeout(() => {
+        const postLength = postMainRef.current!.value.length;
+        postMainRef.current?.focus();
+        postMainRef.current?.setSelectionRange(postLength - 2, postLength - 2);
+        clearTimeout(insTimeout);
+      }, 100);
+    }
+    if (btn === 'H2' || btn === 'H3') {
+      const insTimeout = setTimeout(() => {
+        const postLength = postMainRef.current!.value.length;
+        postMainRef.current?.focus();
+        postMainRef.current?.setSelectionRange(postLength, postLength);
+        clearTimeout(insTimeout);
+      }, 100);
+    }
+  };
+
   const handleFormating = (action: string, symbol: string): void => {
     const el = postMainRef.current;
     if (el) {
@@ -153,21 +169,25 @@ const NewPost = () => {
           if (!checker(symbol, cursorStartPosition, cursorEndPosition))
             inserter(symbol, cursorStartPosition, cursorEndPosition);
           else remover(symbol, cursorStartPosition, cursorEndPosition);
+          if (cursorStartPosition === cursorEndPosition) checkSelection(action);
           break;
         case 'I':
           if (!checker(symbol, cursorStartPosition, cursorEndPosition))
             inserter(symbol, cursorStartPosition, cursorEndPosition);
           else remover(symbol, cursorStartPosition, cursorEndPosition);
+          if (cursorStartPosition === cursorEndPosition) checkSelection(action);
           break;
         case 'S':
           if (!checker(symbol, cursorStartPosition, cursorEndPosition))
             inserter(symbol, cursorStartPosition, cursorEndPosition);
           else remover(symbol, cursorStartPosition, cursorEndPosition);
+          if (cursorStartPosition === cursorEndPosition) checkSelection(action);
           break;
         case 'U':
           if (!checker(symbol, cursorStartPosition, cursorEndPosition))
             inserter(symbol, cursorStartPosition, cursorEndPosition);
           else remover(symbol, cursorStartPosition, cursorEndPosition);
+          if (cursorStartPosition === cursorEndPosition) checkSelection(action);
           break;
         case 'H2':
           if (
@@ -181,6 +201,7 @@ const NewPost = () => {
           )
             inserter(symbol, cursorStartPosition, cursorEndPosition, true);
           else remover(symbol, cursorStartPosition, cursorEndPosition, true);
+          if (cursorStartPosition === cursorEndPosition) checkSelection(action);
           break;
         case 'H3':
           if (
@@ -194,6 +215,7 @@ const NewPost = () => {
           )
             inserter(symbol, cursorStartPosition, cursorEndPosition, true);
           else remover(symbol, cursorStartPosition, cursorEndPosition, true);
+          if (cursorStartPosition === cursorEndPosition) checkSelection(action);
           break;
         case 'L':
           inserter(
@@ -253,11 +275,13 @@ const NewPost = () => {
             postMain.slice(startPos, endPos) +
             postMain.slice(endPos)
         : type === 'link'
-        ? postMain.slice(0, startPos) +
-          '[' +
-          postMain.slice(startPos, endPos) +
-          '](enter url)' +
-          postMain.slice(endPos)
+        ? startPos !== endPos
+          ? postMain.slice(0, startPos) +
+            '[' +
+            postMain.slice(startPos, endPos) +
+            '](enter url)' +
+            postMain.slice(endPos)
+          : postMain.slice(0, startPos) + '[enter link name](enter url)'
         : postMain.slice(0, startPos) +
           `${
             startPos === 0
@@ -310,7 +334,6 @@ const NewPost = () => {
         setBannerUploadProgress(progress);
       },
       (error) => {
-        console.log('Banner Upload failed: ', error);
         setIsUploadingBannerImg(false);
         setIsBannerReady(false);
       },
@@ -407,7 +430,6 @@ const NewPost = () => {
                 replace: true,
               });
             } catch (error) {
-              console.log('Post editing: ', error);
               toast.error('Post editing failed!');
             } finally {
               setIsEditLoading(false);

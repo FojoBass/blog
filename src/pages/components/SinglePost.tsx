@@ -69,7 +69,6 @@ const SinglePost: React.FC<SinglePostProps> = ({
           });
         } catch (error) {
           toast.error('Bookmarking failed');
-          console.log('Bookmark add error: ', error);
         } finally {
           setIsBkmLoading(false);
         }
@@ -97,7 +96,6 @@ const SinglePost: React.FC<SinglePostProps> = ({
           });
         } catch (error) {
           toast.error('Bookmark remove failed');
-          console.log('Bookmark remove error: ', error);
         } finally {
           setIsBkmLoading(false);
         }
@@ -122,12 +120,6 @@ const SinglePost: React.FC<SinglePostProps> = ({
     }
   };
 
-  // const fetchPosterInfo = async () => {
-  //   const res = await blogServices.getUserInfo(uid);
-  //   const data: any = res.data();
-  //   setPosterInfo({ ...data, createdAt: data.createdAt.toDate().toString() });
-  // };
-
   useEffect(() => {
     if (uid === userInfo?.uid) setIsUser(true);
 
@@ -137,10 +129,6 @@ const SinglePost: React.FC<SinglePostProps> = ({
     if (bkms?.find((bm) => bm === userInfo?.uid)) setIsBookmarked(true);
     else setIsBookmarked(false);
   }, [uid, userInfo, bkms]);
-
-  // useEffect(() => {
-  //   fetchPosterInfo();
-  // }, [uid]);
 
   return (
     <article className='single_post'>

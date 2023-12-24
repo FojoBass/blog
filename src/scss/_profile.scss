@@ -33,25 +33,23 @@ $padding: 10px;
       position: relative;
 
       .img_wrapper {
-        width: 50px;
-        height: 55px;
+        width: 6rem;
+        height: 6rem;
         border-radius: 50%;
-        padding: 5px;
+        padding: 0.5rem;
         box-sizing: content-box;
         @include position(absolute, left, top, 0px, -40px);
 
         @include mediaQueries(min, 800px) {
-          width: 100px;
-          height: 110px;
-          padding: 7px;
+          width: 11rem;
+          height: 11rem;
+          padding: 0.7rem;
           @include position(absolute, left, top, 50%, -60px);
         }
 
         img {
           border-radius: 50%;
-          height: 100%;
-          object-fit: cover;
-          object-position: 0 0.1px;
+          @include imgMix;
         }
       }
 
@@ -124,7 +122,6 @@ $padding: 10px;
           line-height: 2.2rem;
 
           .icon_wrapper {
-            // font-size: $txt_size3;
             margin-right: 10px;
           }
 

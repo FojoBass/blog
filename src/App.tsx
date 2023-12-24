@@ -77,7 +77,7 @@ const App = () => {
 
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path='/' element={<Root />} errorElement={<Error type='404' />}>
+      <Route path='/' element={<Root />} errorElement={<Error />}>
         <Route index element={<Home />} />
         <Route path='/know-us' element={<About />} />
         <Route path='/meet-us' element={<Contact />} />
@@ -173,7 +173,6 @@ const App = () => {
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // console.log(user.uid);
         // * User log in variable is false, and there is userInfo
         if (isUserLoggedIn && !userInfo) {
           try {
@@ -203,25 +202,13 @@ const App = () => {
                 unsub();
               }
             });
-          } catch (error) {
-            console.log('User info fetch failed: ', error);
-          }
-          // dispatch(setIsUserLoggedIn(true));
+          } catch (error) {}
         }
-
-        // console.log('signed in: ');
-        // console.log('signed in: ', user);
-      } else {
-        console.log('signed out');
       }
       setAuthLoading && setAuthLoading(false);
     });
     return () => unsub?.();
   }, [storageKeys, loginPersistence]);
-
-  useEffect(() => {
-    console.log('user info: ', userInfo);
-  }, [userInfo]);
 
   useEffect(() => {
     document.documentElement.style.overflowY = noUserInfo ? 'hidden' : 'auto';
@@ -242,6 +229,8 @@ const Root = () => {
     skeletonPosts,
     navigateUrl,
     setNavigateUrl,
+    accessSearchResult,
+    setAccessSearchResult,
   } = useGlobalContext();
   const navigate = useNavigate();
 
@@ -254,6 +243,7 @@ const Root = () => {
       setSearchString && setSearchString((prev) => (prev ? '' : prev));
 
       skeletonPosts && setSearchResults && setSearchResults([...skeletonPosts]);
+      setAccessSearchResult && setAccessSearchResult(false);
     }
   }, [location.pathname]);
 

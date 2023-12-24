@@ -12,8 +12,6 @@ export const addPosts = createAsyncThunk<
   try {
     const userInfo = (thunkApi.getState() as RootState).user.userInfo;
 
-    // console.log('post data: ', payload.data);
-
     if (payload.type === 'pub') {
       await blogServices.addPubPosts(payload.data);
       await blogServices.addUserPosts(payload.data);

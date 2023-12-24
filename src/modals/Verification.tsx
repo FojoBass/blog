@@ -27,9 +27,7 @@ const Verification = () => {
       setIsVerifyOpen && setIsVerifyOpen(false);
       setCounter(0);
       setStartCounter(false);
-    } catch (error) {
-      console.log(`Log out failed: ${error}`);
-    }
+    } catch (error) {}
   };
 
   const handleVerify = async () => {
@@ -39,7 +37,6 @@ const Verification = () => {
       toast.success('Verification link sent to email');
     } catch (error) {
       toast.error('Verification link not sent, try again!');
-      console.log(`Verification error: ${error}`);
     }
   };
 

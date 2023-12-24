@@ -24,9 +24,7 @@ const ImageInputField = () => {
 
       if (typeof bigImg !== 'string' && setAviBigFile)
         setAviBigFile(bigImg.finalFile);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   return (

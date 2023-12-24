@@ -1,8 +1,3 @@
-// TODO Seems I am done.
-// todo Do all final checks, ensure all things work
-// todo Redirect all links to notifications and other none developed pages back to home
-// todo Also remove links for categories
-// Todo Be good bruff
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { BiComment } from 'react-icons/bi';
@@ -111,57 +106,49 @@ const Post = () => {
         orderBy('createdAt', 'desc')
       );
 
-      onSnapshot(
-        q,
-        async (querySnapshot) => {
-          let modComments: any = [];
-          querySnapshot.forEach((doc) => {
-            const comData = doc.data();
+      onSnapshot(q, async (querySnapshot) => {
+        let modComments: any = [];
+        querySnapshot.forEach((doc) => {
+          const comData = doc.data();
 
-            modComments.push({
-              ...comData,
-              createdAt: comData.createdAt?.toDate().toString(),
-            });
+          modComments.push({
+            ...comData,
+            createdAt: comData.createdAt?.toDate().toString(),
           });
+        });
 
-          try {
-            let userInfos: any[] = [];
-            for (let i = 0; i < modComments.length; i++) {
-              let uData: any;
-              const storedData = userInfos.find(
-                (info) => info.uid === modComments[i].uid
+        try {
+          let userInfos: any[] = [];
+          for (let i = 0; i < modComments.length; i++) {
+            let uData: any;
+            const storedData = userInfos.find(
+              (info) => info.uid === modComments[i].uid
+            );
+            if (!storedData) {
+              uData = await blogServices.getUserInfo(
+                modComments[i].uid as string
               );
-              if (!storedData) {
-                uData = await blogServices.getUserInfo(
-                  modComments[i].uid as string
-                );
 
-                modComments[i] = {
-                  ...modComments[i],
-                  aviUrl: uData.data()?.aviUrls.smallAviUrl,
-                  replierName: uData.data()?.userName,
-                };
+              modComments[i] = {
+                ...modComments[i],
+                aviUrl: uData.data()?.aviUrls.smallAviUrl,
+                replierName: uData.data()?.userName,
+              };
 
-                userInfos.push(uData.data());
-              } else {
-                modComments[i] = {
-                  ...modComments[i],
-                  aviUrl: storedData?.aviUrls.smallAviUrl,
-                  replierName: storedData?.userName,
-                };
-              }
+              userInfos.push(uData.data());
+            } else {
+              modComments[i] = {
+                ...modComments[i],
+                aviUrl: storedData?.aviUrls.smallAviUrl,
+                replierName: storedData?.userName,
+              };
             }
-
-            setComments(modComments as CommentInt[]);
-            setIsFetchingComments(false);
-          } catch (error) {
-            console.log('Error fetching replier info: ', error);
           }
-        },
-        (error) => {
-          console.log('Comments fetching failed: ', error);
-        }
-      );
+
+          setComments(modComments as CommentInt[]);
+          setIsFetchingComments(false);
+        } catch (error) {}
+      });
     }
   };
 
@@ -182,7 +169,6 @@ const Post = () => {
 
       setNextPosts(nextPosts);
     } catch (error) {
-      console.log('Next Posts fetching failed: ', error);
     } finally {
       setIsNextPostsLoading(false);
     }
@@ -215,7 +201,6 @@ const Post = () => {
             'views'
           );
         } catch (error) {
-          console.log(`Views or likes adding error ${error}`);
         } finally {
           viewsSet.current = true;
           clearTimeout(viewTimeout);
@@ -311,22 +296,29 @@ const Post = () => {
         collection(db, `users/${authorId}/posts`),
         where('postId', '==', postId)
       );
-      unsub2 = onSnapshot(q2, (querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          postInfo = doc.data();
-        });
-
-        postInfo &&
-          setDisplayPostContent?.({
-            ...(postInfo as PostInt),
-            createdAt: postInfo.createdAt.toDate().toString(),
-            publishedAt: postInfo?.publishedAt
-              ? postInfo?.publishedAt.toDate().toString()
-              : '',
+      unsub2 = onSnapshot(
+        q2,
+        (querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            postInfo = doc.data();
           });
 
-        setFetchingPost(false);
-      });
+          postInfo &&
+            setDisplayPostContent?.({
+              ...(postInfo as PostInt),
+              createdAt: postInfo.createdAt.toDate().toString(),
+              publishedAt: postInfo?.publishedAt
+                ? postInfo?.publishedAt.toDate().toString()
+                : '',
+            });
+
+          setFetchingPost(false);
+        },
+        (error) => {
+          setFetchingPost(false);
+          setDisplayPostContent && setDisplayPostContent(null);
+        }
+      );
     }
     return () => unsub2?.();
   }, [fetch2]);
@@ -823,11 +815,6 @@ const Interactions: React.FC<InteractionsInt> = ({
         }
       } catch (error) {
         toast.error('Operation failed');
-        console.log(
-          `${
-            type === 'bookmark' ? 'Bookmark' : 'Like'
-          } operation error: ${error}`
-        );
       } finally {
         setIsIntLoading(false);
       }
@@ -988,7 +975,6 @@ const SingleComment: React.FC<SingleCommentInt> = ({
         );
       } catch (error) {
         toast.error('Operation failed');
-        console.log('Comment liking failed: ', error);
       } finally {
         setIsLiking(false);
       }
@@ -1009,7 +995,6 @@ const SingleComment: React.FC<SingleCommentInt> = ({
         commentId
       );
     } catch (error) {
-      console.log('Comment Delete failed: ', error);
       toast.error('Deleting failed', { toastId: 'del_comm' });
     } finally {
       setIsDeleting(false);
@@ -1199,7 +1184,6 @@ const CommentForm: React.FC<CommentFormInt> = ({
         setComment('');
         setShowReply && setShowReply(false);
       } catch (error) {
-        console.log('Commenting/Editing failed: ', error);
         toast.error('Please try again', { toastId: 'commnet_failed' });
       } finally {
         setLoading(false);

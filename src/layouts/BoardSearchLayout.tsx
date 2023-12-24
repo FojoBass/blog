@@ -17,7 +17,7 @@ interface BSLInt {
   children?: ReactNode;
   filterItems?: { filters: string[]; sort: string[] };
   modClass?: string;
-  isSearch: boolean;
+  isSearchSect: boolean;
   isSettings: boolean;
   isDashboard?: boolean;
   className?: string;
@@ -41,7 +41,7 @@ const BoardSearchLayout: FC<BSLInt> = ({
   children,
   filterItems,
   modClass,
-  isSearch,
+  isSearchSect,
   className,
   isSettings,
   isDashboard,
@@ -58,6 +58,8 @@ const BoardSearchLayout: FC<BSLInt> = ({
     skeletonPosts,
     setSearchResults,
     fetchSearchResults,
+    isSearch,
+    accessSearchResult,
   } = useGlobalContext();
 
   const handleFilterChange = (item: string) => {
@@ -148,7 +150,7 @@ const BoardSearchLayout: FC<BSLInt> = ({
           )}
         </header>
 
-        {isSearch && <SearchForm />}
+        {isSearchSect && <SearchForm />}
 
         <div className='bsl_nav'>
           {navItems
@@ -236,7 +238,13 @@ const BoardSearchLayout: FC<BSLInt> = ({
               : ''}
           </aside>
           <Outlet />
-          {children ? children : ''}
+          {children
+            ? isSearchSect
+              ? accessSearchResult
+                ? children
+                : ''
+              : children
+            : ''}
         </div>
       </div>
     </section>

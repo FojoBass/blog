@@ -18,20 +18,35 @@ import {
 } from '../features/userAsyncThunk';
 import { useGlobalContext } from '../context';
 import { BlogServices } from '../services/firebase/blogServices';
+import { StorageFuncs } from '../services/storages';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const inputRef = useRef<Array<HTMLInputElement | null>>([]);
   const { setIsSignedUp, setAuthError, setIsJustLoggedIn } = userSlice.actions;
-  const { isSignedUp, isLogInLoading, isJustLoggedIn, signInError } =
-    useBlogSelector((state) => state.user);
+  const {
+    isSignedUp,
+    isLogInLoading,
+    isJustLoggedIn,
+    signInError,
+    isUserLoggedIn,
+  } = useBlogSelector((state) => state.user);
   const dispatch = useBlogDispatch();
 
-  const { setLoginPersistence, setIsVerifyOpen, loginPersistence } =
-    useGlobalContext();
+  const {
+    setLoginPersistence,
+    setIsVerifyOpen,
+    loginPersistence,
+    setIsDemo,
+    isDemo,
+    storageKeys,
+  } = useGlobalContext();
 
   const [email, setEmail] = useState('');
   const [pword, setPword] = useState('');
+  const [demoEmail] = useState('fojo4god@gmail.com');
+  const [demoPword] = useState('1234asdF;');
+  const loginBtnRef = useRef<HTMLButtonElement>(null);
 
   const [isForgot, setIsForgot] = useState(false);
 
@@ -64,6 +79,20 @@ const Login = () => {
     if (email) dispatch(forgotPword({ email }));
     else toast.error('Enter email', { toastId: 'login_error' });
   };
+
+  const handleDemoLogin = () => {
+    setEmail(demoEmail);
+    setPword(demoPword);
+    setIsDemo && setIsDemo(true);
+    storageKeys && StorageFuncs.setStorage('session', storageKeys.demo, 'demo');
+    setLoginPersistence && setLoginPersistence(false);
+  };
+
+  useEffect(() => {
+    if (isDemo && !isUserLoggedIn && !loginPersistence) {
+      loginBtnRef.current?.click();
+    }
+  }, [isUserLoggedIn, isDemo, loginPersistence]);
 
   useEffect(() => {
     if (inputRef.current.find((item) => item)) {
@@ -209,12 +238,23 @@ const Login = () => {
                   Forgot password?
                 </button>
 
-                <button
-                  type='submit'
-                  className={`login_btn ${isLogInLoading ? 'loading' : ''}`}
-                >
-                  {isLogInLoading ? 'Logging in...' : 'Log in'}
-                </button>
+                <div className='logins_wrapper'>
+                  <button
+                    type='submit'
+                    className={`login_btn ${isLogInLoading ? 'loading' : ''}`}
+                    ref={loginBtnRef}
+                  >
+                    {isLogInLoading ? 'Logging in...' : 'Log in'}
+                  </button>
+
+                  <button
+                    className='demo_btn forgot_btn'
+                    onClick={handleDemoLogin}
+                    type='button'
+                  >
+                    Demo Login
+                  </button>
+                </div>
 
                 <div className='btns_wrapper'>
                   <button

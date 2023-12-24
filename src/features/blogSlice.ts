@@ -3,18 +3,15 @@ import { PostInt } from '../types';
 import { addPosts } from './blogAsyncThunk';
 
 interface InitialStateInt {
-  // pubPosts: PostInt[];
   userPosts: PostInt[];
   isOpenSideNav: boolean;
   uploading: boolean;
   uploadingFailed: boolean;
   uploadingSucceed: boolean;
   categories: string[];
-  // isUpdating: boolean
 }
 
 const initialState: InitialStateInt = {
-  // pubPosts: [],
   userPosts: [],
   isOpenSideNav: false,
   uploading: false,
@@ -53,7 +50,6 @@ export const blogSlice = createSlice({
         uploadingSucceed: true,
       }))
       .addCase(addPosts.rejected, (state, error) => {
-        console.log(error);
         return { ...state, uploading: false, uploadingFailed: true };
       });
   },

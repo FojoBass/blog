@@ -57,7 +57,6 @@ const UserPosts = () => {
       res.size < fetchLimit.current && setLimitReached(true);
       isFetched.current = true;
     } catch (error) {
-      console.log(`Fetching all users posts failed ${error}`);
     } finally {
       setIsPostFetching(false);
     }

@@ -39,7 +39,7 @@ const Settings = () => {
           isPosts={{ status: false, items: [] }}
           heading={`Settings for ${userInfo?.userName}`}
           navItems={navItems}
-          isSearch={false}
+          isSearchSect={false}
           isSettings={true}
         />
       ) : (

@@ -6,8 +6,6 @@ import { useBlogSelector } from '../app/store';
 import InfoForm from './components/InfoForm';
 import { StorageFuncs } from '../services/storages';
 
-// TODO For input componenets, make the needed involve global variables
-
 interface FormRefsInt {
   fullNameInputRef: React.RefObject<HTMLInputElement>;
   userNameInputRef: React.RefObject<HTMLInputElement>;

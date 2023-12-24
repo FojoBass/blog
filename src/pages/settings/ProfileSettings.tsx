@@ -34,7 +34,6 @@ const ProfileSettings = () => {
       }
     ),
     [bio, setBio] = useState(userInfo?.bio ?? ''),
-    // TODO Brand color is to be fetched
     [brandColor, setBrandColor] = useState(userInfo?.userColor ?? '#000000'),
     [brandColorChar, setBrandColorChar] = useState(brandColor),
     [hexPattern] = useState(/^(?!.*#.*#)[0-9A-Fa-f-#]+$/);
@@ -47,6 +46,7 @@ const ProfileSettings = () => {
     aviSmallFile,
     setAviBigFile,
     setAviSmallFile,
+    isDemo,
   } = useGlobalContext();
 
   const formRefs: FormRefsInt = {
@@ -103,6 +103,10 @@ const ProfileSettings = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isDemo) {
+      toast.error('Profile update not available for demo account');
+      return;
+    }
 
     if (validateFullName() && validateUsername() && validateSocials()) {
       try {
@@ -173,7 +177,6 @@ const ProfileSettings = () => {
           setAviSmallFile && setAviSmallFile(null);
         }
       } catch (error) {
-        console.log(`Saving info: ${error}`);
         toast.error('Updating Failed');
       } finally {
         setIsSavingInfo(false);

@@ -42,7 +42,6 @@ interface InfoFormInt {
 }
 
 const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
-  // const blogTheme = useBlogSelector((state) => state.theme);
   const [showPassword, setShowPassword] = useState(false),
     [showConPassword, setShowConPassword] = useState(false),
     [fullName, setFullName] = useState(''),
@@ -178,9 +177,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
       logOut && logOut();
       dispatch(setNoUserInfo(false));
       navigate('/');
-    } catch (error) {
-      console.log(`Log out failed: ${error}`);
-    }
+    } catch (error) {}
   };
 
   const validateFullName = (): boolean => {
@@ -242,8 +239,8 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
       );
       return false;
     }
-    // ! ENSURE TO CHANGE BACK TO STRONG PASSWORD AND FOR AUTH_HANDLERS
-    if (regex.alphaNumberic.test(password)) return true;
+
+    if (regex.strongPword.test(password)) return true;
 
     formRefsAction(
       'passwordInputRef',
@@ -278,9 +275,7 @@ const InfoForm: React.FC<InfoFormInt> = ({ type, loading }) => {
       setUserName(data.login);
       setSocials({ ...socials, git: data.html_url });
       setFetchedGit(true);
-    } catch (error) {
-      console.log(`Git api ${error}`);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {

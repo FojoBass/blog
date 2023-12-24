@@ -3,8 +3,6 @@ import { Country, State } from 'country-state-city';
 import { useGlobalContext } from '../../../context';
 import { useBlogSelector } from '../../../app/store';
 
-// TODO Add props to check for fetched location info for both sign up and settings form
-
 const LocationInput = () => {
   const [countries] = useState(Country.getAllCountries()),
     [states, setStates] = useState<string[]>([]);
@@ -17,10 +15,6 @@ const LocationInput = () => {
         State.getStatesOfCountry(country.code).map((state) => state.name)
       );
   }, [country]);
-
-  // TODO THERES ARE BIG ISSUE WITH GOOGLE SIGIN.
-  // TODO TEST THOROUGHLY AND FIX
-  // TODO FOR STARTERS, THERE'S NO LOADING WHEN THE USER SUBMITS INFO
 
   return (
     <>

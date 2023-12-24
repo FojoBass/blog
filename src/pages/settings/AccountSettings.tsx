@@ -17,7 +17,7 @@ const AccountSettings = () => {
   const dispatch = useBlogDispatch();
   const [click, setClick] = useState(false);
   const blogServices = new BlogServices();
-  const { logOut, setDelAcc, delAcc } = useGlobalContext();
+  const { logOut, setDelAcc, delAcc, isDemo } = useGlobalContext();
 
   const navigate = useNavigate();
 
@@ -28,6 +28,12 @@ const AccountSettings = () => {
 
   const handleDel = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (isDemo) {
+      toast.error('Deleting profile not available for demo account');
+      return;
+    }
+
     if (userName === userInfo?.userName) {
       if (!click) {
         toast.warn(
@@ -46,7 +52,6 @@ const AccountSettings = () => {
           toast.success('Account deleted');
         } catch (error) {
           toast.error('Account deletion failed');
-          console.log(`Acccount delete error: ${error}`);
         } finally {
           setDelAcc && setDelAcc(false);
         }

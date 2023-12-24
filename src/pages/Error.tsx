@@ -1,24 +1,26 @@
 import React from 'react';
-import { useRouteError } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface ErrorInt {
   type: '404' | 'profile';
 }
 
-const Error: React.FC<ErrorInt> = ({ type }) => {
-  const error = useRouteError();
-
-  console.log(error);
-
+const Error: React.FC = () => {
   return (
     <div id='error_sect'>
-      {type === '404' ? (
-        <div>Error</div>
-      ) : type === 'profile' ? (
-        <div>User not found</div>
-      ) : (
-        ''
-      )}
+      <div className='wrapper'>
+        <h3>oops!</h3>
+        <h1>
+          <span className='fours'>4</span>0<span className='fours'>4</span>
+        </h1>
+        <p>Page not found</p>
+        <p>
+          Return{' '}
+          <Link to='/' replace>
+            home
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

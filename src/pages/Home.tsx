@@ -14,8 +14,6 @@ export interface HandleStickInt {
   (el: HTMLDivElement, stick: boolean, posValue?: number): void;
 }
 
-// TODO IMPLEMNET RESPONSE SCROLL FOR ASIDE
-
 const Home = () => {
   const asideRef = useRef<HTMLDivElement>(null);
   const { homePosts } = useGlobalContext();

@@ -112,7 +112,7 @@ const Dashboard = () => {
           heading={`Dashboard >> ${pathname.split('/')[3]}`}
           navItems={navItems}
           modClass='dashboard'
-          isSearch={false}
+          isSearchSect={false}
           isSettings={false}
           isDashboard={true}
         />

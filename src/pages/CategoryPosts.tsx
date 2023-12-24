@@ -1,7 +1,8 @@
 import React from 'react';
+import ComingSoon from './components/ComingSoon';
 
 const CategoryPosts = () => {
-  return <div className='gen_sect'>CategoryPosts</div>;
+  return <ComingSoon />;
 };
 
 export default CategoryPosts;

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useGlobalContext } from '../../../context';
 
 const GenderInput = () => {
-  // const [gender, setGender] = useState('male');
   const { gender, setGender } = useGlobalContext();
 
   return (

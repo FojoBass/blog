@@ -69,12 +69,9 @@ const Profile = () => {
   useEffect(() => {
     if (typeof authLoading === 'boolean' && !authLoading) {
       if (uid === userInfo?.uid) {
-        // console.log('IF');
-
         setUserInfoLoading(false);
         setDisplayInfo(userInfo);
       } else {
-        // console.log('ELSE');
         let fetchUserInfo: any = null;
         (async () => {
           try {
@@ -86,7 +83,6 @@ const Profile = () => {
               createdAt: fetchUserInfo.createdAt.toDate().toString(),
             });
           } catch (error) {
-            console.log('User info fetch failed: ', error);
           } finally {
             setUserInfoLoading(false);
           }
@@ -123,12 +119,12 @@ const Profile = () => {
             });
           });
 
-          const lastDocTime = res.docs[res.docs.length - 1].data().createdAt;
+          const lastDocTime =
+            res.size && res.docs[res.docs.length - 1].data().createdAt;
           setUserLastDocTime && setUserLastDocTime(lastDocTime);
 
           setUserPosts && setUserPosts(posts);
         } catch (err) {
-          console.log(`User post initial fetch failed: ${err} `);
         } finally {
           setUserPostsLoading && setUserPostsLoading(false);
           delayListener.current = false;

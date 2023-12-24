@@ -55,7 +55,6 @@ const Bookmarks = () => {
       }
       setBoookmarks(modBkms);
     } catch (error) {
-      console.log('Bookmark fetching failed');
     } finally {
       setIsBkmLoading(false);
     }
@@ -146,5 +145,3 @@ const Bookmarks = () => {
 };
 
 export default Bookmarks;
-
-// Todo When in Dashboard, if I navigate to dashboard, error dey. Fix am

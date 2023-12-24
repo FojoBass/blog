@@ -17,8 +17,7 @@ const Search = () => {
     orderBy,
     fetchSearchResults,
     searchResults,
-    skeletonPosts,
-    setSearchResults,
+    setAccessSearchResult,
   } = useGlobalContext();
 
   const randId = new ShortUniqueId({ length: 10 });
@@ -49,6 +48,13 @@ const Search = () => {
       setIsSearch(false);
     }
   }, [isSearch]);
+
+  useEffect(() => {
+    if (initialEntry.current) {
+      const str = searchParams.get('s');
+      str && setAccessSearchResult && setAccessSearchResult(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const searchString = searchParams.get('s');
@@ -86,7 +92,7 @@ const Search = () => {
         filters: ['posts', 'users', 'my posts only'],
         sort: ['newest', 'oldest'],
       }}
-      isSearch={true}
+      isSearchSect={true}
       className={'search_sect'}
       isSettings={false}
     >

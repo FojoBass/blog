@@ -149,13 +149,11 @@ $acc_clr: var(--acc_clr);
         border-radius: 50%;
         pointer-events: none;
         height: 5rem;
+        width: 5rem;
 
         img {
-          width: 5rem;
-          height: 100%;
-          object-fit: cover;
+          @include imgMix;
           background-color: var(--shw_clr_shd);
-          object-position: 0 0.1px;
         }
       }
     }
@@ -166,7 +164,6 @@ $acc_clr: var(--acc_clr);
     width: 95%;
     background-color: var(--bg_clr3);
     border: 1.5px solid var(--brd_clr);
-    // box-shadow: 0 3px 5px 2px var(--brd_clr);
     border-radius: 5px;
     padding: 0 10px;
     transition: all ease $mid_trans;

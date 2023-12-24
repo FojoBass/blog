@@ -5,7 +5,13 @@ import { CiSearch } from 'react-icons/ci';
 import { useBlogSelector } from '../../app/store';
 
 const SearchForm = () => {
-  const { setSearchString, searchString, setIsSearch } = useGlobalContext();
+  const {
+    setSearchString,
+    searchString,
+    setIsSearch,
+    setAccessSearchResult,
+    accessSearchResult,
+  } = useGlobalContext();
   const { isUserLoggedIn } = useBlogSelector((state) => state.user);
   const navigate = useNavigate();
 
@@ -13,6 +19,8 @@ const SearchForm = () => {
     e.preventDefault();
     if (searchString && setIsSearch) {
       setIsSearch(true);
+      accessSearchResult ||
+        (setAccessSearchResult && setAccessSearchResult(true));
       navigate('/search');
     }
   };

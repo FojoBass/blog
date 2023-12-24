@@ -50,7 +50,6 @@ export const followsHandler: FollowsHandlerInt = (
       );
       resolve();
     } catch (error) {
-      console.log('Following failed: ', error);
       reject(error);
     }
   });
