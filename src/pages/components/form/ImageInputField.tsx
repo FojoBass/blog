@@ -41,7 +41,12 @@ const ImageInputField = () => {
           <img
             src={aviSrc}
             alt=''
-            style={{ height: '100%', width: '100%', objectFit: 'cover' }}
+            style={{
+              height: '100%',
+              width: '100%',
+              objectFit: 'cover',
+              objectPosition: '0 0.01px',
+            }}
           />
         ) : (
           ''
