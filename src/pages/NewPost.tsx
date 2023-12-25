@@ -395,6 +395,7 @@ const NewPost = () => {
             title: post.postTitle,
             views: [],
           };
+
           dispatch(addPosts({ data: postData, type: 'pub' }));
           setDataPost(postData);
           break;

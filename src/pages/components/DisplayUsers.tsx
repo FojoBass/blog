@@ -25,10 +25,16 @@ const DisplayUsers: React.FC<PropInt> = ({ users, type }) => {
           <FollowsLoading key={user.postId} user={user} />
         ) : (
           <article className='card_wrapper' key={(user as SearchFollowsInt).id}>
-            <Link to='/p/dummyUser' className='img_wrapper'>
+            <Link
+              to={`/p/${(user as SearchFollowsInt).id}`}
+              className='img_wrapper'
+            >
               <img src={(user as SearchFollowsInt).avi} alt='' />
             </Link>
-            <Link to='/p/dummyUser' className='user_name'>
+            <Link
+              to={`/p/${(user as SearchFollowsInt).id}`}
+              className='user_name'
+            >
               {(user as SearchFollowsInt).userName}
             </Link>
           </article>
