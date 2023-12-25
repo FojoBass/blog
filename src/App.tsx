@@ -49,6 +49,7 @@ import Verification from './modals/Verification';
 import Bookmarks from './pages/dashboard/Bookmarks';
 import { BlogServices } from './services/firebase/blogServices';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import DOMPurify from 'dompurify';
 
 const App = () => {
   const auth = getAuth();
@@ -138,6 +139,15 @@ const App = () => {
       </Route>
     )
   );
+
+  useEffect(() => {
+    DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+      if ('target' in node) {
+        node.setAttribute('target', '_blank');
+        node.setAttribute('rel', 'noreferrer noopener');
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (document.documentElement.classList.contains('light')) {

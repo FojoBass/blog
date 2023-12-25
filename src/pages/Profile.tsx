@@ -249,7 +249,7 @@ const Profile = () => {
                   {displayInfo?.socials.url && (
                     <article className='more_info_opt'>
                       <a
-                        href='https://fast.com'
+                        href={displayInfo.socials.url}
                         target='_blank'
                         rel='noreferrer'
                       >

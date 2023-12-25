@@ -14,8 +14,6 @@ export const handleParsePost = (rawPost: string) => {
   };
 
   const fitClosingTag = (line: string, sym: string, tag: string) => {
-    //  if(line.slice(0,2) === sym) line = line.replace('/', '');
-
     for (;;) {
       let allIndexes = getAllIndexes(line, sym);
       const i = 0;
@@ -76,13 +74,17 @@ export const handleParsePost = (rawPost: string) => {
         }
       }
 
-      if (linkStartIndex > 0 && closeTagIndex > 0 && linkEndIndex > 0)
+      if (linkStartIndex > 0 && closeTagIndex > 0 && linkEndIndex > 0) {
+        let url = line.slice(linkStartIndex, linkEndIndex);
+        url = url.toLowerCase().includes('https://') ? url : `https://${url}`;
+
         line =
           line.slice(0, allStartIndexes[0]) +
-          `<a href="${line.slice(linkStartIndex, linkEndIndex)}">` +
+          `<a href="${url}" target="_blank">` +
           line.slice(allStartIndexes[0] + 1, closeTagIndex) +
           '</a>' +
           line.slice(linkEndIndex + 1);
+      }
     }
 
     return line;
@@ -95,7 +97,7 @@ export const handleParsePost = (rawPost: string) => {
     else if (mP.includes('![') && mP.charAt(mP.length - 1) === ')') {
       const altText = mP.slice(2, mP.indexOf(']'));
       const url = mP.slice(mP.indexOf('(') + 1, mP.indexOf(')'));
-      return `<div className='img_wrapper'><img alt="${altText}" src='${url}' /></div>`;
+      return `<div class='img_wrapper'><img alt="${altText}" src='${url}' /></div>`;
     }
     mP = mP.replaceAll(' **', ' <strong>');
     mP = mP.replaceAll(' ~~', ' <s>');
